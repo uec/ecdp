@@ -81,21 +81,21 @@ public class FlowcellData implements IsSerializable
 			return true;
 		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
 		String[] words = query.split("\\s+");
-		for(String word : words)
-		{			
-			for(int i : lane.keySet())
+					
+		for(int i : lane.keySet())
+		{
+			ArrayList<Boolean> foundList = new ArrayList<Boolean>();
+			for(String word : words)
 			{
 				Boolean found = false;
-				ArrayList<Boolean> foundList = new ArrayList<Boolean>();
 				for(String v : lane.get(i).values())
-				{
 					if(v.toLowerCase().contains(word.toLowerCase()))
-						found = true;
-					foundList.add(found);
-				}
-				if(foundList.contains(true) && !foundList.contains(false))
-					lanesToKeep.add(i);
+						found = true;					
+				
+				foundList.add(found);				
 			}
+			if(foundList.contains(true) && !foundList.contains(false))
+				lanesToKeep.add(i);
 		}
 		keepOnlyLanes(lanesToKeep);
 		if(lanesToKeep.size() > 1)
@@ -113,11 +113,7 @@ public class FlowcellData implements IsSerializable
 		for(Integer i : lane.keySet())
 		{
 			if(!lanesToKeep.contains(i))
-			{
-				lanesToRemove.add(i);
-				//lane.remove(i);
-				//laneQC.remove(i);				
-			}
+				lanesToRemove.add(i);		
 		}
 		
 		for(Integer i : lanesToRemove)
@@ -132,10 +128,7 @@ public class FlowcellData implements IsSerializable
 			if(file.containsKey("lane"))
 			{
 				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
-				{
-					//fileList.remove(file);
 					filesToRemove.add(file);
-				}
 			}
 		}
 		
