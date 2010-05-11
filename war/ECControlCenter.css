@@ -94,6 +94,21 @@
 	font-weight: normal;
 }
 
+.flowcellsearch td {
+	font-weight: normal;
+	color: #568;
+	padding: 5px;
+	
+}
+
+.flowcellsearch {
+	background-color: #F8FAFF;
+	backgr-color: #F8FAFF;
+	border-syle: solid;
+    border-width: 5px;
+    border-color: #00A;
+}
+
 /* PBS REPORT STYLES */
 
 .Lane-Table {

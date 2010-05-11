@@ -45,8 +45,10 @@ public class FlowcellData implements IsSerializable
 		}
 	}
 	
-	public boolean contains(String query)
+	public boolean flowcellContains(String query)
 	{
+		if(query == null || query.length() < 1)
+			return true;
 		ArrayList<Boolean> foundList = new ArrayList<Boolean>();
 		String[] words = query.split("\\s+");
 		for(String word : words)
@@ -73,26 +75,74 @@ public class FlowcellData implements IsSerializable
 			return false;		
 	}
 	
+	public boolean filterLanesThatContain(String query)
+	{
+		if(query == null || query.length() < 1)
+			return true;
+		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
+		String[] words = query.split("\\s+");
+		for(String word : words)
+		{			
+			for(int i : lane.keySet())
+			{
+				Boolean found = false;
+				ArrayList<Boolean> foundList = new ArrayList<Boolean>();
+				for(String v : lane.get(i).values())
+				{
+					if(v.toLowerCase().contains(word.toLowerCase()))
+						found = true;
+					foundList.add(found);
+				}
+				if(foundList.contains(true) && !foundList.contains(false))
+					lanesToKeep.add(i);
+			}
+		}
+		keepOnlyLanes(lanesToKeep);
+		if(lanesToKeep.size() > 1)
+			return true;
+		else
+			return false;
+		
+	}
+	
 	public void keepOnlyLanes(ArrayList<Integer> lanesToKeep)
 	{
 		lanesToKeep.add(0);
+		ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
+		ArrayList<HashMap<String,String>> filesToRemove = new ArrayList<HashMap<String,String>>();
 		for(Integer i : lane.keySet())
 		{
 			if(!lanesToKeep.contains(i))
 			{
-				lane.remove(i);
-				laneQC.remove(i);				
+				lanesToRemove.add(i);
+				//lane.remove(i);
+				//laneQC.remove(i);				
 			}
 		}
+		
+		for(Integer i : lanesToRemove)
+		{
+			lane.remove(i);
+			laneQC.remove(i);
+		}
+		lanesToRemove.clear();
+		
 		for(HashMap<String,String> file : fileList)
 		{
 			if(file.containsKey("lane"))
 			{
 				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
 				{
-					fileList.remove(file);
+					//fileList.remove(file);
+					filesToRemove.add(file);
 				}
 			}
 		}
+		
+		for(HashMap<String,String> file : filesToRemove)
+		{
+			fileList.remove(file);		
+		}
+		
 	}
 }

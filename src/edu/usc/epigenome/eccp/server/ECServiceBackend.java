@@ -130,6 +130,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;
 		
 	}
+	
 	@SuppressWarnings("deprecation")
 	public ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException
 	{
@@ -212,36 +213,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	public ArrayList<FlowcellData> getQCforFlowcell(String serial) throws IllegalArgumentException
 	{
 		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		//flowcells.flowcellProperties.put("all", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-		
 		try
 		{
-			
-			
-//			System.out.println(qcCommand);
-			
-//			BufferedReader input = new BufferedReader(new InputStreamReader(execQc.getInputStream()));
-//			String xml = "";
-//			String line;
-//			while ((line = input.readLine()) != null)
-//			{
-//				xml += line;
-//			}
-//			
-//			System.out.println(xml);
-			//URL url = new URL("http://www.epigenome.usc.edu/gareports/report.php?flowcell=" + serial + "&xmlqc");
-			//InputStream inputStream = url.openStream();
 			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/report.pl", serial,"qc"};
 			Process execQc = Runtime.getRuntime().exec(qcCommand);
 			InputStream inputStream = execQc.getInputStream();
-
 			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(inputStream);
-			
 			
 			NodeList qcReportList = document.getElementsByTagName("qcreport");
 			for(int i = 0; i < qcReportList.getLength(); i++)
@@ -363,4 +344,24 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}		
 		return (String[])arr.toArray(new String[arr.size()]);
 	}
+
+	public ArrayList<FlowcellData> getFlowcellsByKeyword(String flowcellQuery, String laneQuery)
+	{
+		ArrayList<FlowcellData> flowcells = getFlowcellsAll();
+		ArrayList<FlowcellData> matchedFlowcells = new ArrayList<FlowcellData>();
+		
+		for(FlowcellData flowcell : flowcells)
+		{
+			if(flowcell.flowcellContains(flowcellQuery))
+			{
+				if(flowcell.filterLanesThatContain(laneQuery))
+				{
+					matchedFlowcells.add(flowcell);
+				}
+			}
+		}
+		
+		return matchedFlowcells;
+	}
+
 }

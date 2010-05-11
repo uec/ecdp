@@ -22,15 +22,20 @@ public class FlowcellReport extends ECPane
 	final VerticalPanel mainPanel = new VerticalPanel();
 	final VerticalPanel vp = new VerticalPanel();
 	final HorizontalPanel searchPanel = new HorizontalPanel();
-	final TextBox searchBox = new TextBox();
+	final TextBox globalSearchBox = new TextBox();
+	final TextBox laneSearchBox = new TextBox();
 	final Button searchButton = new Button("search");
 	public enum ReportType 	{ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType; 
 	
 	public FlowcellReport(ReportType reportTypein)
 	{
-		searchPanel.add(searchBox);
+		searchPanel.add(new Label("Flowcell Properties: "));
+		searchPanel.add(globalSearchBox);
+		searchPanel.add(new Label("Lane Properties: "));
+		searchPanel.add(laneSearchBox);
 		searchPanel.add(searchButton);
+		searchPanel.addStyleName("flowcellsearch");
 		mainPanel.add(searchPanel);
 		mainPanel.add(vp);
 		reportType = reportTypein;
@@ -49,7 +54,7 @@ public class FlowcellReport extends ECPane
 	public FlowcellReport()
 	{
 		reportType = ReportType.ShowAll;
-		searchPanel.add(searchBox);
+		searchPanel.add(globalSearchBox);
 		searchPanel.add(searchButton);
 		mainPanel.add(searchPanel);
 		mainPanel.add(vp);
@@ -105,21 +110,33 @@ public class FlowcellReport extends ECPane
 			{
 				vp.clear();
 				for(FlowcellData flowcell : result)
-				{					
-					if(searchBox.getText().length() > 1)
+				{
+					if(flowcell.flowcellContains(globalSearchBox.getText()))
 					{
-						if(flowcell.contains(searchBox.getText()))
+						if(flowcell.filterLanesThatContain(laneSearchBox.getText()))
 						{
 							FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
 							vp.add(flowcellItem);
 						}
 					}
-					else
-					{
-						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
-						vp.add(flowcellItem);
-					}
 				}
+				
+//				for(FlowcellData flowcell : result)
+//				{					
+//					if(searchBox.getText().length() > 1)
+//					{
+//						if(flowcell.flowcellContains(searchBox.getText()))
+//						{
+//							FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
+//							vp.add(flowcellItem);
+//						}
+//					}
+//					else
+//					{
+//						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
+//						vp.add(flowcellItem);
+//					}
+//				}
 			}
 		};	
 		
