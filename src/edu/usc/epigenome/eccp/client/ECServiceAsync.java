@@ -15,7 +15,7 @@ public interface ECServiceAsync
 	void getFlowcellsFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
-	void getQCforFlowcell(String serial,AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
+	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	void getFilesforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	
 	void qstat(String queue, AsyncCallback<String[]> result) throws IllegalArgumentException;

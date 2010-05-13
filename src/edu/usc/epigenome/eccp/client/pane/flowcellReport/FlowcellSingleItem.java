@@ -1,5 +1,4 @@
 package edu.usc.epigenome.eccp.client.pane.flowcellReport;
-import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.OpenEvent;
@@ -20,9 +19,10 @@ public class FlowcellSingleItem extends Composite
 	public DisclosurePanel qcPanel = new DisclosurePanel("Summary Statistics");
 	public DisclosurePanel filePanel = new DisclosurePanel("Download Files");
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
-	
-	public FlowcellSingleItem(final FlowcellData flowcell)
+	FlowcellData flowcell;
+	public FlowcellSingleItem(final FlowcellData flowcellIn)
 	{
+		flowcell=flowcellIn;
 		VerticalPanel vp = new VerticalPanel();
 		FlexTable flowcellTable = new FlexTable();
 		flowcellTable.addStyleName("flowcellitem");
@@ -58,7 +58,7 @@ public class FlowcellSingleItem extends Composite
 			public void onOpen(OpenEvent<DisclosurePanel> event)
 			{
 				qcPanel.add(new Image("images/progress.gif"));
-				remoteService.getQCforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<ArrayList<FlowcellData>>(){
+				remoteService.getQCforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>(){
 
 					public void onFailure(Throwable caught)
 					{
@@ -67,26 +67,28 @@ public class FlowcellSingleItem extends Composite
 						
 					}
 
-					public void onSuccess(ArrayList<FlowcellData> result)
+					public void onSuccess(FlowcellData result)
 					{
 						qcPanel.clear();
+						flowcell.laneQC = result.laneQC;
+						flowcell.filterLanesThatContain();
 						VerticalPanel qcvp = new VerticalPanel();
 						qcPanel.add(qcvp);
-						for(FlowcellData qcFlowcell : result)
+						for(String location : flowcell.laneQC.keySet())
 						{
-							qcvp.add(new Label("QC Metrics from " + qcFlowcell.laneQC.get(0).get("location")));
+							qcvp.add(new Label("QC Metrics from " + location));
 							FlexTable qcFlexTable = new  FlexTable();
 							int j=0;
 							Boolean firstLine = true;
 							for(int i=1;i<=8;i++)
 							{
-								if(qcFlowcell.laneQC.containsKey(i))
+								if(flowcell.laneQC.get(location).containsKey(i))
 								{	
 									j=0;
 									if(firstLine)
 									{						
-										qcFlowcell.laneQC.get(i).remove("FlowCelln");
-										for(String s : qcFlowcell.laneQC.get(i).keySet())
+										flowcell.laneQC.get(location).get(i).remove("FlowCelln");
+										for(String s : flowcell.laneQC.get(location).get(i).keySet())
 										{								
 											qcFlexTable.setText(0, j, s);
 											j++;
@@ -95,10 +97,10 @@ public class FlowcellSingleItem extends Composite
 										j=0;
 									}									
 									
-									qcFlowcell.laneQC.get(i).remove("FlowCelln");
-									for(String s : qcFlowcell.laneQC.get(i).keySet())
+									flowcell.laneQC.get(location).get(i).remove("FlowCelln");
+									for(String s : flowcell.laneQC.get(location).get(i).keySet())
 									{
-										qcFlexTable.setText(i, j, qcFlowcell.laneQC.get(i).get(s));
+										qcFlexTable.setText(i, j, flowcell.laneQC.get(location).get(i).get(s));
 										j++;
 									}
 								}
@@ -127,7 +129,9 @@ public class FlowcellSingleItem extends Composite
 					public void onSuccess(FlowcellData result)
 					{
 						filePanel.clear();
-						FileBrowser f = new FileBrowser(result.fileList);
+						flowcell.fileList = result.fileList;
+						flowcell.filterLanesThatContain();
+						FileBrowser f = new FileBrowser(flowcell.fileList);
 						filePanel.add(f);
 					}});				
 			}			

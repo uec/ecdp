@@ -210,45 +210,41 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcellsIncomplete;
 	}
 	
-	public ArrayList<FlowcellData> getQCforFlowcell(String serial) throws IllegalArgumentException
+	public FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException
 	{
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
+		FlowcellData flowcell = new FlowcellData();
 		try
 		{
 			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/report.pl", serial,"qc"};
 			Process execQc = Runtime.getRuntime().exec(qcCommand);
 			InputStream inputStream = execQc.getInputStream();
-			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(inputStream);
-			
-			NodeList qcReportList = document.getElementsByTagName("qcreport");
-			for(int i = 0; i < qcReportList.getLength(); i++)
-			{
-				FlowcellData flowcell = new FlowcellData();
-				Node qcReport = qcReportList.item(i);
-				String location = qcReport.getAttributes().getNamedItem("path").getNodeValue();
-				NodeList qcEntryList = qcReport.getChildNodes();
-				for(int j = 0; j < qcEntryList.getLength(); j++)
+		
+			NodeList qcReportListNodes = document.getElementsByTagName("qcreport");
+			for(int i = 0; i < qcReportListNodes.getLength(); i++)
+			{				
+				LinkedHashMap<Integer,LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+				Node qcReportNode = qcReportListNodes.item(i);
+				String location = qcReportNode.getAttributes().getNamedItem("path").getNodeValue();
+				NodeList qcLaneListNodes = qcReportNode.getChildNodes();
+				for(int j = 0; j < qcLaneListNodes.getLength(); j++)
 				{
-					Node qcEntry = qcEntryList.item(j);
-					NodeList qcEntryPropertyList = qcEntry.getChildNodes();
+					Node qcEntry = qcLaneListNodes.item(j);
+					NodeList qcLanePropertyListNodes = qcEntry.getChildNodes();
 					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
-					for(int k = 0; k < qcEntryPropertyList.getLength(); k++)
+					for(int k = 0; k < qcLanePropertyListNodes.getLength(); k++)
 					{
-						Node qcProperty = qcEntryPropertyList.item(k);
+						Node qcProperty = qcLanePropertyListNodes.item(k);
 						qcProperties.put(qcProperty.getNodeName(), qcProperty.getFirstChild().getNodeValue());
 						System.out.println(qcProperty.getNodeName() + " " + qcProperty.getFirstChild().getNodeValue());
 					}				
-					flowcell.laneQC.put(Integer.parseInt(qcProperties.get("laneNum")), qcProperties);
-					
+					qcReport.put(Integer.parseInt(qcProperties.get("laneNum")), qcProperties);					
 				}
-				LinkedHashMap<String, String> globalhash = new LinkedHashMap<String,String>();
-				globalhash.put("location", location);
-				flowcell.laneQC.put(0, globalhash);
-				flowcells.add(flowcell);
+				flowcell.laneQC.put(location, qcReport);				
+				
 			}
 			inputStream.close();			
 		}
@@ -257,7 +253,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						e.printStackTrace();
 						System.out.println(e.getMessage());
 		}
-		return flowcells;
+		return flowcell;
 	}
 	
 	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException

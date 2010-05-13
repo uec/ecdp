@@ -11,13 +11,15 @@ public class FlowcellData implements IsSerializable
 	public HashMap<String,String> flowcellProperties;
 	public HashMap<Integer,HashMap<String,String>> lane;
 	public ArrayList<LinkedHashMap<String, String>> fileList;
-	public LinkedHashMap<Integer,LinkedHashMap<String,String>> laneQC;
+	public LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
+	public String flowcellFilter = "";
+	public String laneFilter = "";
 	
 	public FlowcellData()
 	{
 		flowcellProperties = new HashMap<String,String>();
 		lane = new HashMap<Integer,HashMap<String,String>>();
-		laneQC = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+		laneQC = new LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
 		fileList = new ArrayList<LinkedHashMap<String,String>>();
 	}	
 	
@@ -47,6 +49,7 @@ public class FlowcellData implements IsSerializable
 	
 	public boolean flowcellContains(String query)
 	{
+		flowcellFilter = query;
 		if(query == null || query.length() < 1)
 			return true;
 		ArrayList<Boolean> foundList = new ArrayList<Boolean>();
@@ -75,8 +78,14 @@ public class FlowcellData implements IsSerializable
 			return false;		
 	}
 	
+	public boolean filterLanesThatContain()
+	{
+		return filterLanesThatContain(laneFilter);
+	}
+	
 	public boolean filterLanesThatContain(String query)
 	{
+		laneFilter = query;
 		if(query == null || query.length() < 1)
 			return true;
 		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
@@ -118,10 +127,21 @@ public class FlowcellData implements IsSerializable
 		
 		for(Integer i : lanesToRemove)
 		{
-			lane.remove(i);
-			laneQC.remove(i);
+			lane.remove(i);			
 		}
 		lanesToRemove.clear();
+		
+		//remove qc lanes
+		for(String location : laneQC.keySet())
+			for(Integer i : laneQC.get(location).keySet())
+				if(!lanesToKeep.contains(i))
+					lanesToRemove.add(i);
+		for(String location : laneQC.keySet())
+			for(Integer i : lanesToRemove)
+				laneQC.get(location).remove(i);
+		lanesToRemove.clear();
+		
+		
 		
 		for(HashMap<String,String> file : fileList)
 		{

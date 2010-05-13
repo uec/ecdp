@@ -18,7 +18,7 @@ public interface ECService extends RemoteService
 	ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsIncomplete() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException;
-	ArrayList<FlowcellData> getQCforFlowcell(String serial) throws IllegalArgumentException;
+	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
 	
 	//PBS reporting
