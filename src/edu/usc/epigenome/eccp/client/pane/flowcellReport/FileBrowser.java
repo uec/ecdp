@@ -102,6 +102,8 @@ public class FileBrowser extends Composite
 		if(ext.contains("eland")) return "Eland Alignment";
 		if(ext.contains("export")) return "Export Alignment";
 		if(ext.contains(".txt")) return "Fastq sequence";
+		if(ext.contains(".peaks")) return "FindPeaks output";
+		if(ext.contains(".map") && ext.contains("aligntest")) return "Align Contam Test";
 		
 		return ret;
 	}

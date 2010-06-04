@@ -18,7 +18,7 @@ if($doQC)
 }
 else
 {
-	find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.wig","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
+	find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
 }
 
 print "</report>";
@@ -58,18 +58,33 @@ sub qcreports
 		
 		#add qc from summary.xml
 		$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber");
-		$headerLine .= ",Date_Sequenced,Mean_Intensity,Cluster_Density,Num_Total_Clusters,Num_PF_Clusters,Percent_PF_Clusters,Percent_Q25";
+		$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing";
 		for my $i (0..$#qcFileContent)
 		{
 			$qcFileContent[$i] =~ /^.+?,(\d+),/;
 			my $laneNum = $1;
-			$qcFileContent[$i] .= "," . $summaryRef->{Date} . ",";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean} . "%,";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean} . ",";
+			my $date = $summaryRef->{Date};
+			$date =~ s/^.{4}//;
+			$date =~ s/\d+:\d+:\d+ //;
+			$qcFileContent[$i] .= ",$date,";
 			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield} . ",";
+			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean} . ",";
 			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean} . ",";
 			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean} . "%,";
-			$qcFileContent[$i] .= "0.00";			
+			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean} . ",";
+			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean} . "%,";
+			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied} . "%,";
+			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied} . "%";
+			
+			my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
+			my $genome = `$genomeCmd`;
+			$genome =~ /\=*(\S+)\s*$/;
+			$genome = $1;
+			if($genome)
+			{
+				$headerLine .= ",genome";
+				$qcFileContent[$i] .= "," . basename($genome);
+			}
 		}
 		
 		#print $_ . "\n" for (
@@ -83,6 +98,11 @@ sub qcreports
 			my @fields = split(/,/,$line);
 			for my $i (0..$#fields)
 			{
+				if($fields[$i] =~ /^0\.\d\d\d\d+$/)
+				{
+					$fields[$i] = $fields[$i] * 100;
+					$fields[$i] = substr($fields[$i],0,5) . "%";	
+				}
 				print "<$header[$i]>$fields[$i]</$header[$i]>";
 			}
 			print "</qcEntry>";			
