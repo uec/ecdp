@@ -18,7 +18,7 @@ if($doQC)
 }
 else
 {
-	find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
+	find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
 }
 
 print "</report>";
@@ -43,6 +43,8 @@ sub qcreports
 {
 	my @qcFileNames = grep {m/qcmetrics\.csv/} @allFiles;
 	my @summaryFiles = grep {m/\/Summary\.xml/} @allFiles;
+	my @RTAConfigFiles = grep {m/\/RTAConfiguration\.xml/} @allFiles;
+	my $RTAConfigFile = pop @RTAConfigFiles;
 	my $summaryFile = pop @summaryFiles;
 	for my $qcFileName (@qcFileNames)
 	{
@@ -58,7 +60,8 @@ sub qcreports
 		
 		#add qc from summary.xml
 		$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber");
-		$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing";
+		$RTAConfigRef = XMLin($RTAConfigFile);
+		$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing,ControlLane,ReadType";
 		for my $i (0..$#qcFileContent)
 		{
 			$qcFileContent[$i] =~ /^.+?,(\d+),/;
@@ -74,7 +77,9 @@ sub qcreports
 			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean} . ",";
 			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean} . "%,";
 			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied} . "%,";
-			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied} . "%";
+			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied} . "%,";
+			$qcFileContent[$i] .= $RTAConfigRef->{ControlLane} . ",";
+			$qcFileContent[$i] .= $RTAConfigRef->{ReadType};
 			
 			my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
 			my $genome = `$genomeCmd`;
@@ -97,8 +102,14 @@ sub qcreports
 			print "<qcEntry>";
 			my @fields = split(/,/,$line);
 			for my $i (0..$#fields)
-			{
-				if($fields[$i] =~ /^0\.\d\d\d\d+$/)
+			{	
+				if($fields[$i] =~ /^\d\d\d\d\d\d+/)
+				{
+					$fields[$i] = $fields[$i] / 1000000;
+					$fields[$i] = sprintf "%.2f", $fields[$i];					
+					$fields[$i] .= "M";	
+				}
+				elsif($fields[$i] =~ /^0\.\d\d\d\d+$/)
 				{
 					$fields[$i] = $fields[$i] * 100;
 					$fields[$i] = substr($fields[$i],0,5) . "%";	
