@@ -5,10 +5,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 
+
+import com.google.gwt.event.dom.client.ClickEvent;
+
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
+
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -60,7 +65,7 @@ public class FileBrowser extends Composite
 	@SuppressWarnings("unchecked")
 	public void sortBy(final String key)
 	{
-		ArrayList<LinkedHashMap<String,String>> sortedFiles = (ArrayList<LinkedHashMap<String, String>>) flowcellFileList.clone();
+		final ArrayList<LinkedHashMap<String,String>> sortedFiles = (ArrayList<LinkedHashMap<String, String>>) flowcellFileList.clone();
 		
 		filePanel.clear();
 		Collections.sort(sortedFiles, new Comparator<LinkedHashMap<String, String>>()
@@ -77,16 +82,26 @@ public class FileBrowser extends Composite
 		filesFlexTable.setText(0, 0, "File Name");
 		filesFlexTable.setText(0, 1, "File Type");
 		filesFlexTable.setText(0, 2, "File Location");
-		int i = 1;
-		for(LinkedHashMap<String, String> f : sortedFiles)
+		
+		for(int i=0; i < sortedFiles.size(); i++)
 		{
-			filesFlexTable.setWidget(i, 0, new HTML("<a target=\"new\" href=\"http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base") + "\">" + f.get("base") + "</a>"));
-			//filesFlexTable.setText(i, 1, f.get("type").substring(1 + f.get("type").indexOf("_")));
-			filesFlexTable.setText(i, 1, getNiceType(f.get("base")));
-			filesFlexTable.setText(i, 2, f.get("label"));
-			i++;
+			LinkedHashMap<String,String> f = sortedFiles.get(i);			
+			HorizontalPanel chartLaunchPanel = new HorizontalPanel();
+			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base") + "\">" + f.get("base") + "</a>"));
+			if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
+				chartLaunchPanel.add(new ChartViewer(f.get("fullpath")));
+			filesFlexTable.setWidget(i+1, 0, chartLaunchPanel);
+			//filesFlexTable.setText(i+1, 1, f.get("type").substring(1 + f.get("type").indexOf("_")));
+			filesFlexTable.setText(i+1, 1, getNiceType(f.get("base")));
+			filesFlexTable.setText(i+1, 2, f.get("label"));			
 		}
+		
 		filePanel.add(filesFlexTable);
+	}
+	
+	public void onClick(ClickEvent event)
+	{
+		
 	}
 	
 	public String getNiceType(String ext)

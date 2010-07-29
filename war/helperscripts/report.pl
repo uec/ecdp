@@ -7,6 +7,14 @@ $doQC = $ARGV[1];
 
 @allFilesFiltered = @allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
 @allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming)//} @allFilesFiltered;
+
+for my $i (0.. $#allFilesFiltered)
+{
+	$cleanToFullPathHash{$allFilesFiltered[$i]} = @allFiles[$i];
+}
+
+
+
 my %seen = (); @allFilesFiltered = grep { ! $seen{ $_ }++ } @allFilesFiltered;
 
 
@@ -31,10 +39,11 @@ sub find
 		my @results = grep {m/$regex/} @allFilesFiltered;
 		for $hit (@results)
 		{
+			my $fullPath = $cleanToFullPathHash{$hit};
 			my ($base,$dir) = fileparse($hit);
 			$dir =~ /\/.+?\/(.+$)/;
 			my $location = $1||$dir;
-			print "<file base=\"$base\" dir=\"$dir\" label=\"$location\" type=\"unknown\"/>";
+			print "<file base=\"$base\" dir=\"$dir\" label=\"$location\" type=\"unknown\" fullpath=\"$fullPath\"/>";
 		}
 	}
 }

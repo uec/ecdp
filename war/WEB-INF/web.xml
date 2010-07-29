@@ -16,13 +16,13 @@
     <url-pattern>/eccontrolcenter/ecservice</url-pattern>
   </servlet-mapping>
   
-  <!-- Default page to serve -->
+ Default page to serve 
   <welcome-file-list>
     <welcome-file>ECControlCenter.html</welcome-file>
   </welcome-file-list>
 
 
-
+  <!--
 <security-constraint>
    <display-name>Security Constraint</display-name>
    <web-resource-collection>
@@ -35,6 +35,6 @@
 </security-constraint>
 <login-config><auth-method>BASIC</auth-method></login-config>
 <security-role><role-name>solexaWebData</role-name></security-role>
-
+-->
 
 </web-app>

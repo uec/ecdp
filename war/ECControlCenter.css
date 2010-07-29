@@ -40,6 +40,11 @@
         border-width: 1px;
         border-color: #BBCCEE;
 }
+.viewchartlabel {
+	font-size: x-small;
+	color: #0000BB;
+	
+}
 
 .gwt-DisclosurePanel td {
 	padding: 0px

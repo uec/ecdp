@@ -1,8 +1,12 @@
 package edu.usc.epigenome.eccp.server;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -161,7 +165,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						System.out.println(serialMatcher.group(1));
 						flowcell.flowcellProperties.put("serial", serialMatcher.group(1));
 						Date d = new Date(run.lastModified());
-						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth()) + "-" + String.format("%02d",d.getDate()));
+						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
 						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
 						flowcell.flowcellProperties.put("status", "run incomplete or in progress");
 						for(String fileName : run.list())
@@ -295,6 +299,41 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						e.printStackTrace();
 		}
 		return flowcell;
+	}
+	
+	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
+	{
+		if(!filePath.contains("ResultCount") || !filePath.endsWith(".csv"))
+			return "security failed";
+		
+		byte[] buffer = new byte[(int) new File(filePath).length()];
+	    BufferedInputStream f = null;
+	    try 
+	    {
+	        try
+			{
+				f = new BufferedInputStream(new FileInputStream(filePath));
+			} catch (FileNotFoundException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        try
+			{
+				f.read(buffer);
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    } 
+	    finally 
+	    {
+	        if (f != null) 
+	        	try { f.close(); } 
+	        	catch (IOException ignored) { }
+	    }
+	    return new String(buffer);
 	}
 	
 	public ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException

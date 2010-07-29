@@ -18,6 +18,8 @@ public class FlowcellSingleItem extends Composite
 {
 	public DisclosurePanel qcPanel = new DisclosurePanel("Summary Statistics");
 	public DisclosurePanel filePanel = new DisclosurePanel("Download Files");
+	//public DisclosurePanel tilesPanel = new DisclosurePanel("View Tile Images");
+	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	FlowcellData flowcell;
 	public FlowcellSingleItem(final FlowcellData flowcellIn)
@@ -52,6 +54,7 @@ public class FlowcellSingleItem extends Composite
 		vp.add(flowcellTableSample);
 		vp.add(qcPanel);
 		vp.add(filePanel);
+		//vp.add(tilesPanel);
 		
 		qcPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
 		{
@@ -136,7 +139,17 @@ public class FlowcellSingleItem extends Composite
 					}});				
 			}			
 		});
-		
+//		tilesPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
+//		{
+//
+//			public void onOpen(OpenEvent<DisclosurePanel> event)
+//			{				
+//				tilesPanel.clear();
+//				TileViewer t = new TileViewer("123ABCXX");
+//				tilesPanel.add(t);
+//			}
+//			
+//		});
 
 		initWidget(vp);
 	}

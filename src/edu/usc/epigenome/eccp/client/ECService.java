@@ -20,7 +20,7 @@ public interface ECService extends RemoteService
 	ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException;
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
-	
+	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	//PBS reporting
 	public String[] qstat(String queue);
 }
