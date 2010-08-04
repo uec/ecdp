@@ -303,32 +303,18 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
 	{
-		if(!filePath.contains("ResultCount") || !filePath.endsWith(".csv"))
+		if(!filePath.contains("Count") || !filePath.endsWith(".csv"))
 			return "security failed";
 		
 		byte[] buffer = new byte[(int) new File(filePath).length()];
 	    BufferedInputStream f = null;
-	    try 
-	    {
-	        try
-			{
-				f = new BufferedInputStream(new FileInputStream(filePath));
-			} catch (FileNotFoundException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        try
-			{
-				f.read(buffer);
-			} catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	    try {
+	        try { f = new BufferedInputStream(new FileInputStream(filePath));} 
+	        catch (FileNotFoundException e) {e.printStackTrace(); }
+	        try { f.read(buffer);} 
+	        catch (IOException e) { e.printStackTrace();}
 	    } 
-	    finally 
-	    {
+	    finally  {
 	        if (f != null) 
 	        	try { f.close(); } 
 	        	catch (IOException ignored) { }

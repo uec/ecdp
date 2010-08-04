@@ -17,6 +17,9 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer.ChartType;
+
 public class FileBrowser extends Composite
 {
 	VerticalPanel vp = new VerticalPanel();
@@ -89,7 +92,11 @@ public class FileBrowser extends Composite
 			HorizontalPanel chartLaunchPanel = new HorizontalPanel();
 			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base") + "\">" + f.get("base") + "</a>"));
 			if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
-				chartLaunchPanel.add(new ChartViewer(f.get("fullpath")));
+				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
+			else if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
+				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.Area));
+			else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
+				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.Column));
 			filesFlexTable.setWidget(i+1, 0, chartLaunchPanel);
 			//filesFlexTable.setText(i+1, 1, f.get("type").substring(1 + f.get("type").indexOf("_")));
 			filesFlexTable.setText(i+1, 1, getNiceType(f.get("base")));
