@@ -2,6 +2,7 @@ package edu.usc.epigenome.eccp.client;
 import edu.usc.epigenome.eccp.client.controlPanel.ControlPanelWidget;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
+import edu.usc.epigenome.eccp.client.pane.analysisReport.AnalysisReport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.systemStatus.StatusSummary;
 
@@ -35,6 +36,9 @@ public class ECControlCenter implements EntryPoint
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowFS),"Flowcell Reports");
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowIncomplete),"Flowcell Reports");
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowComplete),"Flowcell Reports");
+		
+		//add analysis reports
+		addToControlPanel(new AnalysisReport(AnalysisReport.ReportType.ShowFS),"Analysis Reports");
 		
 		//add pbs reports
 		addToControlPanel(new PBSreport("all"),"HPCC PBS");

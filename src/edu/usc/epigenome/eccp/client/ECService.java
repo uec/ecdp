@@ -23,4 +23,7 @@ public interface ECService extends RemoteService
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	//PBS reporting
 	public String[] qstat(String queue);
+	//Analysis Reporting
+	ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException;
+	
 }

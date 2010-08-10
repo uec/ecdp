@@ -6,7 +6,7 @@ $flowcell = $ARGV[0];
 $doQC = $ARGV[1];
 
 @allFilesFiltered = @allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
-@allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming)//} @allFilesFiltered;
+@allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming|analysis)//} @allFilesFiltered;
 
 for my $i (0.. $#allFilesFiltered)
 {
@@ -68,27 +68,27 @@ sub qcreports
 		}
 		
 		#add qc from summary.xml
-		$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber");
-		$RTAConfigRef = XMLin($RTAConfigFile);
+		$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
+		$RTAConfigRef = XMLin($RTAConfigFile) if -e $RTAConfigFile;
 		$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing,ControlLane,ReadType";
 		for my $i (0..$#qcFileContent)
 		{
 			$qcFileContent[$i] =~ /^.+?,(\d+),/;
 			my $laneNum = $1;
-			my $date = $summaryRef->{Date};
+			my $date = $summaryRef->{Date} || "Mon Jan 00 00:00:00 0000";
 			$date =~ s/^.{4}//;
 			$date =~ s/\d+:\d+:\d+ //;
 			$qcFileContent[$i] .= ",$date,";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield} . ",";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean} . ",";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean} . ",";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean} . "%,";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean} . ",";
-			$qcFileContent[$i] .= $summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean} . "%,";
-			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied} . "%,";
-			$qcFileContent[$i] .= $summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied} . "%,";
-			$qcFileContent[$i] .= $RTAConfigRef->{ControlLane} . ",";
-			$qcFileContent[$i] .= $RTAConfigRef->{ReadType};
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield}) . ",";
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean}) . ",";
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean}) . ",";
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean}) . "%,";
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean}) . ",";
+			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean}) . "%,";
+			$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied}) . "%,";
+			$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied}) . "%,";
+			$qcFileContent[$i] .= getValue($RTAConfigRef->{ControlLane}) . ",";
+			$qcFileContent[$i] .= getValue($RTAConfigRef->{ReadType});
 			
 			my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
 			my $genome = `$genomeCmd`;
@@ -129,4 +129,9 @@ sub qcreports
 		}
 		print "</qcreport>";	
 	}
+}
+
+sub getValue
+{
+	return $_[0] || "NA";
 }

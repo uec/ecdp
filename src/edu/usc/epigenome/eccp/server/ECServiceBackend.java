@@ -384,5 +384,46 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 		return matchedFlowcells;
 	}
+	
+	@SuppressWarnings("deprecation")
+	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException
+	{
+		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/ga/analysis")};
+		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
+		
+		for(File dir : dirs)
+		{
+			System.out.println(dir.getPath());
+			for (File run : dir.listFiles())
+			{
+				System.out.println(run.getPath());
+				FlowcellData flowcell = new FlowcellData();
+				try
+				{
+					if(run.isDirectory())
+					{
+						flowcell.flowcellProperties.put("serial", run.getName());
+						Date d = new Date(run.lastModified());
+						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
+						flowcells.add(flowcell);
+					}
+				}
+				catch (Exception e)
+				{
+					System.out.println(e.getMessage());					
+				}
+			}
+		}
+		Collections.sort(flowcells, new Comparator<FlowcellData>()
+				{
+					public int compare(FlowcellData o2, FlowcellData o1)
+					{
+						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
+					}
+				});
+		return flowcells;
+	}
+	
 
 }
