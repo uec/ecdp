@@ -4,19 +4,26 @@ use XML::Simple;
 
 $flowcell = $ARGV[0];
 $doQC = $ARGV[1];
+@allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
 
-@allFilesFiltered = @allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
+#filter unwanted things
+@allFiles = grep {
+					!m/aligntest/ &&
+					!m/Frame\.htm/ &&
+					!m/sequence\.\d+\./
+				 } @allFiles;
+
+
+@allFilesFiltered = @allFiles;
 @allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming|analysis)//} @allFilesFiltered;
+
 
 for my $i (0.. $#allFilesFiltered)
 {
-	$cleanToFullPathHash{$allFilesFiltered[$i]} = @allFiles[$i];
+	$cleanToFullPathHash{$allFilesFiltered[$i]} = $allFiles[$i];
 }
 
-
-
 my %seen = (); @allFilesFiltered = grep { ! $seen{ $_ }++ } @allFilesFiltered;
-
 
 print "<?xml version=\"1.0\"?><report flowcell=\"$flowcell\" lanes=\"12345678\">";
 if($doQC)
