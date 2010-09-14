@@ -1,10 +1,25 @@
 #!/usr/bin/perl
 use File::Basename;
+use DB_File;
 use XML::Simple;
 
 $flowcell = $ARGV[0];
-$doQC = $ARGV[1];
-@allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
+$doQC = 1 if $ARGV[1] =~ /qc/i;
+$doTDF = 1 if $ARGV[1] =~ /tdf/i;
+
+#caching
+tie %findCache, "DB_File", "/tmp/genFileCache", O_RDWR|O_CREAT, 0666, $DB_HASH;
+$cache_expire = 14400;
+
+if(!($findCache{$flowcell} && $findCache{$flowcell . "WriteTime"} && (time() - $findCache{$flowcell . "WriteTime"} < $cache_expire)))
+{
+	$findCache{$flowcell} = `/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`;
+	$findCache{$flowcell . "WriteTime"} = time();	
+}
+
+@allFiles = split(/\n/,$findCache{$flowcell});
+
+#@allFiles = split(/\n/,`/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`);
 
 #filter unwanted things
 @allFiles = grep {
@@ -30,6 +45,10 @@ if($doQC)
 {
 	find("\\.csv");
 	qcreports();
+}
+elsif($doTDF)
+{
+	find("\\.tdf");
 }
 else
 {
