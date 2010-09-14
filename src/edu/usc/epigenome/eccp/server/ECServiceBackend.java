@@ -9,7 +9,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -79,18 +78,15 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	
 	public ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException
 	{
-		//FlowcellData flowcells = new FlowcellData();
 		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		//flowcells.flowcellProperties.put("all", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db;
 		try
 		{
-			db = dbf.newDocumentBuilder();
-			URL url = new URL("http://www.epigenome.usc.edu/gareports/flowcell.php?xml");
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/flowcell.pl"};
+			Process execQc = Runtime.getRuntime().exec(qcCommand);
+			InputStream inputStream = execQc.getInputStream();
 			
-			InputStream inputStream = url.openStream();
 			Document document = db.parse(inputStream);
 			NodeList flowcellNodeList = document.getElementsByTagName("flowcell");
 			for(int i = 0; i < flowcellNodeList.getLength(); i++)
@@ -223,8 +219,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Process execQc = Runtime.getRuntime().exec(qcCommand);
 			InputStream inputStream = execQc.getInputStream();
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db;
-			db = dbf.newDocumentBuilder();
+			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document document = db.parse(inputStream);
 		
 			NodeList qcReportListNodes = document.getElementsByTagName("qcreport");
