@@ -11,7 +11,7 @@ $doTDF = 1 if $ARGV[1] =~ /tdf/i;
 tie %findCache, "DB_File", "/tmp/genFileCache", O_RDWR|O_CREAT, 0666, $DB_HASH;
 $cache_expire = 14400;
 
-if(!($findCache{$flowcell} && $findCache{$flowcell . "WriteTime"} && (time() - $findCache{$flowcell . "WriteTime"} < $cache_expire)))
+if(!$findCache{$flowcell} || !$findCache{$flowcell . "WriteTime"} || (time() - $findCache{$flowcell . "WriteTime"} > $cache_expire))
 {
 	$findCache{$flowcell} = `/usr/bin/locate -d /storage/index/mlocate.db $flowcell | /bin/grep -v Thumbnail_Images | /bin/grep -v .cif | /bin/grep -v .hpc-pbs.usc.edu`;
 	$findCache{$flowcell . "WriteTime"} = time();	
@@ -81,80 +81,87 @@ sub qcreports
 	my @RTAConfigFiles = grep {m/\/RTAConfiguration\.xml/} @allFiles;
 	my $RTAConfigFile = pop @RTAConfigFiles;
 	my $summaryFile = pop @summaryFiles;
+		
 	for my $qcFileName (@qcFileNames)
 	{
-		my @qcFileContent;
-		open(my $qcFile, "<$qcFileName") || die;
-		my $headerLine = <$qcFile>;
-		chomp $headerLine;
-		while(my $line = <$qcFile>)
+		#Check cache to see if we already have this qc report.
+		if(!$findCache{$qcFileName} || !$findCache{$$qcFileName . "WriteTime"} || (time() - $findCache{$qcFileName . "WriteTime"} > (100 * $cache_expire)))
 		{
-			chomp $line;
-			push @qcFileContent, $line;
-		}
-		
-		#add qc from summary.xml
-		$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
-		$RTAConfigRef = XMLin($RTAConfigFile) if -e $RTAConfigFile;
-		$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing,ControlLane,ReadType";
-		for my $i (0..$#qcFileContent)
-		{
-			$qcFileContent[$i] =~ /^.+?,(\d+),/;
-			my $laneNum = $1;
-			my $date = $summaryRef->{Date} || "Mon Jan 00 00:00:00 0000";
-			$date =~ s/^.{4}//;
-			$date =~ s/\d+:\d+:\d+ //;
-			$qcFileContent[$i] .= ",$date,";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield}) . ",";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean}) . ",";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean}) . ",";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean}) . "%,";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean}) . ",";
-			$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean}) . "%,";
-			$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied}) . "%,";
-			$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied}) . "%,";
-			$qcFileContent[$i] .= getValue($RTAConfigRef->{ControlLane}) . ",";
-			$qcFileContent[$i] .= getValue($RTAConfigRef->{ReadType});
-			
-			my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
-			my $genome = `$genomeCmd`;
-			$genome =~ /\=*(\S+)\s*$/;
-			$genome = $1;
-			if($genome)
+			my $reportContents = ""; 
+			my @qcFileContent;
+			open(my $qcFile, "<$qcFileName") || die;
+			my $headerLine = <$qcFile>;
+			chomp $headerLine;
+			while(my $line = <$qcFile>)
 			{
-				$headerLine .= ",genome";
-				$qcFileContent[$i] .= "," . basename($genome);
+				chomp $line;
+				push @qcFileContent, $line;
 			}
-		}
-		
-		#print $_ . "\n" for (
-		
-		
-		print "<qcreport path=\"$qcFileName\">";
-		my @header = split(/,/,$headerLine);
-		foreach my $line (@qcFileContent)
-		{			
-			print "<qcEntry>";
-			my @fields = split(/,/,$line);
-			for my $i (0..$#fields)
-			{	
-				if($fields[$i] =~ /^\d\d\d\d\d\d+/)
+			
+			#add qc from summary.xml
+			$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
+			$RTAConfigRef = XMLin($RTAConfigFile) if -e $RTAConfigFile;
+			$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing,ControlLane,ReadType";
+			for my $i (0..$#qcFileContent)
+			{				
+				$qcFileContent[$i] =~ /^.+?,(\d+),/;
+				my $laneNum = $1;
+				my $date = $summaryRef->{Date} || "Mon Jan 00 00:00:00 0000";
+				$date =~ s/^.{4}//;
+				$date =~ s/\d+:\d+:\d+ //;
+				$qcFileContent[$i] .= ",$date,";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield}) . ",";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean}) . ",";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean}) . ",";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean}) . "%,";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean}) . ",";
+				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean}) . "%,";
+				$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied}) . "%,";
+				$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied}) . "%,";
+				$qcFileContent[$i] .= getValue($RTAConfigRef->{ControlLane}) . ",";
+				$qcFileContent[$i] .= getValue($RTAConfigRef->{ReadType});
+				
+				my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
+				my $genome = `$genomeCmd`;
+				$genome =~ /\=*(\S+)\s*$/;
+				$genome = $1;
+				if($genome)
 				{
-					$fields[$i] = $fields[$i] / 1000000;
-					$fields[$i] = sprintf "%.2f", $fields[$i];					
-					$fields[$i] .= "M";	
+					$headerLine .= ",genome";
+					$qcFileContent[$i] .= "," . basename($genome);
 				}
-				elsif($fields[$i] =~ /^0\.\d\d\d\d+$/)
-				{
-					$fields[$i] = $fields[$i] * 100;
-					$fields[$i] = substr($fields[$i],0,5) . "%";	
-				}
-				print "<$header[$i]>$fields[$i]</$header[$i]>";
 			}
-			print "</qcEntry>";			
+			
+			$reportContents .= "<qcreport path=\"$qcFileName\">";
+			my @header = split(/,/,$headerLine);
+			foreach my $line (@qcFileContent)
+			{			
+				$reportContents .= "<qcEntry>";
+				my @fields = split(/,/,$line);
+				for my $i (0..$#fields)
+				{	
+					if($fields[$i] =~ /^\d\d\d\d\d\d+/)
+					{
+						$fields[$i] = $fields[$i] / 1000000;
+						$fields[$i] = sprintf "%.2f", $fields[$i];					
+						$fields[$i] .= "M";	
+					}
+					elsif($fields[$i] =~ /^0\.\d\d\d\d+$/)
+					{
+						$fields[$i] = $fields[$i] * 100;
+						$fields[$i] = substr($fields[$i],0,5) . "%";	
+					}
+					$reportContents .=  "<$header[$i]>$fields[$i]</$header[$i]>";
+				}
+				$reportContents .=  "</qcEntry>";			
+			}
+			$reportContents .=  "</qcreport>";
+			$findCache{$qcFileName} = $reportContents;
+			$findCache{$qcFileName . "WriteTime"} = time();
 		}
-		print "</qcreport>";	
+		print $findCache{$qcFileName};	
 	}
+	
 }
 
 sub getValue
