@@ -3,6 +3,7 @@ import edu.usc.epigenome.eccp.client.controlPanel.ControlPanelWidget;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
 import edu.usc.epigenome.eccp.client.pane.analysisReport.AnalysisReport;
+import edu.usc.epigenome.eccp.client.pane.cacheManagement.CacheManager;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.systemStatus.StatusSummary;
 
@@ -47,6 +48,9 @@ public class ECControlCenter implements EntryPoint
 		
 		//add system reports
 		addToControlPanel(new StatusSummary(),"System Status");
+		
+		//cache manager to clear file and geneus cache
+		addToControlPanel(new CacheManager(),"Cache Management");
 		
 		RootPanel.get().add(mainPanel);		
 	}

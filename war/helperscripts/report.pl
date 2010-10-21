@@ -9,7 +9,7 @@ $doTDF = 1 if $ARGV[1] =~ /tdf/i;
 
 #caching
 tie %findCache, "DB_File", "/tmp/genFileCache", O_RDWR|O_CREAT, 0666, $DB_HASH;
-$cache_expire = 14400;
+$cache_expire = 86400;
 
 if(!$findCache{$flowcell} || !$findCache{$flowcell . "WriteTime"} || (time() - $findCache{$flowcell . "WriteTime"} > $cache_expire))
 {
@@ -85,7 +85,7 @@ sub qcreports
 	for my $qcFileName (@qcFileNames)
 	{
 		#Check cache to see if we already have this qc report.
-		if(!$findCache{$qcFileName} || !$findCache{$$qcFileName . "WriteTime"} || (time() - $findCache{$qcFileName . "WriteTime"} > (100 * $cache_expire)))
+		if(!$findCache{$qcFileName} || !$findCache{$$qcFileName . "WriteTime"} || (time() - $findCache{$qcFileName . "WriteTime"} >  $cache_expire))
 		{
 			my $reportContents = ""; 
 			my @qcFileContent;

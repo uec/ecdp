@@ -420,5 +420,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;
 	}
 	
+	public String clearCache()
+	{
+		File urlCache = new File("/tmp/genURLcache");
+		File fileCache = new File("/tmp/genFileCache");
+		
+		urlCache.delete();
+		fileCache.delete();
+		
+		return "cache cleared";
+	}
+	
 
 }

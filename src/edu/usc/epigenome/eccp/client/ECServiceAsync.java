@@ -20,4 +20,5 @@ public interface ECServiceAsync
 	void getCSVFromDisk(String filePath, AsyncCallback<String> String) throws IllegalArgumentException;
 	void qstat(String queue, AsyncCallback<String[]> result) throws IllegalArgumentException;
 	void getAnalysisFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
+	void clearCache(AsyncCallback<String> callback) throws IllegalArgumentException;
 }

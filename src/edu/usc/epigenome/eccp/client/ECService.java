@@ -25,5 +25,8 @@ public interface ECService extends RemoteService
 	public String[] qstat(String queue);
 	//Analysis Reporting
 	ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException;
+	//Cache management
+	String clearCache() throws IllegalArgumentException;
+
 	
 }
