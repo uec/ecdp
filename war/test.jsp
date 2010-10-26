@@ -15,7 +15,8 @@ if(request.getParameter("xml") != null)
 	for(FlowcellData x : f)
 	{
 	        if(x.flowcellContains(request.getParameter("project")))
-	                clean.add(x);
+	        	clean.add(x);
+	        
 	}
 	
 	for(FlowcellData x : clean)
@@ -33,8 +34,7 @@ if(request.getParameter("xml") != null)
 else
 {
 	out.println("http://www.broadinstitute.org/igvdata/annotations/hg18/hg18_annotations.xml");
-	out.println("http://webapp.epigenome.usc.edu/ECCP/test2.jsp?project=" + request.getParameter("project") + "&xml=true");
-	
+	out.println("http://webapp.epigenome.usc.edu/ECCP/test2.jsp?project=" + request.getParameter("project") + "&xml=true");	
 }
 %>
 </body>

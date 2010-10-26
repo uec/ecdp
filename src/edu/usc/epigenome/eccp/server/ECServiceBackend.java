@@ -25,6 +25,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
+import edu.usc.epigenome.eccp.client.data.MethylationData;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 
@@ -130,6 +132,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;
 		
 	}
+	
 	
 	@SuppressWarnings("deprecation")
 	public ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException
@@ -296,10 +299,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 	
+	
+	
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
 	{
-		if(!filePath.contains("Count") || !filePath.endsWith(".csv"))
-			return "security failed";
+		if(!(filePath.contains("Count") && filePath.endsWith(".csv") || filePath.endsWith("Metrics.txt")))
+			return "security failed, blocked by ECCP access controls";
 		
 		byte[] buffer = new byte[(int) new File(filePath).length()];
 	    BufferedInputStream f = null;
@@ -334,6 +339,211 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					}
 				});
 		return flowcellsComplete;
+	}
+	
+	
+	
+	@SuppressWarnings("deprecation")
+	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException
+	{
+		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/ga/analysis")};
+		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
+		
+		for(File dir : dirs)
+		{
+			System.out.println(dir.getPath());
+			for (File run : dir.listFiles())
+			{
+				System.out.println(run.getPath());
+				FlowcellData flowcell = new FlowcellData();
+				try
+				{
+					if(run.isDirectory())
+					{
+						flowcell.flowcellProperties.put("serial", run.getName());
+						Date d = new Date(run.lastModified());
+						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
+						flowcells.add(flowcell);
+					}
+				}
+				catch (Exception e)
+				{
+					System.out.println(e.getMessage());					
+				}
+			}
+		}
+		Collections.sort(flowcells, new Comparator<FlowcellData>()
+				{
+					public int compare(FlowcellData o2, FlowcellData o1)
+					{
+						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
+					}
+				});
+		return flowcells;
+	}
+	
+	/* METHODS FOR Methylation data retrieval
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
+	 */
+	
+	
+	public ArrayList<MethylationData> getMethFromGeneus() throws IllegalArgumentException
+	{
+		ArrayList<MethylationData> flowcells = new ArrayList<MethylationData>();
+		try
+		{
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/beadchip.pl"};
+			Process execQc = Runtime.getRuntime().exec(qcCommand);
+			InputStream inputStream = execQc.getInputStream();
+			
+			Document document = db.parse(inputStream);
+			NodeList flowcellNodeList = document.getElementsByTagName("flowcell");
+			for(int i = 0; i < flowcellNodeList.getLength(); i++)
+			{
+				Node flowcellNode = flowcellNodeList.item(i);
+				MethylationData flowcell = new MethylationData();
+				for(int j = 0; j < flowcellNode.getAttributes().getLength(); j++)
+				{
+					flowcell.flowcellProperties.put(flowcellNode.getAttributes().item(j).getNodeName(), flowcellNode.getAttributes().item(j).getNodeValue());
+				}
+				flowcell.flowcellProperties.put("status", "in geneus");
+				
+				NodeList sampleNodeList =flowcellNode.getChildNodes();
+				for(int j = 0; j < sampleNodeList.getLength(); j++)
+				{
+					Node sampleNode = sampleNodeList.item(j);
+					HashMap<String,String> sampleData = new HashMap<String,String>();
+					for(int k = 0; k < sampleNode.getAttributes().getLength(); k++)
+					{
+						sampleData.put(sampleNode.getAttributes().item(k).getNodeName(), sampleNode.getAttributes().item(k).getNodeValue());
+					}
+					flowcell.lane.put((int) sampleNode.getAttributes().getNamedItem("lane").getNodeValue().charAt(0), sampleData);					
+				}
+				
+				flowcells.add(flowcell);
+			}
+			inputStream.close();			
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Collections.sort(flowcells, new Comparator<FlowcellData>()
+		{
+			public int compare(FlowcellData o2, FlowcellData o1)
+			{
+				return o1.getFlowcellProperty("serial").compareTo(o2.getFlowcellProperty("serial"));
+			}
+		});
+		return flowcells;
+		
+	}
+	
+	public MethylationData getFilesForMeth(final String serial) throws IllegalArgumentException
+	{
+		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/methylation/meth27k"),new File("/storage/hpcc/uec-02/shared/production/methylation/meth450k")};
+		ArrayList<LinkedHashMap<String, String>> fileList = new ArrayList<LinkedHashMap<String, String>>() ;
+		MethylationData flowcell = new MethylationData();
+		FilenameFilter filter = new FilenameFilter()
+		{
+			public boolean accept(File dir, String name)
+			{
+				return (name.contains(serial) && !name.contains(".")); 
+			}
+		};
+		
+		for(File topDir : dirs)
+			for(File IntermediateDir : topDir.listFiles())
+				for(File dataDir : IntermediateDir.listFiles(filter))
+				{
+					
+					try
+					{
+						if(dataDir.isDirectory())
+						{
+							for(File dataFile : dataDir.listFiles())
+							{
+								LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();
+								qcFileProperties.put("base", dataFile.getName());
+								qcFileProperties.put("fullpath", dataFile.getAbsolutePath());
+								qcFileProperties.put("dir", "/" + topDir.getName() + "/" + IntermediateDir.getName() + "/" + dataDir.getName());
+								qcFileProperties.put("label", IntermediateDir.getName() + "/" + dataDir.getName());
+								qcFileProperties.put("type", "unknown");
+								Pattern laneNumPattern = Pattern.compile("_(\\d+)[\\._]+");
+								Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+								if(laneNumMatcher.find())
+									qcFileProperties.put("lane", laneNumMatcher.group(1));
+								else
+									qcFileProperties.put("lane", "0");
+								fileList.add(qcFileProperties);
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						System.out.println(e.getMessage());					
+					}
+					
+				}
+		flowcell.fileList = fileList;
+		return flowcell;
+	}
+	
+	public MethylationData getQCforMeth(String serial) throws IllegalArgumentException
+	{
+		MethylationData flowcell = new MethylationData();
+		try
+		{
+			for (HashMap<String,String> file : getFilesForMeth(serial).fileList)
+			{
+				if(file.get("base").contentEquals("Metrics.txt"))
+				{
+					//LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
+					LinkedHashMap<Integer,LinkedHashMap<String,String>> row = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+					String contentsRaw = getCSVFromDisk(file.get("fullpath"));
+					String[] contentLines = contentsRaw.split("\\n");
+					String[] headers = contentLines[0].split("\\t");
+					for(int i = 1; i < contentLines.length; i++)
+					{
+						String[] rowRaw = contentLines[i].split("\\t");
+						LinkedHashMap<String,String> entry = new LinkedHashMap<String,String>();
+						for(int j = 0; j < rowRaw.length; j++)
+						{
+							entry.put(headers[j], rowRaw[j]);
+						}
+						row.put(i, entry);						
+					}
+					flowcell.laneQC.put(file.get("fullpath"), row);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+						e.printStackTrace();
+						System.out.println(e.getMessage());
+		}
+		return flowcell;
+	}
+	
+	/* System Administration Methods
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
+	 */
+	
+	public String clearCache()
+	{
+		File urlCache = new File("/tmp/genURLcache");
+		File fileCache = new File("/tmp/genFileCache");
+		
+		urlCache.delete();
+		fileCache.delete();
+		
+		return "cache cleared";
 	}
 	
 	public String[] qstat(String queue) throws IllegalArgumentException
@@ -380,56 +590,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return matchedFlowcells;
 	}
 	
-	@SuppressWarnings("deprecation")
-	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException
-	{
-		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/ga/analysis")};
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		
-		for(File dir : dirs)
-		{
-			System.out.println(dir.getPath());
-			for (File run : dir.listFiles())
-			{
-				System.out.println(run.getPath());
-				FlowcellData flowcell = new FlowcellData();
-				try
-				{
-					if(run.isDirectory())
-					{
-						flowcell.flowcellProperties.put("serial", run.getName());
-						Date d = new Date(run.lastModified());
-						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
-						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
-						flowcells.add(flowcell);
-					}
-				}
-				catch (Exception e)
-				{
-					System.out.println(e.getMessage());					
-				}
-			}
-		}
-		Collections.sort(flowcells, new Comparator<FlowcellData>()
-				{
-					public int compare(FlowcellData o2, FlowcellData o1)
-					{
-						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-					}
-				});
-		return flowcells;
-	}
-	
-	public String clearCache()
-	{
-		File urlCache = new File("/tmp/genURLcache");
-		File fileCache = new File("/tmp/genFileCache");
-		
-		urlCache.delete();
-		fileCache.delete();
-		
-		return "cache cleared";
-	}
 	
 
 }

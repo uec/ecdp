@@ -5,6 +5,7 @@ import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
 import edu.usc.epigenome.eccp.client.pane.analysisReport.AnalysisReport;
 import edu.usc.epigenome.eccp.client.pane.cacheManagement.CacheManager;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
+import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
 import edu.usc.epigenome.eccp.client.pane.systemStatus.StatusSummary;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -37,9 +38,10 @@ public class ECControlCenter implements EntryPoint
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowFS),"Flowcell Reports");
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowIncomplete),"Flowcell Reports");
 		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowComplete),"Flowcell Reports");
+		addToControlPanel(new AnalysisReport(AnalysisReport.ReportType.ShowFS),"Flowcell Reports");
 		
-		//add analysis reports
-		addToControlPanel(new AnalysisReport(AnalysisReport.ReportType.ShowFS),"Analysis Reports");
+		//Methylation Report
+		addToControlPanel(new MethylationReport(),"Methylation Reports");
 		
 		//add pbs reports
 		addToControlPanel(new PBSreport("all"),"HPCC PBS");

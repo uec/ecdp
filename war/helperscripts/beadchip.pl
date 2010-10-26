@@ -6,15 +6,16 @@ use XML::LibXSLT;
 tie %pageCache, "DB_File", "/tmp/genURLcache", O_RDWR|O_CREAT, 0666, $DB_HASH;
 $cache_expire = 2000000;
 
-$report = getGeneusNoCache("http://epilims.usc.edu:8080/api/v1/processes?type=GA%20Analysis%20Workflow");
-if($report eq $pageCache{"SolexaAllEntries"} && $pageCache{"SolexaCachedFinalXML"})
+$report = getGeneusNoCache("http://epilims.usc.edu:8080/api/v1/containers?type=Beadchip%201%20x%2012");
+if($report eq $pageCache{"MethAllEntries"} && $pageCache{"MethCachedFinalXML"})
 {
-	print $pageCache{"SolexaCachedFinalXML"};
+	print $pageCache{"MethCachedFinalXML"};
 	exit;
 }
-$pageCache{"SolexaAllEntries"} = $report;
 
-@tags = (qr/\<process\suri=\"(.+?)\".+?\>/, qr/\<input\suri=\"(.+?)\".+?<\/input>/, qr/\<sample\suri=\"(.+?)\".+?\>/, qr/\<project\suri=\"(.+?)\".+?\>/);
+$pageCache{"MethAllEntries"} = $report;
+
+@tags = (qr/\<container\suri=\"(.+?)\".+?<\/container>/, qr/\<placement\suri=\"(.+?)\".+?<\/placement>/, qr/\<sample\suri=\"(.+?)\".+?\>/, qr/\<project\suri=\"(.+?)\".+?\>/);
 for $entity (@tags)
 {
         while($report =~ m/$entity/g)
@@ -24,7 +25,7 @@ for $entity (@tags)
                 #print STDERR $tag . "\n";
                 my $replacement = getGeneus($url);
                 #print STDERR $replacement . "\n";
-                $report =~ s/$tag/$replacement/g || die "failed";
+                $report =~ s/$tag/$replacement/g || die "failed";                
         }
 }
 $report =~ s/\<(\/*)\w+\:(\w+)/\<$1$2/g;
@@ -32,11 +33,12 @@ $report =  "<\?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" . $r
 my $xslt = XML::LibXSLT->new();
 my $xml = XML::LibXML->new();
 my $source = $xml->parse_string($report);
-my $style_doc = $xml->parse_file('/opt/tomcat6/webapps/ECCP/helperscripts/flowcellXML.xslt');
+my $style_doc = $xml->parse_file('/opt/tomcat6/webapps/ECCP/helperscripts/beadchipXML.xslt');
 my $stylesheet = $xslt->parse_stylesheet($style_doc);
 my $results = $stylesheet->transform($source);
-$pageCache{"SolexaCachedFinalXML"} = $stylesheet->output_as_bytes($results);
-print $pageCache{"SolexaCachedFinalXML"};
+$pageCache{"MethCachedFinalXML"} = $stylesheet->output_as_bytes($results);
+print $pageCache{"MethCachedFinalXML"};
+
 
 untie %pageCache;
 
