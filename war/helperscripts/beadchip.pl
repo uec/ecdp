@@ -5,6 +5,8 @@ use XML::LibXML;
 use XML::LibXSLT;
 tie %pageCache, "DB_File", "/tmp/genURLcache", O_RDWR|O_CREAT, 0666, $DB_HASH;
 $cache_expire = 2000000;
+$totalCalls = 0;
+$cacheMisses = 0; 
 
 $report = getGeneusNoCache("http://epilims.usc.edu:8080/api/v1/containers?type=Beadchip%201%20x%2012");
 if($report eq $pageCache{"MethAllEntries"} && $pageCache{"MethCachedFinalXML"})
@@ -22,9 +24,7 @@ for $entity (@tags)
         {
                 my $url = $1;
                 my $tag = quotemeta($&);
-                #print STDERR $tag . "\n";
                 my $replacement = getGeneus($url);
-                #print STDERR $replacement . "\n";
                 $report =~ s/$tag/$replacement/g || die "failed";                
         }
 }
@@ -38,14 +38,16 @@ my $stylesheet = $xslt->parse_stylesheet($style_doc);
 my $results = $stylesheet->transform($source);
 $pageCache{"MethCachedFinalXML"} = $stylesheet->output_as_bytes($results);
 print $pageCache{"MethCachedFinalXML"};
-
+print STDERR "calls: $totalCalls     cacheMisses: $cacheMisses\n";
 
 untie %pageCache;
 
 sub getGeneus
 {
+		$totalCalls++;
         my $url = shift @_;
         return $pageCache{$url} if $pageCache{$url} && $pageCache{$url . "WriteTime"} && (time() - $pageCache{$url . "WriteTime"} < $cache_expire);
+        $cacheMisses++;
         my $ua = LWP::UserAgent->new;
         $ua->credentials("epilims.usc.edu:8080","GLSSecurity",'zack'=>'genzack');
         my $response = $ua->get($url);

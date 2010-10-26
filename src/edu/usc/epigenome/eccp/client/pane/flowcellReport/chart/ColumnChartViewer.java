@@ -46,8 +46,8 @@ public class ColumnChartViewer extends Composite
 	private Options createOptions() 
 	{
 	    Options options = Options.create();
-	    options.setWidth(800);
-	    options.setHeight(400);
+	    options.setWidth(500);
+	    options.setHeight(300);
 	    options.setTitle("Counts: Top 10, Bottom 10");
 	    //options.setLogScale(true);
 	    return options;

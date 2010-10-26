@@ -43,8 +43,8 @@ public class AreaChartViewer extends Composite
 	private Options createOptions() 
 	{
 	    Options options = Options.create();
-	    options.setWidth(800);
-	    options.setHeight(600);
+	    options.setWidth(500);
+	    options.setHeight(300);
 	    options.setMax(100.00);
 	    options.setMin(0.00);
 	    options.setLogScale(true);
