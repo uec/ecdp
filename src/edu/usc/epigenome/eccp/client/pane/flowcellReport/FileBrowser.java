@@ -90,7 +90,9 @@ public class FileBrowser extends Composite
 		{
 			LinkedHashMap<String,String> f = sortedFiles.get(i);			
 			HorizontalPanel chartLaunchPanel = new HorizontalPanel();
-			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base") + "\">" + f.get("base") + "</a>"));
+			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
+			
+			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
 			if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
 				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
 			else if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))

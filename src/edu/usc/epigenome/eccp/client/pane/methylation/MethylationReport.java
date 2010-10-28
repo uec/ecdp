@@ -14,13 +14,11 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
-import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.MethylationData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
-import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellSingleItem;
+
 
 
 public class MethylationReport extends ECPane

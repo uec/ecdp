@@ -9,6 +9,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,11 +19,15 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.MethylationData;
@@ -258,6 +263,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
@@ -284,6 +290,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				}
 				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
 				Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+				qcFileProperties.put("encfullpath", java.net.URLEncoder.encode(encryptString(qcFileProperties.get("fullpath"))));
 				if(laneNumMatcher.find())
 					qcFileProperties.put("lane", laneNumMatcher.group(1));
 				else
@@ -383,6 +390,26 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;
 	}
 	
+	public ArrayList<FlowcellData> getFlowcellsByKeyword(String flowcellQuery, String laneQuery)
+	{
+		ArrayList<FlowcellData> flowcells = getFlowcellsAll();
+		ArrayList<FlowcellData> matchedFlowcells = new ArrayList<FlowcellData>();
+		
+		for(FlowcellData flowcell : flowcells)
+		{
+			if(flowcell.flowcellContains(flowcellQuery))
+			{
+				if(flowcell.filterLanesThatContain(laneQuery))
+				{
+					matchedFlowcells.add(flowcell);
+				}
+			}
+		}
+		
+		return matchedFlowcells;
+	}
+	
+	
 	/* METHODS FOR Methylation data retrieval
 	 * (non-Javadoc)
 	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
@@ -444,6 +471,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	public MethylationData getFilesForMeth(final String serial) throws IllegalArgumentException
 	{
 		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/methylation/meth27k"),new File("/storage/hpcc/uec-02/shared/production/methylation/meth450k")};
@@ -471,6 +499,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 								LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();
 								qcFileProperties.put("base", dataFile.getName());
 								qcFileProperties.put("fullpath", dataFile.getAbsolutePath());
+								qcFileProperties.put("encfullpath", java.net.URLEncoder.encode(encryptString(dataFile.getAbsolutePath())));
 								qcFileProperties.put("dir", "/" + topDir.getName() + "/" + IntermediateDir.getName() + "/" + dataDir.getName());
 								qcFileProperties.put("label", IntermediateDir.getName() + "/" + dataDir.getName());
 								qcFileProperties.put("type", "unknown");
@@ -571,25 +600,26 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return (String[])arr.toArray(new String[arr.size()]);
 	}
 
-	public ArrayList<FlowcellData> getFlowcellsByKeyword(String flowcellQuery, String laneQuery)
-	{
-		ArrayList<FlowcellData> flowcells = getFlowcellsAll();
-		ArrayList<FlowcellData> matchedFlowcells = new ArrayList<FlowcellData>();
-		
-		for(FlowcellData flowcell : flowcells)
+	private String encryptString(String srcText)
+	{		
+		try
 		{
-			if(flowcell.flowcellContains(flowcellQuery))
-			{
-				if(flowcell.filterLanesThatContain(laneQuery))
-				{
-					matchedFlowcells.add(flowcell);
-				}
-			}
+			SecretKeySpec keySpec = new SecretKeySpec("ep1HackD".getBytes(), "DES");
+			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.ENCRYPT_MODE,keySpec);
+			byte[] byteDataToEncrypt = srcText.getBytes();
+			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt); 
+			String strCipherText = new BASE64Encoder().encode(byteCipherText);
+			System.out.println("Cipher Text generated using DES with CBC mode and PKCS5 Padding is " +strCipherText);
+			return strCipherText;
+		}		
+		catch (Exception e)
+		{			
+			e.printStackTrace();
 		}
-		
-		return matchedFlowcells;
+		return srcText;
 	}
-	
+
 	
 
 }
