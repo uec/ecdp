@@ -14,8 +14,8 @@
 	try
 	{
 		//Decode the text using cipher
-		SecretKeySpec keySpec = new SecretKeySpec("ep1HackD".getBytes(), "DES");
-		Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+		SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+		Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 		desCipher.init(Cipher.DECRYPT_MODE,keySpec,desCipher.getParameters());
 		byte[] encodedBytes = new BASE64Decoder().decodeBuffer(encFileName);
 		String filePath = new String( desCipher.doFinal(encodedBytes));

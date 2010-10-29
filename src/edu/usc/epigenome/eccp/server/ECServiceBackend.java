@@ -604,8 +604,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	{		
 		try
 		{
-			SecretKeySpec keySpec = new SecretKeySpec("ep1HackD".getBytes(), "DES");
-			Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			desCipher.init(Cipher.ENCRYPT_MODE,keySpec);
 			byte[] byteDataToEncrypt = srcText.getBytes();
 			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt); 
