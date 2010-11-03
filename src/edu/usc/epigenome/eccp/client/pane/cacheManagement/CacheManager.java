@@ -36,13 +36,13 @@ public class CacheManager extends ECPane
 	@Override
 	public void showTool()
 	{
-		Button b = new Button("clear geneus and file cache");
+		Button b = new Button("clear Geneus Web Data cache");
 		vp.add(b);
 		b.addClickHandler(new ClickHandler(){
 
 			public void onClick(ClickEvent event)
 			{
-				remoteService.clearCache(new AsyncCallback<String>(){
+				remoteService.clearCache("/tmp/genURLcache", new AsyncCallback<String>(){
 
 					public void onFailure(Throwable caught)
 					{
@@ -56,6 +56,29 @@ public class CacheManager extends ECPane
 					}});
 				
 			}});
+		
+		
+		Button c = new Button("clear File Info cache");
+		vp.add(c);
+		c.addClickHandler(new ClickHandler(){
+
+			public void onClick(ClickEvent event)
+			{
+				remoteService.clearCache("/tmp/genFileCache", new AsyncCallback<String>(){
+
+					public void onFailure(Throwable caught)
+					{
+						vp.add(new Label(caught.getMessage()));						
+					}
+
+					public void onSuccess(String result)
+					{
+						vp.add(new Label(result));
+						
+					}});
+				
+			}});
+		
 	}
 
 

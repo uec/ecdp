@@ -79,7 +79,7 @@ public class AnalysisReport extends ECPane
 				for(char c : globalSearchBox.getText().toCharArray())
 					encodedGlobal += (int) c > 99 ? String.valueOf((int) c) : "0" + String.valueOf((int) c) ;
 				
-				String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?" + "a=" + encodedGlobal + "&l=" + encodedLane;
+				String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?" + "r=solan&a=" + encodedGlobal + "&l=" + encodedLane;
 				searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url + "</a>"));
 				
 				vp.clear();

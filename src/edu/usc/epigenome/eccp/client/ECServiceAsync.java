@@ -25,7 +25,8 @@ public interface ECServiceAsync
 	void getFilesForMeth(String serial, AsyncCallback<MethylationData> callback)  throws IllegalArgumentException;
 	void getQCforMeth(String serial, AsyncCallback<MethylationData> callback)  throws IllegalArgumentException;
 	
-	void clearCache(AsyncCallback<String> callback) throws IllegalArgumentException;
+	void clearCache(String cachefile, AsyncCallback<String> callback) throws IllegalArgumentException;
 	void qstat(String queue, AsyncCallback<String[]> result) throws IllegalArgumentException;
+	void encryptURLEncoded(String srcText, AsyncCallback<String> callback);
 
 }

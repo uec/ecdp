@@ -33,7 +33,9 @@ public interface ECService extends RemoteService
 	//PBS reporting
 	public String[] qstat(String queue);
 	//Cache management
-	String clearCache() throws IllegalArgumentException;
+	String clearCache(String cachefile) throws IllegalArgumentException;
+	
+	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
 
 	
 }

@@ -263,7 +263,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
@@ -290,7 +289,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				}
 				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
 				Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
-				qcFileProperties.put("encfullpath", java.net.URLEncoder.encode(encryptString(qcFileProperties.get("fullpath"))));
+				qcFileProperties.put("encfullpath",  encryptURLEncoded(qcFileProperties.get("fullpath")));
 				if(laneNumMatcher.find())
 					qcFileProperties.put("lane", laneNumMatcher.group(1));
 				else
@@ -471,7 +470,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 	}
 	
-	@SuppressWarnings("deprecation")
 	public MethylationData getFilesForMeth(final String serial) throws IllegalArgumentException
 	{
 		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/methylation/meth27k"),new File("/storage/hpcc/uec-02/shared/production/methylation/meth450k")};
@@ -499,7 +497,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 								LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();
 								qcFileProperties.put("base", dataFile.getName());
 								qcFileProperties.put("fullpath", dataFile.getAbsolutePath());
-								qcFileProperties.put("encfullpath", java.net.URLEncoder.encode(encryptString(dataFile.getAbsolutePath())));
+								qcFileProperties.put("encfullpath",  encryptURLEncoded(dataFile.getAbsolutePath()));
 								qcFileProperties.put("dir", "/" + topDir.getName() + "/" + IntermediateDir.getName() + "/" + dataDir.getName());
 								qcFileProperties.put("label", IntermediateDir.getName() + "/" + dataDir.getName());
 								qcFileProperties.put("type", "unknown");
@@ -564,13 +562,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
 	 */
 	
-	public String clearCache()
+	public String clearCache(String cachefile)
 	{
-		File urlCache = new File("/tmp/genURLcache");
-		File fileCache = new File("/tmp/genFileCache");
-		
-		urlCache.delete();
-		fileCache.delete();
+		String[] cachefiles = {"/tmp/genFileCache", "/tmp/genURLcache"};
+		for(String f : cachefiles)
+			if(cachefile.contentEquals(f))
+				new File(f).delete();
 		
 		return "cache cleared";
 	}
@@ -610,7 +607,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			byte[] byteDataToEncrypt = srcText.getBytes();
 			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt); 
 			String strCipherText = new BASE64Encoder().encode(byteCipherText);
-			System.out.println("Cipher Text generated using DES with CBC mode and PKCS5 Padding is " +strCipherText);
 			return strCipherText;
 		}		
 		catch (Exception e)
@@ -618,6 +614,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			e.printStackTrace();
 		}
 		return srcText;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public String encryptURLEncoded(String srcText) throws IllegalArgumentException
+	{
+		return java.net.URLEncoder.encode(encryptString(srcText));
 	}
 
 	

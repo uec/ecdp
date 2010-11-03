@@ -36,9 +36,9 @@ public class MethylationReport extends ECPane
 	{
 		searchPanel.add(searchOptionsPanel);
 		searchPanel.addStyleName("flowcellsearch");
-		searchOptionsPanel.add(new Label("Flowcell Properties: "));
+		searchOptionsPanel.add(new Label("Bead Array Properties: "));
 		searchOptionsPanel.add(globalSearchBox);
-		searchOptionsPanel.add(new Label("Lane Properties: "));
+		searchOptionsPanel.add(new Label("Sample Properties: "));
 		searchOptionsPanel.add(laneSearchBox);
 		searchOptionsPanel.add(searchButton);
 		searchOptionsPanel.addStyleName("flowcellsearch");
@@ -94,7 +94,7 @@ public class MethylationReport extends ECPane
 	@Override
 	public Label getToolTitle()
 	{
-		String labelString = "Meth from Geneus";
+		String labelString = "Infinium Meth (Geneus)";
 		return new Label(labelString);
 	}
 

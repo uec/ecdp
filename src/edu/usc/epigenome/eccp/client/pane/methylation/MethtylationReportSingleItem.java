@@ -34,7 +34,7 @@ public class MethtylationReportSingleItem extends Composite
 		VerticalPanel vp = new VerticalPanel();
 		FlexTable flowcellTable = new FlexTable();
 		flowcellTable.addStyleName("flowcellitem");
-		flowcellTable.setText(0,0, "Flowcell ID: " + beadArray.getFlowcellProperty("serial"));
+		flowcellTable.setText(0,0, "Bead Array ID: " + beadArray.getFlowcellProperty("serial"));
 		flowcellTable.setText(0,1, "Lims ID: " + beadArray.getFlowcellProperty("limsID"));
 //		flowcellTable.setText(0,2, beadArray.getFlowcellProperty("technician") +" " + beadArray.getFlowcellProperty("date"));
 		//flowcellTable.setText(1,0, "Protocol: " + beadArray.getFlowcellProperty("protocol"));
