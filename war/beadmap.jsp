@@ -10,7 +10,7 @@ try
 		Collections.sort(keys);
 		for(int i : keys)
 		{
-			out.println(beadArray.getFlowcellProperty("serial") + " " + beadArray.getLaneProperty(i,"lane").replace(":1","") + " " +  beadArray.getLaneProperty(i,"name"));
+			out.println(beadArray.getFlowcellProperty("serial") + "	" + beadArray.getLaneProperty(i,"lane").replace(":1","") + "	" +  beadArray.getLaneProperty(i,"name"));
 		}
 	}
 }
