@@ -13,6 +13,8 @@ try
                         out.println(beadArray.getFlowcellProperty("serial") + "	" + beadArray.getLaneProperty(i,"lane").replace(":1","") + "	" +   beadArray.getLaneProperty(i,"name") + "	" +  beadArray.getLaneProperty(i,"sex") + "	" +  beadArray.getLaneProperty(i,"tissue"));
 
                 }
+                
+                
         }
 }
 catch(Exception e)
