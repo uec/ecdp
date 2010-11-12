@@ -94,7 +94,7 @@ public class MethylationReport extends ECPane
 	@Override
 	public Label getToolTitle()
 	{
-		String labelString = "Infinium Meth (Geneus)";
+		String labelString = "Infinium Methylation 27K";
 		return new Label(labelString);
 	}
 

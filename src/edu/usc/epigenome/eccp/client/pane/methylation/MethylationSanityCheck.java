@@ -4,7 +4,6 @@ import java.util.Collections;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
@@ -32,7 +31,7 @@ public class MethylationSanityCheck extends ECPane
 		@Override
 		public Label getToolTitle()
 		{
-			return new Label("Meth Data Sanity Check");
+			return new Label("Methylation Sanity Check");
 		}
 
 		@Override

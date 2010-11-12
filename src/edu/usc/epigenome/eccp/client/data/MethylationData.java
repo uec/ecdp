@@ -2,6 +2,7 @@ package edu.usc.epigenome.eccp.client.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -10,7 +11,8 @@ public class MethylationData extends FlowcellData implements IsSerializable
 	public ArrayList<String> validateIntegrity(ArrayList<MethylationData> list)
 	{
 		ArrayList<String> errors = new ArrayList<String>();
-		HashMap<String,String> dupcheck = new HashMap<String,String>();
+		HashMap<String,ArrayList<String>> dupcheckBySample = new HashMap<String,ArrayList<String>>();
+		HashMap<String,ArrayList<String>> dupcheckByBarcode = new HashMap<String,ArrayList<String>>();
 		for(MethylationData m : list)
 		{
 			for(int l : m.lane.keySet())
@@ -18,31 +20,61 @@ public class MethylationData extends FlowcellData implements IsSerializable
 				String beadKey = m.getFlowcellProperty("serial") + m.getLaneProperty(l, "lane").replace(":1", "");
 				String sampleKey = m.getLaneProperty(l,"name");
 				
-				if(dupcheck.containsKey(beadKey))
-				{
-					errors.add("Warning: duplicate entry for barcode: " + beadKey);
-					if(!dupcheck.get(beadKey).contains(sampleKey))
-						errors.add("ERROR: Diff samples on same barcode: " + sampleKey + " on " + beadKey +"," + dupcheck.get(sampleKey));
-					dupcheck.put(beadKey, dupcheck.get(beadKey) + sampleKey + ",") ;
-				}
+				//populate the data structure
+				if(dupcheckBySample.containsKey(sampleKey))
+					dupcheckBySample.get(sampleKey).add(beadKey);
 				else
-					dupcheck.put(beadKey, sampleKey + ",");
-				
-				
-				if(dupcheck.containsKey(sampleKey) && sampleKey.toUpperCase().startsWith("TCGA"))
 				{
-					errors.add("Warning: TCGA ID on multiple barcodes: " + sampleKey + " on " + beadKey +"," + dupcheck.get(sampleKey));
-					dupcheck.put(sampleKey, dupcheck.get(sampleKey) + beadKey + ",") ;
+					ArrayList<String> s = new ArrayList<String>();
+					s.add(beadKey);
+					dupcheckBySample.put(sampleKey, s);
 				}
+				
+				if(dupcheckByBarcode.containsKey(beadKey))
+					dupcheckByBarcode.get(beadKey).add(sampleKey);
 				else
-					dupcheck.put(sampleKey, beadKey + ",");
-				
-				
-				if(sampleKey.toUpperCase().startsWith("TCGA") && false) // sampleKey.matches("????-\\w+-\\w+-\\w+-\\w+-\\w+-\\w+"))
 				{
-					errors.add("Warning: TCGA ID naming does not conform to standard: " + sampleKey);
+					ArrayList<String> s = new ArrayList<String>();
+					s.add(sampleKey);
+					dupcheckByBarcode.put(beadKey, s);
 				}
 			}
+		}
+		
+		for(String bkey : dupcheckByBarcode.keySet())
+		{
+			if(dupcheckByBarcode.get(bkey).size() > 1)
+			{
+				String allSamples = "";
+				for(String s : dupcheckByBarcode.get(bkey))
+				{
+					allSamples += " " + s;
+				}
+				HashSet<String> h = new HashSet<String>(dupcheckByBarcode.get(bkey));
+				if(h.size() > 1)
+					errors.add("ERROR: Different samples on same barcode: " + bkey + ": " + allSamples);  
+			}	
+		}
+		
+		
+		for(String skey : dupcheckBySample.keySet())
+		{
+			if(dupcheckBySample.get(skey).size() > 1)
+			{
+				String allSamples = "";
+				for(String s : dupcheckBySample.get(skey))
+				{
+					allSamples += " " + s;
+				}
+				
+				HashSet<String> h = new HashSet<String>(dupcheckBySample.get(skey));
+				if(h.size() > 1)
+					
+					errors.add("Warning: sample TCGA ID on multiple barcodes: " + skey + ": " + allSamples);
+				else
+					errors.add("Warning: duplicate entry for barcode: "  + skey + ": " + allSamples);
+					
+			}	
 		}
 		
 		return errors;
