@@ -295,10 +295,10 @@ public class FileBrowser extends Composite
 	//Interface to add images to the tree structure
 	public interface MyTreeImages extends TreeImages{
 		
-		 @Resource("downArrow.png")
+		 @Resource("images/downArrow.png")
 		    AbstractImagePrototype treeOpen();
 		    
-		    @Resource("rightArrow.png")
+		    @Resource("images/rightArrow.png")
 		    AbstractImagePrototype treeClosed();
 
 	}
