@@ -12,10 +12,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -181,7 +183,9 @@ public class FileBrowser extends Composite
 		//Set the TreeNode image
 		TreeImages images = (TreeImages)GWT.create(MyTreeImages.class);
 		TreeItem addinfo = null;
+		//Tree t = new Tree(images);
 		Tree t = new Tree(images);
+		
 		
 		//System.out.println("The size of the sorted list is " + sortedFiles.size());
 		TreeMap<String, ArrayList<LinkedHashMap<String, String>>> hm = new TreeMap<String, ArrayList<LinkedHashMap<String, String>>>();
@@ -215,12 +219,11 @@ public class FileBrowser extends Composite
 				
 				//Create FlexTable to display the data of each treenode
 				FlexTable displaytable = new FlexTable();
-				displaytable.addStyleName("filelist");
-				//Label bfilename = new Label("File Name");
+				displaytable.addStyleName("filelist");			
 				displaytable.setText(0, 0, "File Name");
 				displaytable.setText(0, 1, "File Type");
 				displaytable.setText(0, 2, "File Location");
-				
+
 				//Iterate over the arraylist for the particular nodevalue
 				for(int n=0;n<nodevalue.size();n++)
 				{
@@ -249,7 +252,8 @@ public class FileBrowser extends Composite
 				t.addItem(addinfo);
 			}
 			//finally add the tree to the filepanel
-			filePanel.add(t);			
+			filePanel.add(t);
+			
 	}
 
 	//Function to sort the arraylist by the option selected 
@@ -295,10 +299,10 @@ public class FileBrowser extends Composite
 	//Interface to add images to the tree structure
 	public interface MyTreeImages extends TreeImages{
 		
-		 @Resource("images/downArrow.png")
+		 @Resource("downArrow.png")
 		    AbstractImagePrototype treeOpen();
 		    
-		    @Resource("images/rightArrow.png")
+		    @Resource("rightArrow.png")
 		    AbstractImagePrototype treeClosed();
 
 	}
