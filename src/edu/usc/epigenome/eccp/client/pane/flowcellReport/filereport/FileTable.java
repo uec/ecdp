@@ -24,7 +24,7 @@ public class FileTable extends Composite
 	FlexTable contentTable = new FlexTable();
 	ArrayList<LinkedHashMap<String, String>> files;
 	HorizontalPanel header;
-	Image headerIcon = new Image("images/downArrow.png");
+	Image headerIcon = new Image("images/rightArrow.png");
 	Label headerText;
 	FileTable(String headerIn, ArrayList<LinkedHashMap<String, String>> filesIn)
 	{
@@ -38,6 +38,7 @@ public class FileTable extends Composite
 		header.add(contentCountText);
 		
 		main.add(header);
+		contentTable.addStyleName("contentTableDisplay");
 		contentTable.setVisible(false);
 		if(headerIn.contains("Search Res"))
 		{
@@ -55,12 +56,12 @@ public class FileTable extends Composite
 				if(contentTable.isVisible() == false)
 				{
 					contentTable.setVisible(true);
-					headerIcon.setUrl("images/rightArrow.png");
+					headerIcon.setUrl("images/downArrow.png");
 				}
 				else
 				{
 					contentTable.setVisible(false);
-					headerIcon.setUrl("images/downArrow.png");
+					headerIcon.setUrl("images/rightArrow.png");
 				}
 			}};
 			
