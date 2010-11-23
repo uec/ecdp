@@ -8,6 +8,8 @@ import java.util.TreeMap;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -15,11 +17,13 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.user.client.ui.Widget;
 
 
 @SuppressWarnings("deprecation")
@@ -30,6 +34,8 @@ public class FileBrowser extends Composite
 	HorizontalPanel menu_items = new HorizontalPanel();
 	MenuBar mainbar = new MenuBar();
 	Button searchbutton = new Button("Search");
+	
+	VerticalPanel fileGroups = new VerticalPanel();
 	
 	ArrayList<LinkedHashMap<String,String>> flowcellFileList;
 	
@@ -80,6 +86,7 @@ public class FileBrowser extends Composite
 		menu_items.add(searchpanel);
 		vp.add(menu_items);
 		vp.add(filePanel);
+		vp.add(fileGroups);
 		organizeBy("type");
 		initWidget(vp);
 		
@@ -93,6 +100,7 @@ public class FileBrowser extends Composite
 			public void onClick(ClickEvent event)
 			{
 				filePanel.clear();
+				fileGroups.clear();
 				String[] text = searchbox.getText().trim().toLowerCase().split("\\s");
 				ArrayList<LinkedHashMap<String, String>> searchHits =  new ArrayList<LinkedHashMap<String, String>>();
 				for(LinkedHashMap<String,String> flow : flowcellFileList)
@@ -107,7 +115,7 @@ public class FileBrowser extends Composite
 				}
 
 				if(searchHits.size()>0)
-					filePanel.add(new FileTable(searchHits));
+					filePanel.add(new FileTable("Search Results",searchHits));
 			}});	
 	}
 			
@@ -119,12 +127,7 @@ public class FileBrowser extends Composite
 		filePanel.clear();
 		
 		//Set the TreeNode image
-		TreeImages images = (TreeImages)GWT.create(MyTreeImages.class);
-		TreeItem addinfo = null;
-		//Tree t = new Tree(images);
-		Tree t = new Tree(images);
-		
-		
+		fileGroups.clear();
 		//System.out.println("The size of the sorted list is " + sortedFiles.size());
 		TreeMap<String, ArrayList<LinkedHashMap<String, String>>> organizedFiles = new TreeMap<String, ArrayList<LinkedHashMap<String, String>>>();
 		for(int i=0; i < sortedFiles.size(); i++)
@@ -145,13 +148,9 @@ public class FileBrowser extends Composite
 		}
 			for(String organizedByThis : organizedFiles.keySet())
 			{
-				addinfo= new TreeItem(organizedByThis);
-				addinfo.addItem(new FileTable(organizedFiles.get(organizedByThis)));
-				t.addItem(addinfo);
+				fileGroups.add(new FileTable(organizedByThis, organizedFiles.get(organizedByThis)));
+				
 			}
-			//finally add the tree to the filepanel
-			filePanel.add(t);
-			
 	}
 	
 	//Function to sort the arraylist by the option selected 

@@ -11,21 +11,62 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer.ChartType;
 
 public class FileTable extends Composite
 {
+	VerticalPanel main;
 	FlexTable contentTable = new FlexTable();
 	ArrayList<LinkedHashMap<String, String>> files;
-	
-	FileTable(ArrayList<LinkedHashMap<String, String>> filesIn)
+	HorizontalPanel header;
+	Image headerIcon = new Image("images/downArrow.png");
+	Label headerText;
+	FileTable(String headerIn, ArrayList<LinkedHashMap<String, String>> filesIn)
 	{
 		files = filesIn;
-		drawTable();
-		initWidget(contentTable);
+		main = new VerticalPanel();
+		header = new HorizontalPanel();
+		header.add(headerIcon);
+		headerText= new Label(headerIn);
+		header.add(headerText);
+		
+		main.add(header);
+		contentTable.setVisible(false);
+		if(headerIn.contains("Search Res"))
+		{
+			drawTable();
+			contentTable.setVisible(true);
+		}
+		
+		main.add(contentTable);
+		
+		
+		ClickHandler expand = new ClickHandler(){
+			public void onClick(ClickEvent event)
+			{
+				drawTable();
+				if(contentTable.isVisible() == false)
+				{
+					contentTable.setVisible(true);
+					headerIcon.setUrl("images/rightArrow.png");
+				}
+				else
+				{
+					contentTable.setVisible(false);
+					headerIcon.setUrl("images/downArrow.png");
+				}
+			}};
+			
+		headerText.addClickHandler(expand);
+		headerIcon.addClickHandler(expand);
+		
+			
+		initWidget(main);
 	}
 	
 	public void drawTable()
@@ -107,12 +148,4 @@ public class FileTable extends Composite
 		
 		return ret;
 	}
-	
-	public void onClick(ClickEvent event)
-	{
-		
-	}
-	
-	
-	
 }
