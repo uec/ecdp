@@ -36,18 +36,16 @@ public class FileBrowser extends Composite
 		flowcellFileList = fileListIn;
 		for(LinkedHashMap<String,String> set_type : flowcellFileList)
 			set_type.put("type", FileTable.getNiceType(set_type.get("base")));
-		
-			
-		
+
 		final HorizontalPanel searchpanel = new HorizontalPanel();
 		searchpanel.addStyleName("displayfilehorizontal");
 		final TextBox searchbox = new TextBox();
 		
-		searchpanel.add(new Label("Search Files for:"));
+		searchpanel.add(new Label("Search Files For:"));
 		searchpanel.add(searchbox);
 		searchpanel.add(searchbutton);
 		
-		mainbar.addItem("Organize by File Location", new Command()
+		mainbar.addItem("Organize By File Location", new Command()
 		{
 			public void execute()
 			{
@@ -56,7 +54,7 @@ public class FileBrowser extends Composite
 			}
 		});
 		
-		mainbar.addItem("by File Lane", new Command()
+		mainbar.addItem("Organize By File Lane", new Command()
 		{
 			public void execute()
 			{
@@ -64,23 +62,26 @@ public class FileBrowser extends Composite
 			}
 		});
 		
-		mainbar.addItem("by File Type", new Command()
+		mainbar.addItem("Organize By File Type", new Command()
 		{
 			public void execute()
 			{
 				organizeBy("type");
 			}
 		});
-		mainbar.addItem("Search for Files", new Command()
+		mainbar.addItem("Search Files", new Command()
 		{
 			public void execute()
 			{
 				DecoratedPopupPanel searchpopup = new DecoratedPopupPanel(true);
 				searchpopup.add(searchpanel);			
 				searchpopup.showRelativeTo(mainbar);
+
 			}
 		});
-
+		
+		fileGroups.addStyleName("fileGroupsDisplay");
+		vp.addStyleName("displayMenuBar");
 		vp.add(mainbar);
 		vp.add(filePanel);
 		vp.add(fileGroups);
