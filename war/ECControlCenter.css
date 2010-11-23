@@ -212,4 +212,6 @@
 	margin-right: 2px;
 }
 
-.displayMenuBar .gwt-Menu
+.displayContext {
+	margin-left: 3px;
+}
