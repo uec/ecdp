@@ -5,28 +5,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.Widget;
 
 
-@SuppressWarnings("deprecation")
+
 public class FileBrowser extends Composite
 {
 	VerticalPanel vp = new VerticalPanel();
@@ -45,17 +37,17 @@ public class FileBrowser extends Composite
 		for(LinkedHashMap<String,String> set_type : flowcellFileList)
 			set_type.put("type", FileTable.getNiceType(set_type.get("base")));
 		
-		MenuBar organize_dropdown = new MenuBar(true);	
+			
 		
-		HorizontalPanel searchpanel = new HorizontalPanel();
+		final HorizontalPanel searchpanel = new HorizontalPanel();
 		searchpanel.addStyleName("displayfilehorizontal");
 		final TextBox searchbox = new TextBox();
 		
-		searchpanel.add(new Label(" Search Files for:"));
+		searchpanel.add(new Label("Search Files for:"));
 		searchpanel.add(searchbox);
 		searchpanel.add(searchbutton);
 		
-		organize_dropdown.addItem("File Location", new Command()
+		mainbar.addItem("Organize by File Location", new Command()
 		{
 			public void execute()
 			{
@@ -64,7 +56,7 @@ public class FileBrowser extends Composite
 			}
 		});
 		
-		organize_dropdown.addItem("File Lane", new Command()
+		mainbar.addItem("by File Lane", new Command()
 		{
 			public void execute()
 			{
@@ -72,19 +64,24 @@ public class FileBrowser extends Composite
 			}
 		});
 		
-		organize_dropdown.addItem("File Type", new Command()
+		mainbar.addItem("by File Type", new Command()
 		{
 			public void execute()
 			{
 				organizeBy("type");
 			}
 		});
-		
-		menu_items.addStyleName("displayfilemenu");
-		mainbar.addItem("Organize By", organize_dropdown);
-		menu_items.add(mainbar);
-		menu_items.add(searchpanel);
-		vp.add(menu_items);
+		mainbar.addItem("Search for Files", new Command()
+		{
+			public void execute()
+			{
+				DecoratedPopupPanel searchpopup = new DecoratedPopupPanel(true);
+				searchpopup.add(searchpanel);			
+				searchpopup.showRelativeTo(mainbar);
+			}
+		});
+
+		vp.add(mainbar);
 		vp.add(filePanel);
 		vp.add(fileGroups);
 		organizeBy("type");
@@ -166,17 +163,6 @@ public class FileBrowser extends Composite
 			}
 		});
 		return sortedFiles;
-	}
-	
-	//Interface to add images to the tree structure
-	public interface MyTreeImages extends TreeImages{
-		
-		 @Resource("downArrow.png")
-		    AbstractImagePrototype treeOpen();
-		    
-		    @Resource("rightArrow.png")
-		    AbstractImagePrototype treeClosed();
-
 	}
 }
 
