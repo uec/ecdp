@@ -12,10 +12,13 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 
 
@@ -31,6 +34,7 @@ public class FileBrowser extends Composite
 	
 	ArrayList<LinkedHashMap<String,String>> flowcellFileList;
 	
+	@SuppressWarnings("deprecation")
 	public FileBrowser(ArrayList<LinkedHashMap<String,String>> fileListIn)
 	{
 		flowcellFileList = fileListIn;
@@ -40,8 +44,7 @@ public class FileBrowser extends Composite
 		final HorizontalPanel searchpanel = new HorizontalPanel();
 		searchpanel.addStyleName("displayfilehorizontal");
 		final TextBox searchbox = new TextBox();
-		
-		searchpanel.add(new Label("Search Files For:"));
+		searchbox.setValue("search for");
 		searchpanel.add(searchbox);
 		searchpanel.add(searchbutton);
 		
@@ -69,20 +72,20 @@ public class FileBrowser extends Composite
 				organizeBy("type");
 			}
 		});
-		mainbar.addItem("Search Files", new Command()
-		{
-			public void execute()
-			{
-				DecoratedPopupPanel searchpopup = new DecoratedPopupPanel(true);
-				searchpopup.add(searchpanel);			
-				searchpopup.showRelativeTo(mainbar);
-
+		
+		searchbox.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				searchbox.setValue("");
 			}
 		});
 		
 		fileGroups.addStyleName("fileGroupsDisplay");
-		vp.addStyleName("displayMenuBar");
-		vp.add(mainbar);
+		menu_items.add(mainbar);
+		menu_items.add(searchpanel);
+		vp.add(menu_items);
 		vp.add(filePanel);
 		vp.add(fileGroups);
 		organizeBy("type");
@@ -115,6 +118,9 @@ public class FileBrowser extends Composite
 				if(searchHits.size()>0)
 					filePanel.add(new FileTable("Search Results",searchHits));
 			}});	
+		
+		SubmitListener listenEnterClick = new SubmitListener();
+		searchbox.addKeyboardListener(listenEnterClick);
 	}
 			
 	
@@ -165,6 +171,14 @@ public class FileBrowser extends Composite
 		});
 		return sortedFiles;
 	}
+	
+	@SuppressWarnings("deprecation")
+	private class SubmitListener extends KeyboardListenerAdapter {
+	    public void onKeyPress(Widget sender, char key, int mods) {
+	      if (KeyboardListener.KEY_ENTER == key)
+	       searchbutton.click();
+	    }
+	  }
 }
 
 
