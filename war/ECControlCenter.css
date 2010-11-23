@@ -188,3 +188,28 @@
 	margin: 0 auto;
 	padding: 3px;
 }
+
+.contentTableDisplay {
+	margin-left: 15px;
+}
+
+.contentTableDisplay .gwt-Label{
+	text-decoration: underline;
+	font-weight:thicker;
+	font-style: normal;
+}
+
+.fileGroupsDisplay {
+	margin-top: 5px;
+}
+
+.fileGroupsDisplay .gwt-Label {
+	margin-top: 3px;
+}
+
+.fileGroupsDisplay .gwt-Image {
+	margin-top: 3px;
+	margin-right: 2px;
+}
+
+.displayMenuBar .gwt-Menu
