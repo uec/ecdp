@@ -35,6 +35,7 @@ public class FileTable extends Composite
 		headerText= new Label(headerIn);
 		header.add(headerText);
 		Label contentCountText = new Label(" (" + files.size() + " items)");
+		contentCountText.addStyleName("displayContext");
 		header.add(contentCountText);
 		
 		main.add(header);
