@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
-import edu.usc.epigenome.eccp.client.pane.flowcellReport.FileBrowser;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
 
 public class AnalysisSingleItem extends Composite
 {

@@ -68,9 +68,8 @@ public class MethylationData extends FlowcellData implements IsSerializable
 				}
 				
 				HashSet<String> h = new HashSet<String>(dupcheckBySample.get(skey));
-				if(h.size() > 1)
-					
-					errors.add("Warning: sample TCGA ID on multiple barcodes: " + skey + ": " + allSamples);
+				if(h.size() > 1)					
+					errors.add("Warning: Same Sample ID on multiple barcodes: " + skey + ": " + allSamples);
 				else
 					errors.add("Warning: duplicate entry for barcode: "  + skey + ": " + allSamples);
 					
