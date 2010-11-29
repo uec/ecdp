@@ -43,6 +43,7 @@ public class FileTable extends Composite
 		contentTable.setVisible(false);
 		if(headerIn.contains("Search Res"))
 		{
+			headerIcon.setUrl("images/downArrow.png");
 			drawTable();
 			contentTable.setVisible(true);
 		}
