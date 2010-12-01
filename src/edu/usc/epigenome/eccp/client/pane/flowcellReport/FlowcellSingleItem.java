@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -47,8 +48,10 @@ public class FlowcellSingleItem extends Composite
 		for(int i = 1; i<=8;i++)
 		{
 			flowcellTableSample.setText(i,0, flowcell.getLaneProperty(i,"processing"));
-			flowcellTableSample.setText(i,1, flowcell.getLaneProperty(i,"name"));
-			flowcellTableSample.setText(i,2, flowcell.getLaneProperty(i,"organism"));
+			String library = flowcell.getLaneProperty(i, "name").replace("+", "<br/>");
+			flowcellTableSample.setWidget(i,1, new HTML(library));
+			String organism = flowcell.getLaneProperty(i,"organism").replace("+", "<br/>");
+			flowcellTableSample.setWidget(i,2, new HTML(organism));
 			flowcellTableSample.setText(i,3, flowcell.getLaneProperty(i,"project"));						
 		}
 		vp.add(flowcellTable);
