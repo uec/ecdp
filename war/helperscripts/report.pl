@@ -24,8 +24,11 @@ if(!$findCache{$flowcell} || !$findCache{$flowcell . "WriteTime"} || (time() - $
 #filter unwanted things
 @allFiles = grep {
 					!m/aligntest/ &&
-					!m/Frame\.htm/ &&
-					!m/sequence\.\d+\./
+					!m/Frame\.htm/ 
+					
+					#had to remove because of tophat
+					#&&
+					#!m/sequence\.\d+\./
 				 } @allFiles;
 
 
@@ -53,7 +56,7 @@ elsif($doTDF)
 else
 {
 	#find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
-	find("\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
+	find("\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive","\\.expr");
 }
 
 print "</report>";
