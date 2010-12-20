@@ -95,7 +95,7 @@ public class AnalysisReport extends ECPane
 					@Override
 					public void onSuccess(ArrayList<String> result) 
 					{
-						String url = "http://localhost:8080/gareports/Gareports.html?"+"au=solan" + "&t=" + result.get(1) + "&q=" + result.get(0);
+						String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?"+"au=solan" + "&t=" + result.get(1) + "&q=" + result.get(0);
 						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url + "</a>"));
 						searchPanel.setWidth("720px");
 					}
