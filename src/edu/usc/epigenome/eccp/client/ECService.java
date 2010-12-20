@@ -36,6 +36,7 @@ public interface ECService extends RemoteService
 	String clearCache(String cachefile) throws IllegalArgumentException;
 	
 	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
-
+	ArrayList<String> getEncryptedData(String globalText, String laneText) throws IllegalArgumentException;
+	ArrayList<String> decryptKeyword(String fcellText, String laneText)throws IllegalArgumentException;
 	
 }
