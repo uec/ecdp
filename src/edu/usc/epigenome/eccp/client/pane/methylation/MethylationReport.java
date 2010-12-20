@@ -20,7 +20,6 @@ import edu.usc.epigenome.eccp.client.data.MethylationData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 
 
-
 public class MethylationReport extends ECPane
 {
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
@@ -31,7 +30,9 @@ public class MethylationReport extends ECPane
 	final TextBox globalSearchBox = new TextBox();
 	final TextBox laneSearchBox = new TextBox();
 	final Button searchButton = new Button("search");
-		
+	String laneText = null;
+	String fcellText = null;
+	
 	public MethylationReport()
 	{
 		searchPanel.add(searchOptionsPanel);
@@ -62,6 +63,15 @@ public class MethylationReport extends ECPane
 		if(Window.Location.getParameter("g") != null || Window.Location.getParameter("l") != null)
 			searchPanel.setVisible(false);
 		
+		if(Window.Location.getParameter("t") != null)
+			laneText = Window.Location.getParameter("t");
+		
+		if(Window.Location.getParameter("q") != null)
+			fcellText = Window.Location.getParameter("q");
+		
+		if(Window.Location.getParameter("t") != null || Window.Location.getParameter("q") != null)
+			searchPanel.setVisible(false);
+		
 		initWidget(mainPanel);
 		searchButton.addClickHandler(new ClickHandler(){
 
@@ -69,16 +79,25 @@ public class MethylationReport extends ECPane
 			{
 				if(searchPanel.getWidgetCount() > 1)
 					searchPanel.remove(1);
-				String encodedGlobal = "";
-				String encodedLane = "";
-				for(char c : laneSearchBox.getText().toCharArray())
-					encodedLane += (int) c > 99 ? String.valueOf((int) c) : "0" + String.valueOf((int) c) ;
-				for(char c : globalSearchBox.getText().toCharArray())
-					encodedGlobal += (int) c > 99 ? String.valueOf((int) c) : "0" + String.valueOf((int) c) ;
 				
-				String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?" + "r=meth&g=" + encodedGlobal + "&l=" + encodedLane;
-				searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url + "</a>"));
-				
+				AsyncCallback<ArrayList<String>> encrypstring = new AsyncCallback<ArrayList<String>>(){
+
+					@Override
+					public void onFailure(Throwable caught)
+					{
+						caught.printStackTrace();
+					}
+
+					@Override
+					public void onSuccess(ArrayList<String> result) 
+					{
+						String url = "http://localhost:8080/gareports/Gareports.html?"+"au=meth" + "&t=" + result.get(1) + "&q=" + result.get(0);
+						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url + "</a>"));
+						searchPanel.setWidth("720px");
+					}
+				};
+ 	 			remoteService.getEncryptedData(globalSearchBox.getText(), laneSearchBox.getText(), encrypstring);
+ 	 			
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
 				showTool();				
@@ -126,4 +145,23 @@ public class MethylationReport extends ECPane
 		remoteService.getMethFromGeneus(DisplayFlowcellCallback);	
 				
 	}
+	
+	public void decryptKeys()
+	{
+		AsyncCallback<ArrayList<String>> GotPlainText = new AsyncCallback<ArrayList<String>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				caught.printStackTrace();
+			}
+
+			@Override
+			public void onSuccess(ArrayList<String> result) {	
+				globalSearchBox.setText(result.get(0));
+				laneSearchBox.setText(result.get(1));
+			}
+		};
+		remoteService.decryptKeyword(fcellText, laneText, GotPlainText);
+	}
+
 }
