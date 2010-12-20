@@ -98,7 +98,7 @@ public class FlowcellReport extends ECPane
 					@Override
 					public void onSuccess(ArrayList<String> result) 
 					{
-						String url = "http://localhost:8080/gareports/Gareports.html?"+"au=sol" + "&t=" + result.get(1) + "&q=" + result.get(0);
+						String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?"+"au=sol" + "&t=" + result.get(1) + "&q=" + result.get(0);
 						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url  + "</a>"));
 						searchPanel.setWidth("720px");
 						//String IgvUrl = "http://localhost:8080/ECCP/Igvtrack.jsp?project=" + result.get(1) + "&fcell=" + result.get(0) + "&xml=true";
@@ -106,7 +106,7 @@ public class FlowcellReport extends ECPane
 						if(!(laneSearchBox.getText().isEmpty()))
 						{
 							//String IgvUrl = "http://localhost:8080/ECCP/Igvtrack.jsp?project=" + result.get(1) + "&xml=true";
-							String IgvUrl = "http://localhost:8080/ECCP/Igvtrack.jsp?project=" + result.get(1) + "&fcell=" + result.get(0) + "&";
+							String IgvUrl = "http://webapp.epigenome.usc.edu/ECCP/Igvtrack.jsp?project=" + result.get(1) + "&fcell=" + result.get(0) + "&";
 							searchPanel.add(new HTML("IGV Data Upload Track: <a href='" + IgvUrl + "'>" + IgvUrl + "</a>"));
 							searchPanel.setWidth("720px");
 						}
