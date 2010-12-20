@@ -28,5 +28,6 @@ public interface ECServiceAsync
 	void clearCache(String cachefile, AsyncCallback<String> callback) throws IllegalArgumentException;
 	void qstat(String queue, AsyncCallback<String[]> result) throws IllegalArgumentException;
 	void encryptURLEncoded(String srcText, AsyncCallback<String> callback);
-
+	void getEncryptedData(String globalText, String laneText, AsyncCallback<ArrayList<String>> callback);
+	void decryptKeyword(String fcellText, String laneText, AsyncCallback<ArrayList<String>> callback);
 }
