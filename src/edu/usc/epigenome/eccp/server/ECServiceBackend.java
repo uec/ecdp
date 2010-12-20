@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
@@ -410,6 +411,54 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return matchedFlowcells;
 	}
 	
+	public ArrayList<String> decryptKeyword(String fcellData, String laneData)
+	{
+		ArrayList<String> decryptedContents = new ArrayList<String>();
+		String fcellAfterDecrypt = null;
+		String laneAfterDecrypt = null;
+		try
+		{
+			//Decode the text using cipher
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.DECRYPT_MODE,keySpec,desCipher.getParameters());
+			
+			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
+			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(fcellData);
+			
+			System.out.println("The lane string to be decrypted is " + laneData + "fcell data is " + fcellData);
+			System.out.println("The decrypted string for lane is " + laneEncodedBytes + "fcell is " + fcellEncodedBytes);
+			
+			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
+			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
+			laneAfterDecrypt = new String(laneBytes);
+			fcellAfterDecrypt = new String(fcellBytes);
+			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
+			String tempFcell = fcellAfterDecrypt.substring(0,fcellAfterDecrypt.length()-32);
+			
+			System.out.println("decrypted contents fcell is  " + tempFcell + "and for lane is " + tempLane);	
+			System.out.println("The md5 of decrypted fcell is " + md5(tempFcell) + "and of decrypted lane is " + md5(tempLane));
+			
+			if(md5(tempLane).equals(laneAfterDecrypt.substring(laneAfterDecrypt.length()-32, laneAfterDecrypt.length())) && 
+					md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length()-32, fcellAfterDecrypt.length())))
+			{
+				System.out.println("RETURNING FROM IF CASE");
+				decryptedContents.add(tempFcell);
+				decryptedContents.add(tempLane);
+				return decryptedContents;
+			}
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("RETURNING FROM DEFAULT CASE");
+		decryptedContents.add(fcellData);
+		decryptedContents.add(laneData);
+		System.out.println("The contents for DEFAULT return is " + decryptedContents.get(0) + "and " + decryptedContents.get(1));
+		return decryptedContents;
+	}
 	
 	/* METHODS FOR Methylation data retrieval
 	 * (non-Javadoc)
@@ -618,13 +667,37 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return srcText;
 	}
 	
+	public ArrayList<String> getEncryptedData(String globalText, String laneText)
+	{
+		try
+		{
+			ArrayList<String> retCipher = new ArrayList<String>();
+			System.out.println("The global text is " + globalText);
+			System.out.println("The lane text is " + laneText);
+			String mdGlobal = md5(globalText);
+			String mdLane = md5(laneText);
+			String tempGlobal = globalText.concat(mdGlobal);
+			System.out.println("The md5 concatenated string is " + tempGlobal);
+			String tempLane = laneText.concat(mdLane);
+			System.out.println("The md5 concatenated string is " + tempLane);
+			retCipher.add(encryptURLEncoded(tempGlobal));
+			retCipher.add(encryptURLEncoded(tempLane));
+			return retCipher;
+		}		
+		catch (Exception e)
+		{			
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	@SuppressWarnings("deprecation")
 	public String encryptURLEncoded(String srcText) throws IllegalArgumentException
 	{
 		return java.net.URLEncoder.encode(encryptString(srcText));
 	}
-
-	public static String md5(String text)
+	
+	private static String md5(String text)
 	{
 		MessageDigest md;
 		try
@@ -648,5 +721,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return text;		
 	}
+
+	
 
 }
