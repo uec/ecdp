@@ -56,7 +56,7 @@ elsif($doTDF)
 else
 {
 	#find("\\.htm","\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive");
-	find("\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive","\\.expr","\\.diff");
+	find("\\.csv","sequence\\.txt","export\\.txt","eland","\\.map","\\.bam","\\.sam","\\.wig","\\.peaks","\\.tdf","\\.bed","\\.g[tf]f","\\.srf","qseqs_archive","\\.expr","\\.diff","\\.tracking");
 }
 
 print "</report>";
