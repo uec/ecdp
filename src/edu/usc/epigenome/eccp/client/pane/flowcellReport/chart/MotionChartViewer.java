@@ -2,6 +2,8 @@ package edu.usc.epigenome.eccp.client.pane.flowcellReport.chart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.visualization.client.DataTable;
@@ -18,6 +20,9 @@ public class MotionChartViewer extends Composite
 		final String resultRows[] = inputDataCSV.split("\\n");
 		final ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
 		final HashMap<String,Integer> totals = new HashMap<String,Integer>();
+		final HashMap<String, Integer> accTotals = new HashMap<String, Integer>();
+		final HashMap<String, Float> accSum = new HashMap<String, Float>();
+		
 		
 		for (int i = 0; i < resultRows.length; i++)
 		{
@@ -71,7 +76,29 @@ public class MotionChartViewer extends Composite
 					    dataMatrixNormalized.addColumn(ColumnType.STRING, "Base");
 						dataMatrixNormalized.addRows(resultRows.length);
 						
+						//data container for Accumulative counts for qualities
+						DataTable dataMatrixAccumulative = DataTable.create();
+						dataMatrixAccumulative.addColumn(ColumnType.STRING, "Base-Qual");
+						dataMatrixAccumulative.addColumn(ColumnType.NUMBER, "Quality");
+						dataMatrixAccumulative.addColumn(ColumnType.NUMBER, "Cycle");							    
+						dataMatrixAccumulative.addColumn(ColumnType.NUMBER, "Count");
+						dataMatrixAccumulative.addColumn(ColumnType.STRING, "Base");
+						dataMatrixAccumulative.addRows(resultRows.length);
 						
+						
+						DataTable dataMatrixAccPercent = DataTable.create();
+						dataMatrixAccPercent.addColumn(ColumnType.STRING, "Base-Qual");
+						dataMatrixAccPercent.addColumn(ColumnType.NUMBER, "Quality");
+						dataMatrixAccPercent.addColumn(ColumnType.NUMBER, "Cycle");							    
+						dataMatrixAccPercent.addColumn(ColumnType.NUMBER, "Percentage");
+						dataMatrixAccPercent.addColumn(ColumnType.STRING, "Base");
+						dataMatrixAccPercent.addRows(resultRows.length);
+						
+						String str1;
+						//variable to hold the summation value
+						int summation;
+						float sum;
+			
 						for (int i = 0; i < data.size(); i++)
 						{									
 							dataMatrixRawCounts.setValue(i, 0, data.get(i).get(0));
@@ -87,12 +114,97 @@ public class MotionChartViewer extends Composite
 							dataMatrixNormalized.setValue(i, 3, 100 * percentage);
 							dataMatrixNormalized.setValue(i, 4, data.get(i).get(4));
 							
-						}								
+							//get the base-qual and count value for the first element in the data arraylist
+							str1 = data.get(i).get(0);
+							summation = Integer.parseInt(data.get(i).get(3));
+							sum = Float.parseFloat(data.get(i).get(3));
+							
+							//start a for loop from (i+1th) element 
+							for(int j=i+1;j<data.size();j++)
+							{
+								//compare if elements belong to the same base and cycle
+								if(str1.equals(data.get(j).get(0)))
+								{
+									//if yes, add the count to the summation
+									summation = summation + Integer.parseInt(data.get(j).get(3));
+									sum = sum + Float.parseFloat(data.get(j).get(3));
+								}
+								else
+								{
+									//break 
+									break;
+								}
+							}//end of inner for loop (j)
+							
+							accSum.put((data.get(i).get(4) + data.get(i).get(2) + Integer.parseInt(data.get(i).get(1))), sum);
+							
+							if(accTotals.containsKey(data.get(i).get(2) + Integer.parseInt(data.get(i).get(1))))
+								accTotals.put(data.get(i).get(2) + Integer.parseInt(data.get(i).get(1)),accTotals.get(data.get(i).get(2) + Integer.parseInt(data.get(i).get(1))) + summation); 
+							else
+								accTotals.put(data.get(i).get(2) + Integer.parseInt(data.get(i).get(1)),summation);	
+							
+							//set values in the data table along with the summation value
+							dataMatrixAccumulative.setValue(i, 0, data.get(i).get(0));
+							dataMatrixAccumulative.setValue(i, 1, Integer.parseInt(data.get(i).get(1)));
+							dataMatrixAccumulative.setValue(i, 2, Integer.parseInt(data.get(i).get(2)));
+							dataMatrixAccumulative.setValue(i, 3, summation);
+							dataMatrixAccumulative.setValue(i, 4, data.get(i).get(4));
+						}//end for						
+						
+						//for displaying accumulative qualities by percentage
+						/*float percentSum;
+						String str2;
+						for(int i = 0;i < data.size(); i++)
+						{
+							str2 = data.get(i).get(0);
+							percentSum = Float.parseFloat(data.get(i).get(3));
+							
+							//start a for loop from (i+1th) element 
+							for(int j=i+1;j<data.size();j++)
+							{
+								//compare if elements belong to the same base and cycle
+								if(str2.equals(data.get(j).get(0)))
+								{
+									//if yes, add the count to the summation
+									percentSum = percentSum + Float.parseFloat(data.get(j).get(3));
+								}
+								else
+								{
+									//break 
+									break;
+								}
+							}
+							dataMatrixAccPercent.setValue(i, 0, data.get(i).get(0));
+							dataMatrixAccPercent.setValue(i, 1, Integer.parseInt(data.get(i).get(1)));
+							dataMatrixAccPercent.setValue(i, 2, Integer.parseInt(data.get(i).get(2)));
+							float percentAccu = (percentSum) / accTotals.get(data.get(i).get(2) + data.get(i).get(1));
+							dataMatrixAccPercent.setValue(i, 3, 100 * percentAccu);
+							dataMatrixAccPercent.setValue(i, 4, data.get(i).get(4));
+						}*/
+						
+						for(int i=0; i< data.size(); i++)
+						{
+							dataMatrixAccPercent.setValue(i, 0, data.get(i).get(0));
+							dataMatrixAccPercent.setValue(i, 1, Integer.parseInt(data.get(i).get(1)));
+							dataMatrixAccPercent.setValue(i, 2, Integer.parseInt(data.get(i).get(2)));
+							float percentAccu = accSum.get((data.get(i).get(4) + data.get(i).get(2) + Integer.parseInt(data.get(i).get(1)))) / accTotals.get(data.get(i).get(2) + data.get(i).get(1));
+							dataMatrixAccPercent.setValue(i, 3, 100 * percentAccu);
+							dataMatrixAccPercent.setValue(i, 4, data.get(i).get(4));
+						}
+						
+						//System.out.println("The accTotals for 261015 is " + accTotals.get("261015"));
+						//System.out.println("The accSum for A 261015 is " + accSum.get("A261015"));
+						//System.out.println("The size of accSum is " + accSum.size());
+						
 						MotionChart motion = new MotionChart(dataMatrixRawCounts, createOptions());
 						MotionChart motionPercentage = new MotionChart(dataMatrixNormalized, createOptions());
+						MotionChart motionAccu = new MotionChart(dataMatrixAccumulative, createOptions());
+						MotionChart motionAccuPercentage = new MotionChart(dataMatrixAccPercent, createOptions());
 						mainPanel.add(motion, "View by Raw Counts");
 						mainPanel.add(motionPercentage, "View by Percentage");
-						mainPanel.selectTab(1);
+						mainPanel.add(motionAccu,"View by Accumulative Qualities");
+						mainPanel.add(motionAccuPercentage, "View by Accumulative Percentage");
+						mainPanel.selectTab(3);
 										
 			}}, MotionChart.PACKAGE);
 		initWidget(mainPanel);
