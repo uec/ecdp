@@ -204,7 +204,7 @@ public class MotionChartViewer extends Composite
 						mainPanel.add(motionPercentage, "View by Percentage");
 						mainPanel.add(motionAccu,"View by Accumulative Qualities");
 						mainPanel.add(motionAccuPercentage, "View by Accumulative Percentage");
-						mainPanel.selectTab(3);
+						mainPanel.selectTab(1);
 										
 			}}, MotionChart.PACKAGE);
 		initWidget(mainPanel);
