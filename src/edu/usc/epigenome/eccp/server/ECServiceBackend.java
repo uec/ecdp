@@ -152,7 +152,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			public boolean accept(File dir, String name)
 			{
-				return (name.toUpperCase().matches("\\w{5}A[AB]XX") && !name.contains(".")); 
+				//System.out.println("The name returned is " + name);
+				//System.out.println("matches" + ((name.toUpperCase().contains("AAXX") || name.toUpperCase().contains("ABXX")) && !name.contains(".")));
+				return ((name.toUpperCase().contains("AAXX") || name.toUpperCase().contains("ABXX")) && !name.contains(".")); 
 			}
 		};
 		
