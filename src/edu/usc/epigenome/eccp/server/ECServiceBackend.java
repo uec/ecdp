@@ -152,7 +152,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			public boolean accept(File dir, String name)
 			{
-				return (name.toUpperCase().contains("AAXX") && !name.contains(".")); 
+				return (name.toUpperCase().matches("\\w{5}A[AB]XX") && !name.contains(".")); 
 			}
 		};
 		
@@ -165,7 +165,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				FlowcellData flowcell = new FlowcellData();
 				try
 				{
-					Pattern serialPattern = Pattern.compile("(\\w{5}AAXX)");
+					Pattern serialPattern = Pattern.compile("(\\w{5}A[AB]XX)");
 					Matcher serialMatcher = serialPattern.matcher(run.getName());
 					if(run.isDirectory() && serialMatcher.find())
 					{
