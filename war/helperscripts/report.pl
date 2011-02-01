@@ -2,6 +2,7 @@
 use File::Basename;
 use DB_File;
 use XML::Simple;
+use Data::Dumper;
 
 $flowcell = $ARGV[0];
 $doQC = 1 if $ARGV[1] =~ /qc/i;
@@ -103,28 +104,57 @@ sub qcreports
 			}
 			
 			#add qc from summary.xml
-			$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
+			if ($summaryFile =~ /.bz2/)
+			{
+				#print Dumper($summaryFile);
+ 				$bzoutput = qx/bzcat $summaryFile/;
+ 				$summaryRef = XMLin($bzoutput, KeyAttr => "laneNumber", forcearray => ['Read']) if -e $summaryFile;
+ 			}
+ 			else{
+			$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber", forcearray => ['Read']) if -e $summaryFile;
+			}
+			#$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
 			$RTAConfigRef = XMLin($RTAConfigFile) if -e $RTAConfigFile;
-			$headerLine .= ",Date_Sequenced,Lane_Yield,Clusters_Raw,Clusters_PF,Percent_Clusters_PF,Int_1Cycle,Int_20Cycles,Phasing,Prephasing,ControlLane,ReadType";
+			$headerLine .= ",Date_Sequenced";
 			for my $i (0..$#qcFileContent)
 			{				
+				#print Dumper($summaryRef);
 				$qcFileContent[$i] =~ /^.+?,(\d+),/;
 				my $laneNum = $1;
 				my $date = $summaryRef->{Date} || "Mon Jan 00 00:00:00 0000";
 				$date =~ s/^.{4}//;
 				$date =~ s/\d+:\d+:\d+ //;
 				$qcFileContent[$i] .= ",$date,";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{laneYield}) . ",";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountRaw}->{mean}) . ",";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{clusterCountPF}->{mean}) . ",";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{percentClustersPF}->{mean}) . "%,";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{oneSig}->{mean}) . ",";
-				$qcFileContent[$i] .= getValue($summaryRef->{LaneResultsSummary}->{Read}->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean}) . "%,";
-				$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{phasingApplied}) . "%,";
-				$qcFileContent[$i] .= getValue($summaryRef->{ExpandedLaneSummary}->{Read}->{Lane}->{$laneNum}->{prephasingApplied}) . "%,";
+				
+				#get lane results summary data from xml
+				for my $readData (@{$summaryRef->{LaneResultsSummary}->{Read}})
+				{
+					my $end = $readData->{readNumber};
+					$headerLine .= ",Lane_Yield_R$end,Clusters_Raw_R$end,Clusters_PF_R$end,Percent_Clusters_PF_R$end,Int_1Cycle_R$end,Int_20Cycles_R$end";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{laneYield}) . ",";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{clusterCountRaw}->{mean}) . ",";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{clusterCountPF}->{mean}) . ",";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{percentClustersPF}->{mean}) . "%,";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{oneSig}->{mean}) . ",";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{signal20AsPctOf1}->{mean}) . "%,";
+										
+				}
+				
+				#get EXPANDED lane results summary data from xml
+				for my $readData (@{$summaryRef->{ExpandedLaneSummary}->{Read}})
+				{
+					my $end = $readData->{readNumber};
+					$headerLine .= ",Phasing_R$end,Prephasing_R$end";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{phasingApplied}) . "%,";
+					$qcFileContent[$i] .= getValue($readData->{Lane}->{$laneNum}->{prephasingApplied}) . "%,";
+				}
+				
+				#get RTA nums from xml
+				$headerLine .= ",ControlLane,ReadType";
 				$qcFileContent[$i] .= getValue($RTAConfigRef->{ControlLane}) . ",";
 				$qcFileContent[$i] .= getValue($RTAConfigRef->{ReadType});
 				
+				#get genome aligned to
 				my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
 				my $genome = `$genomeCmd`;
 				$genome =~ /\=*(\S+)\s*$/;
@@ -136,6 +166,7 @@ sub qcreports
 				}
 			}
 			
+			#now print xml results
 			$reportContents .= "<qcreport path=\"$qcFileName\">";
 			my @header = split(/,/,$headerLine);
 			foreach my $line (@qcFileContent)
