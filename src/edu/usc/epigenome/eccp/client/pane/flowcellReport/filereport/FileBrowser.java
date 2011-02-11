@@ -3,6 +3,7 @@ package edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -126,13 +127,17 @@ public class FileBrowser extends Composite
 	
 	public void organizeBy(String orgby) 
 	{	
-		//get the Arraylist sorted by the selection made 
-		ArrayList<LinkedHashMap<String,String>> sortedFiles = sortBy(orgby);
+		ArrayList<LinkedHashMap<String,String>> sortedFiles = flowcellFileList;
+		//remove duplicates from the ArrayList
+		HashSet<LinkedHashMap<String, String>> noDups = new HashSet<LinkedHashMap<String, String>>(sortedFiles);
+		sortedFiles.clear();
+		sortedFiles.addAll(noDups);
+		//get the Arraylist sorted by the selection made
+		sortedFiles= sortBy(orgby);
+		//ArrayList<LinkedHashMap<String,String>> sortedFiles = sortBy(orgby);
 		filePanel.clear();
-		
 		//Set the TreeNode image
 		fileGroups.clear();
-		//System.out.println("The size of the sorted list is " + sortedFiles.size());
 		TreeMap<String, ArrayList<LinkedHashMap<String, String>>> organizedFiles = new TreeMap<String, ArrayList<LinkedHashMap<String, String>>>();
 		for(int i=0; i < sortedFiles.size(); i++)
 		{
@@ -142,14 +147,17 @@ public class FileBrowser extends Composite
 				ArrayList<LinkedHashMap<String, String>> valret = (ArrayList<LinkedHashMap<String, String>>)organizedFiles.get(f.get(orgby));
 				valret.add(f);
 				organizedFiles.put(f.get(orgby), valret);
+				//System.out.println("organized by if contains key is " + organizedFiles);
 			}
 			else
 			{
 				ArrayList<LinkedHashMap<String, String>> putval = new ArrayList<LinkedHashMap<String, String>>();
 				putval.add(f);
 				organizedFiles.put(f.get(orgby), putval);
+				//System.out.println("organized by if not contains is " + organizedFiles);
 			}
 		}
+		//System.out.println("The treemap files are " + organizedFiles);
 			for(String organizedByThis : organizedFiles.keySet())
 			{
 				fileGroups.add(new FileTable(organizedByThis, organizedFiles.get(organizedByThis)));
