@@ -115,16 +115,18 @@ sub qcreports
 			}
 			#$summaryRef = XMLin($summaryFile, KeyAttr => "laneNumber") if -e $summaryFile;
 			$RTAConfigRef = XMLin($RTAConfigFile) if -e $RTAConfigFile;
-			$headerLine .= ",Date_Sequenced";
+			$headerLine .= ",Date_Sequenced,Machine";
 			for my $i (0..$#qcFileContent)
 			{				
 				#print Dumper($summaryRef);
 				$qcFileContent[$i] =~ /^.+?,(\d+),/;
 				my $laneNum = $1;
+				my $machine = $summaryRef->{ChipSummary}->{Machine} || "NA";
 				my $date = $summaryRef->{Date} || "Mon Jan 00 00:00:00 0000";
 				$date =~ s/^.{4}//;
 				$date =~ s/\d+:\d+:\d+ //;
 				$qcFileContent[$i] .= ",$date,";
+				$qcFileContent[$i] .= "$machine,";
 				
 				#get lane results summary data from xml
 				for my $readData (@{$summaryRef->{LaneResultsSummary}->{Read}})
