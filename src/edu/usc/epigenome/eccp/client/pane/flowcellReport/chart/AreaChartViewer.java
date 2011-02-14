@@ -47,7 +47,9 @@ public class AreaChartViewer extends Composite
 	    options.setHeight(300);
 	    options.setMax(100.00);
 	    options.setMin(0.00);
-	    options.setLogScale(true);
+	    options.setTitleY("Percentage");
+	    options.setTitleX("Read");
+	    //options.setLogScale(true);
 	    return options;
 	}
 }
