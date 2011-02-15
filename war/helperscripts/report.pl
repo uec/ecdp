@@ -25,8 +25,8 @@ if(!$findCache{$flowcell} || !$findCache{$flowcell . "WriteTime"} || (time() - $
 #filter unwanted things
 @allFiles = grep {
 					!m/aligntest/ &&
-					!m/Frame\.htm/ 
-					
+					!m/Frame\.htm/ && 
+					m/^\/storage.+(flowcells|incoming|analysis|runs)/					
 					#had to remove because of tophat
 					#&&
 					#!m/sequence\.\d+\./
@@ -34,11 +34,13 @@ if(!$findCache{$flowcell} || !$findCache{$flowcell . "WriteTime"} || (time() - $
 
 
 @allFilesFiltered = @allFiles;
-@allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming|analysis)//} @allFilesFiltered;
-
+#@allFiles = grep {/^\/storage.+(flowcells|incoming|analysis|runs)/} @allFiles;
+@allFilesFiltered = grep {s/^\/storage.+(flowcells|incoming|analysis|runs)//} @allFilesFiltered;
+$#allFilesFiltered == $#allFiles || die;
 
 for my $i (0.. $#allFilesFiltered)
 {
+	#print $allFilesFiltered[$i] . "\t" . $allFiles[$i] . "\n";
 	$cleanToFullPathHash{$allFilesFiltered[$i]} = $allFiles[$i];
 }
 
@@ -67,14 +69,14 @@ sub find
 {
 	for my $regex (@_)
 	{
-		my @results = grep {m/$regex/} @allFilesFiltered;
+		my @results = grep {m/$regex/} @allFilesFiltered; 
 		for $hit (@results)
 		{
-			my $fullPath = $cleanToFullPathHash{$hit};
-			my ($base,$dir) = fileparse($hit);
-			$dir =~ /\/.+?\/(.+$)/;
-			my $location = $1||$dir;
-			print "<file base=\"$base\" dir=\"$dir\" label=\"$location\" type=\"unknown\" fullpath=\"$fullPath\"/>";
+				my $fullPath = $cleanToFullPathHash{$hit};
+				my ($base,$dir) = fileparse($hit);
+				$dir =~ /\/.+?\/(.+$)/;
+				my $location = $1||$dir;
+				print "<file base=\"$base\" dir=\"$dir\" label=\"$location\" type=\"unknown\" fullpath=\"$fullPath\"/>";
 		}
 	}
 }
