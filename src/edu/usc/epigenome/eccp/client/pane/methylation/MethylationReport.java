@@ -82,13 +82,11 @@ public class MethylationReport extends ECPane
 				
 				AsyncCallback<ArrayList<String>> encrypstring = new AsyncCallback<ArrayList<String>>(){
 
-					@Override
 					public void onFailure(Throwable caught)
 					{
 						caught.printStackTrace();
 					}
 
-					@Override
 					public void onSuccess(ArrayList<String> result) 
 					{
 						String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?"+"au=meth" + "&t=" + result.get(1) + "&q=" + result.get(0);
@@ -150,12 +148,10 @@ public class MethylationReport extends ECPane
 	{
 		AsyncCallback<ArrayList<String>> GotPlainText = new AsyncCallback<ArrayList<String>>() {
 
-			@Override
 			public void onFailure(Throwable caught) {
 				caught.printStackTrace();
 			}
 
-			@Override
 			public void onSuccess(ArrayList<String> result) {	
 				globalSearchBox.setText(result.get(0));
 				laneSearchBox.setText(result.get(1));

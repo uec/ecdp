@@ -76,7 +76,6 @@ public class FileBrowser extends Composite
 		
 		searchbox.addClickHandler(new ClickHandler() {
 			
-			@Override
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
 				searchbox.setValue("");
