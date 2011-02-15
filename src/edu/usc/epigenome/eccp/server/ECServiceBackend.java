@@ -12,6 +12,12 @@ import java.io.InputStreamReader;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,7 +92,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 	}
 	
-	public ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException
+	public ArrayList<FlowcellData> getFlowcellsFromGeneusFiles() throws IllegalArgumentException
 	{
 		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
 		try
@@ -140,6 +146,146 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;
 		
 	}
+	/*
+	 * Get flowcells from Geneus information from the database
+	 */
+	@SuppressWarnings("deprecation")
+	public ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException
+	{
+		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+
+			//URL
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+
+			//create the connection
+			 myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//Get all the distinct geneusId's 
+			String selectQuery ="select distinct(geneusID_run), Date_Sequenced from sequencing.view_run_metric where Date_Sequenced != 'NULL' order by str_to_date(Date_Sequenced, '%m/%d/%y') Desc";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the resultset consisting of GeneusID(limsid)
+		   if(results.next())
+		   {
+		     do
+			 {
+		    	 FlowcellData flowcell = new FlowcellData();
+		    	 String lims_id = results.getString("geneusId_run");
+		    	 Statement st1 = myConnection.createStatement();
+		    	 //for each geneusid get the flowcell serial no, protocol, technician, the date and the control lane 
+		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing.view_run_metric where geneusID_run ='"+lims_id + "' and Date_Sequenced !='NULL' group by geneusId_run";            
+		    	 ResultSet rs = st1.executeQuery(innSelect);
+		    	 //Iterate over the resultset and add the flowcellproperties for each of the flowcells
+		    	 while(rs.next())
+		    	 {
+		    		 flowcell.flowcellProperties.put("serial", rs.getString("flowcell_serial"));
+		    		 flowcell.flowcellProperties.put("limsID", lims_id);
+		    		 flowcell.flowcellProperties.put("technician", rs.getString("technician").replace("å", ""));
+		    		 //@SuppressWarnings("deprecation")  
+		    		 Date d = new Date(rs.getString("Date_Sequenced"));
+		    		 flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+		    		 //flowcell.flowcellProperties.put("date", rs.getString("Date_Sequenced"));
+		    		 flowcell.flowcellProperties.put("protocol", rs.getString("protocol"));
+		    		 flowcell.flowcellProperties.put("status","in geneus");
+		    		 flowcell.flowcellProperties.put("control", rs.getString("ControlLane"));
+		    	 }
+				 rs.close();
+				 st1.close();
+					
+				//Select distinct lanes for each of the flowcells
+				Statement statLane = myConnection.createStatement();
+				String LaneProp ="select distinct(lane) from sequencing.view_run_metric where geneusID_run ='"+lims_id+"'";
+				ResultSet RsProp = statLane.executeQuery(LaneProp);	
+				//Iterate over the lane numbers 
+				while(RsProp.next())
+				{
+					int lane_no =  RsProp.getInt("lane");
+					HashMap<String,String> sampleData = new HashMap<String,String>();
+					Statement cellprop = myConnection.createStatement();
+					//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
+					String st2 ="select processing, sample_name, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
+					ResultSet Prop = cellprop.executeQuery(st2);
+						
+					//Iterate over the information and populate the lane information
+					while(Prop.next())
+					{
+						sampleData.put("processing", Prop.getString("processing"));
+						String sample_name = Prop.getString("sample_name");
+						String organism = Prop.getString("organism");
+						if(sampleData.containsKey("name"))
+						{
+							String tempName = sampleData.get("name");
+							//System.out.println("The temp name is " + tempName);
+							if(!(tempName.contains(sample_name)))
+							{
+								//System.out.println("The names are not equal");
+								sampleData.put("name", sampleData.get("name").concat("+").concat(sample_name));
+							}
+							//else{
+								//System.out.println("THE names are equal");
+								//sampleData.put("name", tempName);
+							//}
+						}
+						else
+							sampleData.put("name", sample_name);
+							
+						if(sampleData.containsKey("organism"))
+						{
+							String tempOrg = sampleData.get("organism");
+							if(!(tempOrg.contains(organism)))
+								sampleData.put("organism", sampleData.get("organism").concat("+").concat(organism));
+							//else
+								//sampleData.put("organism", tempOrg);
+						}
+						else
+							sampleData.put("organism", Prop.getString("organism"));
+						    sampleData.put("project", Prop.getString("project"));
+					}
+					Prop.close();
+					cellprop.close();
+					flowcell.lane.put(lane_no, sampleData);	
+				}
+				RsProp.close();
+				statLane.close();
+			    //add each of the flowcell to the arraylist
+				flowcells.add(flowcell);
+				
+		     }while(results.next());
+		    
+		     results.close();
+		     stat.close();
+		   }
+		   else
+		   	{
+			   System.out.println("In the else clause for FLOWCELLS");
+			   flowcells = getFlowcellsFromGeneusFiles();
+		   	}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try {
+				myConnection.close();
+			 } catch (SQLException e) {
+				e.printStackTrace();
+			 }
+		}
+		return flowcells;	
+	}
 	
 	
 	@SuppressWarnings("deprecation")
@@ -152,8 +298,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			public boolean accept(File dir, String name)
 			{
-				//System.out.println("The name returned is " + name);
-				//System.out.println("matches" + ((name.toUpperCase().contains("AAXX") || name.toUpperCase().contains("ABXX")) && !name.contains(".")));
 				return ((name.toUpperCase().contains("AAXX") || name.toUpperCase().contains("ABXX")) && !name.contains(".")); 
 			}
 		};
@@ -223,7 +367,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcellsIncomplete;
 	}
 	
-	public FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException
+	public FlowcellData getQCforFlowcellFiles(String serial) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
 		try
@@ -267,6 +411,103 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return flowcell;
 	}
+	
+	public FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException
+	{
+		FlowcellData flowcell = new FlowcellData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' order by analysis_id";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the result set
+		 if(results.next())
+		 {
+			do	
+			{
+				String analysis_id = results.getString("analysis_id");
+				//System.out.println("analysis_id is " + analysis_id);
+				Statement st1 = myConnection.createStatement();
+				//for each analysis_id get the QC information from the database
+				String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "'and Date_Sequenced !='NULL' group by lane";
+				ResultSet rs = st1.executeQuery(innSelect);
+				ResultSetMetaData rsMetaData = rs.getMetaData();
+				
+				LinkedHashMap<Integer,LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+				while(rs.next())
+				{
+					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
+					qcProperties.put("lane", rs.getString("lane"));
+					for(int i=1;i<=rsMetaData.getColumnCount();i++)
+					{
+						if(rsMetaData.getColumnName(i).equalsIgnoreCase("id_run_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_run") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("analysis_id") || rsMetaData.getColumnName(i).equalsIgnoreCase("processing") || rsMetaData.getColumnName(i).equalsIgnoreCase("project") || rsMetaData.getColumnName(i).equalsIgnoreCase("protocol") || 
+								rsMetaData.getColumnName(i).equalsIgnoreCase("organism") || rsMetaData.getColumnName(i).equalsIgnoreCase("technician") || rsMetaData.getColumnName(i).equalsIgnoreCase("flowcell_serial") || rsMetaData.getColumnName(i).equalsIgnoreCase("Date_Sequenced") || rsMetaData.getColumnName(i).equalsIgnoreCase("sample_name") || rsMetaData.getColumnName(i).equalsIgnoreCase("FlowCelln") || rsMetaData.getColumnName(i).equalsIgnoreCase("lane"))
+							continue;
+						else if(rsMetaData.getColumnName(i).equalsIgnoreCase("genome") || rsMetaData.getColumnName(i).equalsIgnoreCase("ReadType") || rsMetaData.getColumnName(i).equalsIgnoreCase("machine"))
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"NA");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i), rs.getString(i));
+						}
+						else
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"0");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
+						}
+					}
+					qcReport.put(rs.getInt("lane"), qcProperties);
+				}
+				rs.close();
+				st1.close();
+				//add the qcReport LinkedHashmap to the flowcell laneQC	
+				flowcell.laneQC.put(analysis_id, qcReport);
+			}while(results.next());
+			
+			 results.close();
+			 stat.close();
+			 myConnection.close();
+		}
+		else
+		{
+			System.out.println("In the else clause for QC");
+			flowcell = getQCforFlowcellFiles(serial);
+		}
+	 }catch( Exception E )
+		{ 
+			System.out.println( E.getMessage());	
+		}			
+		finally
+		{
+			try
+			{
+				myConnection.close();
+			}
+			catch (SQLException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+			return flowcell;
+	}
+	
 	
 	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
 	{
@@ -371,10 +612,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					if(run.isDirectory())
 					{
-						flowcell.flowcellProperties.put("serial", run.getName());
+			 			flowcell.flowcellProperties.put("serial", run.getName());
 						Date d = new Date(run.lastModified());
 						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
-						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
+			 			flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
 						flowcells.add(flowcell);
 					}
 				}
@@ -383,6 +624,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					System.out.println(e.getMessage());					
 				}
 			}
+			
 		}
 		Collections.sort(flowcells, new Comparator<FlowcellData>()
 				{
@@ -427,10 +669,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
 			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(fcellData);
-			
-			System.out.println("The lane string to be decrypted is " + laneData + "fcell data is " + fcellData);
-			System.out.println("The decrypted string for lane is " + laneEncodedBytes + "fcell is " + fcellEncodedBytes);
-			
 			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
 			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
 			laneAfterDecrypt = new String(laneBytes);
@@ -438,13 +676,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
 			String tempFcell = fcellAfterDecrypt.substring(0,fcellAfterDecrypt.length()-32);
 			
-			System.out.println("decrypted contents fcell is  " + tempFcell + "and for lane is " + tempLane);	
-			System.out.println("The md5 of decrypted fcell is " + md5(tempFcell) + "and of decrypted lane is " + md5(tempLane));
-			
 			if(md5(tempLane).equals(laneAfterDecrypt.substring(laneAfterDecrypt.length()-32, laneAfterDecrypt.length())) && 
 					md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length()-32, fcellAfterDecrypt.length())))
 			{
-				System.out.println("RETURNING FROM IF CASE");
 				decryptedContents.add(tempFcell);
 				decryptedContents.add(tempLane);
 				return decryptedContents;
@@ -455,10 +689,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			e.printStackTrace();
 		}
-		System.out.println("RETURNING FROM DEFAULT CASE");
 		decryptedContents.add(fcellData);
 		decryptedContents.add(laneData);
-		System.out.println("The contents for DEFAULT return is " + decryptedContents.get(0) + "and " + decryptedContents.get(1));
 		return decryptedContents;
 	}
 	
@@ -674,14 +906,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		try
 		{
 			ArrayList<String> retCipher = new ArrayList<String>();
-			System.out.println("The global text is " + globalText);
-			System.out.println("The lane text is " + laneText);
 			String mdGlobal = md5(globalText);
 			String mdLane = md5(laneText);
 			String tempGlobal = globalText.concat(mdGlobal);
-			System.out.println("The md5 concatenated string is " + tempGlobal);
 			String tempLane = laneText.concat(mdLane);
-			System.out.println("The md5 concatenated string is " + tempLane);
 			retCipher.add(encryptURLEncoded(tempGlobal));
 			retCipher.add(encryptURLEncoded(tempLane));
 			return retCipher;
@@ -723,7 +951,43 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return text;		
 	}
-
+	/*public String NoFormat(double num)
+	{
+		NumberFormat formatter = NumberFormat.getInstance();
+		String result = null;
+		//double no = Double.valueOf(num);
+		if (num != 0 && num > 100000) 
+	   	result = formatter.format(num / 1000000) + "M";
+	   	else
+		  	result = String.valueOf(num);
+		return result;
+	}*/
+	
+	NumberFormat formatter = NumberFormat.getInstance();
+	public String NoFormat(String temp)
+	{
+		String result = null;
+			// if(temp.contains(".bfa"))
+			//{
+				//return temp;
+			//}
+			//else
+			//{
+				double no = Double.valueOf(temp);
+				//System.out.println("The number is " + no);
+				if(no == 0)
+					result = temp;
+				else if(no > 100000)
+					result = formatter.format(no/1000000) + "M";
+				else if(no < 1.0)
+				{
+					result = formatter.format(no*100) +"%";
+				}
+				else
+					result = temp;
+			//}
+		return result;
+	}
 	
 
 }
