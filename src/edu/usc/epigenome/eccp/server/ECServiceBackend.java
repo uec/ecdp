@@ -172,7 +172,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//Get all the distinct geneusId's 
-			String selectQuery ="select distinct(geneusID_run), Date_Sequenced from sequencing.view_run_metric where Date_Sequenced != 'NULL' order by str_to_date(Date_Sequenced, '%m/%d/%y') Desc";
+			String selectQuery ="select distinct(geneusID_run), Date_Sequenced from sequencing.view_run_metric order by str_to_date(Date_Sequenced, '%m/%d/%y') Desc";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the resultset consisting of GeneusID(limsid)
@@ -184,7 +184,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		    	 String lims_id = results.getString("geneusId_run");
 		    	 Statement st1 = myConnection.createStatement();
 		    	 //for each geneusid get the flowcell serial no, protocol, technician, the date and the control lane 
-		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing.view_run_metric where geneusID_run ='"+lims_id + "' and Date_Sequenced !='NULL' group by geneusId_run";            
+		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing.view_run_metric where geneusID_run ='"+lims_id + "' group by geneusId_run";            
 		    	 ResultSet rs = st1.executeQuery(innSelect);
 		    	 //Iterate over the resultset and add the flowcellproperties for each of the flowcells
 		    	 while(rs.next())
@@ -193,8 +193,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		    		 flowcell.flowcellProperties.put("limsID", lims_id);
 		    		 flowcell.flowcellProperties.put("technician", rs.getString("technician").replace("å", ""));
 		    		 //@SuppressWarnings("deprecation")  
-		    		 Date d = new Date(rs.getString("Date_Sequenced"));
-		    		 flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+		    		 if(rs.getString("Date_Sequenced") == null || rs.getString("Date_Sequenced").equals(""))
+		    			 flowcell.flowcellProperties.put("date", "Unknown");
+		    		 else
+		    		 {
+		    			 Date d = new Date(rs.getString("Date_Sequenced"));
+		    			 flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+		    		 }
 		    		 //flowcell.flowcellProperties.put("date", rs.getString("Date_Sequenced"));
 		    		 flowcell.flowcellProperties.put("protocol", rs.getString("protocol"));
 		    		 flowcell.flowcellProperties.put("status","in geneus");
