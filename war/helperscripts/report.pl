@@ -160,7 +160,11 @@ sub qcreports
 				
 				#get genome aligned to
 				my $genomeCmd  = "cat " . dirname($qcFileName) . "/../../work*.txt | grep Lane.$laneNum" . ".Reference";
+				my $genomeCmd2  = "cat " . dirname($qcFileName) . "/../../../work*.txt | grep Lane.$laneNum" . ".Reference";
 				my $genome = `$genomeCmd`;
+				my $genome2 = `$genomeCmd2`;
+				$genome = length($genome) > length($genome2) ? $genome : $genome2;
+				
 				$genome =~ /\=*(\S+)\s*$/;
 				$genome = $1;
 				if($genome)
