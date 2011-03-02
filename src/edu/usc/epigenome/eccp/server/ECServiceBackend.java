@@ -514,7 +514,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	}
 	
 	
-	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
+	public FlowcellData getFilesforFlowcellOld(String serial) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
 		try
@@ -556,6 +556,85 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 	
+	
+	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
+	{
+		FlowcellData flowcell = new FlowcellData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+		
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select file_fullpath from sequencing.flowcell_file where flowcell_serial = '"+serial + "'";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
+			Matcher matcher;
+			Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
+			Matcher laneNumMatcher;
+			//Iterate over the result set
+			if(results.next())
+			{
+				do	
+					{
+						String fullPath = results.getString("file_fullpath");
+						System.out.println("FULLPATH is " + fullPath);
+						LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
+						//qcFileProperties.put("base", );
+						matcher = pattern.matcher(fullPath);
+						
+						if(matcher.find())
+						{
+							//System.out.println("IT MATCHES" + matcher.end());
+							qcFileProperties.put("base", getFileName(fullPath));
+							qcFileProperties.put("fullpath", fullPath);
+							qcFileProperties.put("type", "unknown");
+							qcFileProperties.put("label", fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
+							qcFileProperties.put("encfullpath", encryptURLEncoded(fullPath));
+							
+							laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+							if(laneNumMatcher.find())
+									qcFileProperties.put("lane", laneNumMatcher.group(1));
+							else
+									qcFileProperties.put("lane", "0");
+							
+							System.out.println("The remaining substring is " + fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
+							
+							flowcell.fileList.add(qcFileProperties);
+						}
+						
+					}while(results.next());
+			 }
+			else
+			{
+				System.out.println("In the else clause for files");
+				flowcell = getFilesforFlowcellOld(serial);
+			}
+	 }
+		catch (Exception e) {
+		// TODO: handle exception
+				e.printStackTrace();
+		}
+		return flowcell;
+ }
+	
+	public String getFileName(String fullPath)
+	{
+		int sep = fullPath.lastIndexOf('/');
+		return fullPath.substring(sep+1,fullPath.length());
+	}
 	
 	
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
