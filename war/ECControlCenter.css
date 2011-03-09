@@ -27,17 +27,20 @@
 
 .qctable tr:first-child td {
         font-weight: bold;
+        background-color: #BBCCEE;      
 }
 .qctable td {
         font-size: x-small;
         border-syle: dotted;
         border-width: 1px;
         border-color: #BBCCEE;
+        white-space:nowrap;
         text-align: right;
 }
 .qctable table {
         border-syle: dotted;
         border-width: 1px;
+        white-space:nowrap;
         border-color: #BBCCEE;
 }
 .viewchartlabel {
