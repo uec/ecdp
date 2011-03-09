@@ -231,16 +231,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						if(sampleData.containsKey("name"))
 						{
 							String tempName = sampleData.get("name");
-							//System.out.println("The temp name is " + tempName);
 							if(!(tempName.contains(sample_name)))
-							{
-								//System.out.println("The names are not equal");
 								sampleData.put("name", sampleData.get("name").concat("+").concat(sample_name));
-							}
-							//else{
-								//System.out.println("THE names are equal");
-								//sampleData.put("name", tempName);
-							//}
 						}
 						else
 							sampleData.put("name", sample_name);
@@ -250,8 +242,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							String tempOrg = sampleData.get("organism");
 							if(!(tempOrg.contains(organism)))
 								sampleData.put("organism", sampleData.get("organism").concat("+").concat(organism));
-							//else
-								//sampleData.put("organism", tempOrg);
 						}
 						else
 							sampleData.put("organism", Prop.getString("organism"));
@@ -458,12 +448,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
 					qcProperties.put("lane", rs.getString("lane"));
-					for(int i=1;i<=rsMetaData.getColumnCount();i++)
+					qcProperties.put("geneusID_sample", rs.getString("geneusID_sample"));
+					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
 					{
-						if(rsMetaData.getColumnName(i).equalsIgnoreCase("id_run_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_run") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("analysis_id") || rsMetaData.getColumnName(i).equalsIgnoreCase("processing") || rsMetaData.getColumnName(i).equalsIgnoreCase("project") || rsMetaData.getColumnName(i).equalsIgnoreCase("protocol") || 
-								rsMetaData.getColumnName(i).equalsIgnoreCase("organism") || rsMetaData.getColumnName(i).equalsIgnoreCase("technician") || rsMetaData.getColumnName(i).equalsIgnoreCase("flowcell_serial") || rsMetaData.getColumnName(i).equalsIgnoreCase("Date_Sequenced") || rsMetaData.getColumnName(i).equalsIgnoreCase("sample_name") || rsMetaData.getColumnName(i).equalsIgnoreCase("FlowCelln") || rsMetaData.getColumnName(i).equalsIgnoreCase("lane"))
-							continue;
-						else if(rsMetaData.getColumnName(i).equalsIgnoreCase("genome") || rsMetaData.getColumnName(i).equalsIgnoreCase("ReadType") || rsMetaData.getColumnName(i).equalsIgnoreCase("machine"))
+						
+						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
 						{
 							if(rs.getString(i) == null || rs.getString(i).equals(""))
 								qcProperties.put(rsMetaData.getColumnName(i),"NA");
@@ -478,6 +467,27 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							    qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
 						}
 					}
+					/*for(int i=1;i<=rsMetaData.getColumnCount();i++)
+					{
+						//if(rsMetaData.getColumnName(i).equalsIgnoreCase("id_run_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_run") || rsMetaData.getColumnName(i).equalsIgnoreCase("geneusID_sample") || rsMetaData.getColumnName(i).equalsIgnoreCase("analysis_id") || rsMetaData.getColumnName(i).equalsIgnoreCase("processing") || rsMetaData.getColumnName(i).equalsIgnoreCase("project") || rsMetaData.getColumnName(i).equalsIgnoreCase("protocol") || 
+							//	rsMetaData.getColumnName(i).equalsIgnoreCase("organism") || rsMetaData.getColumnName(i).equalsIgnoreCase("technician") || rsMetaData.getColumnName(i).equalsIgnoreCase("flowcell_serial") || rsMetaData.getColumnName(i).equalsIgnoreCase("Date_Sequenced") || rsMetaData.getColumnName(i).equalsIgnoreCase("sample_name") || rsMetaData.getColumnName(i).equalsIgnoreCase("FlowCelln") || rsMetaData.getColumnName(i).equalsIgnoreCase("lane"))
+							//continue;
+						//System.out.println("The column type is " + rsMetaData.getColumnType(i));
+						 if(rsMetaData.getColumnName(i).equalsIgnoreCase("genome") || rsMetaData.getColumnName(i).equalsIgnoreCase("ReadType") || rsMetaData.getColumnName(i).equalsIgnoreCase("machine"))
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"NA");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i), rs.getString(i));
+						}
+						else
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"0");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
+						}
+					}*/
 					qcReport.put(rs.getInt("lane"), qcProperties);
 				}
 				rs.close();
@@ -590,14 +600,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				do	
 					{
 						String fullPath = results.getString("file_fullpath");
-						System.out.println("FULLPATH is " + fullPath);
 						LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
-						//qcFileProperties.put("base", );
 						matcher = pattern.matcher(fullPath);
 						
 						if(matcher.find())
 						{
-							//System.out.println("IT MATCHES" + matcher.end());
 							qcFileProperties.put("base", getFileName(fullPath));
 							qcFileProperties.put("fullpath", fullPath);
 							qcFileProperties.put("type", "unknown");
@@ -609,8 +616,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 									qcFileProperties.put("lane", laneNumMatcher.group(1));
 							else
 									qcFileProperties.put("lane", "0");
-							
-							System.out.println("The remaining substring is " + fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
 							
 							flowcell.fileList.add(qcFileProperties);
 						}
@@ -1035,41 +1040,23 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return text;		
 	}
-	/*public String NoFormat(double num)
-	{
-		NumberFormat formatter = NumberFormat.getInstance();
-		String result = null;
-		//double no = Double.valueOf(num);
-		if (num != 0 && num > 100000) 
-	   	result = formatter.format(num / 1000000) + "M";
-	   	else
-		  	result = String.valueOf(num);
-		return result;
-	}*/
 	
 	NumberFormat formatter = NumberFormat.getInstance();
 	public String NoFormat(String temp)
 	{
 		String result = null;
-			// if(temp.contains(".bfa"))
-			//{
-				//return temp;
-			//}
-			//else
-			//{
-				double no = Double.valueOf(temp);
-				//System.out.println("The number is " + no);
-				if(no == 0)
-					result = temp;
-				else if(no > 100000)
-					result = formatter.format(no/1000000) + "M";
-				else if(no < 1.0)
-				{
-					result = formatter.format(no*100) +"%";
-				}
-				else
-					result = temp;
-			//}
+		double no = Double.valueOf(temp);
+		if(no == 0)
+			result = temp;
+		else if(no > 100000)
+			result = formatter.format(no/1000000) + "M";
+		else if(no < 1.0)
+		{
+			result = formatter.format(no*100) +"%";
+		}
+		else
+			result = temp;
+		
 		return result;
 	}
 	
