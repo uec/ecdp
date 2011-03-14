@@ -146,17 +146,14 @@ public class FileBrowser extends Composite
 				ArrayList<LinkedHashMap<String, String>> valret = (ArrayList<LinkedHashMap<String, String>>)organizedFiles.get(f.get(orgby));
 				valret.add(f);
 				organizedFiles.put(f.get(orgby), valret);
-				//System.out.println("organized by if contains key is " + organizedFiles);
 			}
 			else
 			{
 				ArrayList<LinkedHashMap<String, String>> putval = new ArrayList<LinkedHashMap<String, String>>();
 				putval.add(f);
 				organizedFiles.put(f.get(orgby), putval);
-				//System.out.println("organized by if not contains is " + organizedFiles);
 			}
 		}
-		//System.out.println("The treemap files are " + organizedFiles);
 			for(String organizedByThis : organizedFiles.keySet())
 			{
 				fileGroups.add(new FileTable(organizedByThis, organizedFiles.get(organizedByThis)));
