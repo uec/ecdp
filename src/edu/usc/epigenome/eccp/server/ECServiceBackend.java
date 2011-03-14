@@ -172,7 +172,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//Get all the distinct geneusId's 
-			String selectQuery ="select distinct(geneusID_run), Date_Sequenced from sequencing.view_run_metric order by str_to_date(Date_Sequenced, '%m/%d/%y') Desc";
+			String selectQuery ="select distinct(geneusID_run) from sequencing.view_run_metric";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the resultset consisting of GeneusID(limsid)
@@ -451,7 +451,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					qcProperties.put("geneusID_sample", rs.getString("geneusID_sample"));
 					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
 					{
-						
 						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
 						{
 							if(rs.getString(i) == null || rs.getString(i).equals(""))
