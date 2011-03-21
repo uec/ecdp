@@ -29,12 +29,8 @@
 		ServletOutputStream myOut = null;
 		try
 		{
-
 			myOut = response.getOutputStream();
 			File myfile = new File(filePath);
-
-			
-
 			FileInputStream input = new FileInputStream(myfile);
 			buf = new BufferedInputStream(input);
 			int readBytes = 0;
@@ -42,30 +38,28 @@
 			//set response headers
 			response.setContentType("application/octet-stream");
 			response.addHeader("Content-Disposition", "attachment; filename=" + myfile.getName());
-			response.setContentLength((int) myfile.length());
-			
+			if(myfile.length() <= Integer.MAX_VALUE)
+				response.setContentLength((int) myfile.length());
+			else
+				response.setHeader("Content-Length", Long.toString(myfile.length()));
 			
 			//read from the file; write to the ServletOutputStream
 			while ((readBytes = buf.read()) != -1)
 				myOut.write(readBytes);
-
+			
 		} catch (IOException ioe)
 		{
 			out.println("Unauthorized File Request");	
 			throw new ServletException(ioe.getMessage());
-
-		} finally
+		} 
+		finally
 		{
-
 			//close the input/output streams
 			if (myOut != null)
 				myOut.close();
 			if (buf != null)
 				buf.close();
-
 		}
-		
-		
 	}
 	catch(Exception e)
 	{
