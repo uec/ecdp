@@ -156,8 +156,8 @@ public class FlowcellSingleItem extends Composite
 
 			public void onOpen(OpenEvent<DisclosurePanel> event) 
 			{
-				String tabDnldUrl = "http://localhost:8080/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep1";
-				String wflowDnldUrl = "http://localhost:8080/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep2";
+				String tabDnldUrl = "http://webapp.epigenome.usc.edu/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep1";
+				String wflowDnldUrl = "http://webapp.epigenome.usc.edu/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep2";
 				Anchor tab = new Anchor("Illumina Sample Sheet", true, tabDnldUrl);
 				Anchor wflow = new Anchor("UEC Pipeline Parameters", true, wflowDnldUrl);
 				//HorizontalPanel toHold = new HorizontalPanel();
