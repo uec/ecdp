@@ -1,13 +1,17 @@
 package edu.usc.epigenome.eccp.client.pane.flowcellReport;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -20,6 +24,7 @@ public class FlowcellSingleItem extends Composite
 {
 	public DisclosurePanel qcPanel = new DisclosurePanel("Summary Statistics");
 	public DisclosurePanel filePanel = new DisclosurePanel("Download Files");
+	public DisclosurePanel reportPanel = new DisclosurePanel("Pipeline Parameters");
 	//public DisclosurePanel tilesPanel = new DisclosurePanel("View Tile Images");
 	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
@@ -58,6 +63,8 @@ public class FlowcellSingleItem extends Composite
 		vp.add(flowcellTableSample);
 		vp.add(qcPanel);
 		vp.add(filePanel);
+		vp.add(reportPanel);
+		
 		//vp.add(tilesPanel);
 		
 		qcPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
@@ -143,6 +150,25 @@ public class FlowcellSingleItem extends Composite
 					}});				
 			}			
 		});
+		
+		reportPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
+		{
+
+			public void onOpen(OpenEvent<DisclosurePanel> event) 
+			{
+				String tabDnldUrl = "http://localhost:8080/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep1";
+				String wflowDnldUrl = "http://localhost:8080/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep2";
+				Anchor tab = new Anchor("Illumina Sample Sheet", true, tabDnldUrl);
+				Anchor wflow = new Anchor("UEC Pipeline Parameters", true, wflowDnldUrl);
+				//HorizontalPanel toHold = new HorizontalPanel();
+				FlexTable toHold = new FlexTable();
+				//toHold.add(tab);
+				toHold.setWidget(0, 0,tab);
+				toHold.setWidget(1,0,wflow);
+				reportPanel.add(toHold);
+			}
+		});
+		
 //		tilesPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
 //		{
 //
