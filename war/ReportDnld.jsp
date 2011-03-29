@@ -56,7 +56,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select geneusID_sample, lane, sample_name, processing, Clusters_PF_R2 from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
+		String selectQuery ="select geneusID_sample, lane, sample_name, processing, protocol from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
 		ResultSet results = stat.executeQuery(selectQuery);
 	
 		ServletOutputStream myOut = null;
@@ -76,19 +76,19 @@ try{
 				myOut.println("Sample."+ i + ".SampleID = " + results.getString("geneusID_sample"));
 				String lane = results.getString("lane");
 				myOut.println("Sample."+ i + ".Lane = " + lane);
-				if(results.getString("Clusters_PF_R2").equals("0"))
+				if(results.getString("protocol").contains("Paired"))
 					myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt,s_" + lane + "_2_sequence.txt");
-				else
-					myOut.println("Sample."+ i + ".Input = s_1_sequence.txt,s_2_sequence.txt");
+				else if(results.getString("protocol").contains("Single"))
+					myOut.println("Sample."+ i + ".Input = s_" + lane + "_sequence.txt");
 				
 				if(results.getString("processing").contains("ChIP-seq"))
-					myOut.println("Sample."+ i + ".Workflow = Chipseq");
+					myOut.println("Sample."+ i + ".Workflow = chipseq");
 				else if(results.getString("processing").contains("BS-seq"))
-					myOut.println("Sample."+ i + ".Workflow = Bisulfite");
+					myOut.println("Sample."+ i + ".Workflow = bisulfite");
 				else if(results.getString("processing").contains("RNA-seq"))
-					myOut.println("Sample."+ i + ".Workflow = RNA-seq");
+					myOut.println("Sample."+ i + ".Workflow = rnaseq");
 				else
-					myOut.println("Sample."+ i + ".Workflow = Basic");
+					myOut.println("Sample."+ i + ".Workflow = basic");
 				
 				myOut.println("Sample."+ i + ".Reference = hg18");
 			}
