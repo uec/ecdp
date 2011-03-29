@@ -63,8 +63,8 @@ try{
 		try
 		{
 			myOut = response.getOutputStream();
-			response.setContentType("application/octet-stream");
-			response.addHeader("Content-Disposition", "attachment; filename=" + fcell_serial + "_pipeline.txt");
+			response.setContentType("text/plain");
+			response.addHeader("Content-Disposition", "inline; filename=" + fcell_serial + "_pipeline.txt");
 			int i=0;
 		
 			myOut.print("ClusterSize = 8" + "\n" + "queue = laird" + "\n" + "FlowcellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
