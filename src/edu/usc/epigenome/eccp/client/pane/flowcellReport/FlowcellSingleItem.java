@@ -158,8 +158,8 @@ public class FlowcellSingleItem extends Composite
 			{
 				String tabDnldUrl = "http://webapp.epigenome.usc.edu/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep1";
 				String wflowDnldUrl = "http://webapp.epigenome.usc.edu/ECCP/ReportDnld.jsp?fcserial=" + flowcell.getFlowcellProperty("serial") + "&report=rep2";
-				Anchor tab = new Anchor("Illumina Sample Sheet", true, tabDnldUrl);
-				Anchor wflow = new Anchor("UEC Pipeline Parameters", true, wflowDnldUrl);
+				Anchor tab = new Anchor("Illumina Sample Sheet", tabDnldUrl, "_blank");
+				Anchor wflow = new Anchor("UEC Pipeline Parameters", wflowDnldUrl, "_blank");
 				//HorizontalPanel toHold = new HorizontalPanel();
 				FlexTable toHold = new FlexTable();
 				//toHold.add(tab);
