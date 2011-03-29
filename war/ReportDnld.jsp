@@ -21,8 +21,8 @@ try{
 		try
 		{
 			myOut = response.getOutputStream();
-			response.setContentType("application/octet-stream");
-			response.addHeader("Content-Disposition", "attachment; filename=" + fcell_serial + "_sample.csv");
+			response.setContentType("text/plain");
+			response.addHeader("Content-Disposition", "inline; filename=" + fcell_serial + "_sample.csv");
 			int cols = results.getMetaData().getColumnCount();
 
 			myOut.print("FCID" + "," + "Lane" + "," + "SampleID" + "," + "SampleRef" + "," + "Index"  + "," + "Description" + "," + "Control" + "," +"Recipe" + "," + "Operator");
