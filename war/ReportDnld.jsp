@@ -77,9 +77,9 @@ try{
 				String lane = results.getString("lane");
 				myOut.println("Sample."+ i + ".Lane = " + lane);
 				if(results.getString("Clusters_PF_R2").equals("0"))
-					myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt, s_" + lane + "_2_sequence.txt");
+					myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt,s_" + lane + "_2_sequence.txt");
 				else
-					myOut.println("Sample."+ i + ".Input = s_1_sequence.txt, s_2_sequence.txt");
+					myOut.println("Sample."+ i + ".Input = s_1_sequence.txt,s_2_sequence.txt");
 				
 				if(results.getString("processing").contains("ChIP-seq"))
 					myOut.println("Sample."+ i + ".Workflow = Chipseq");
