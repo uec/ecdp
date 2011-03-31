@@ -88,7 +88,7 @@ try{
 				else if(results.getString("processing").contains("RNA-seq"))
 					myOut.println("Sample."+ i + ".Workflow = rnaseq");
 				else
-					myOut.println("Sample."+ i + ".Workflow = basic");
+					myOut.println("Sample."+ i + ".Workflow = regular");
 				
 				myOut.println("Sample."+ i + ".Reference = hg18");
 			}
