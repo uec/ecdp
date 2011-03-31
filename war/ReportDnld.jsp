@@ -15,7 +15,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, analysis_id, sample_name, ControlLane, processing, technician from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
+		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, analysis_id, sample_name, ControlLane, processing, technician from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
 		ResultSet results = stat.executeQuery(selectQuery);
 		ServletOutputStream myOut = null;
 		try
