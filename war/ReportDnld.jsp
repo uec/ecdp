@@ -67,7 +67,7 @@ try{
 			response.addHeader("Content-Disposition", "inline; filename=" + fcell_serial + "_pipeline.txt");
 			int i=0;
 		
-			myOut.print("ClusterSize = 8" + "\n" + "queue = laird" + "\n" + "FlowcellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
+			myOut.print("ClusterSize = 8" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
 			myOut.println();
 			while(results.next())
 			{
