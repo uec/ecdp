@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -136,6 +137,37 @@ public class FileTable extends Composite
 	
 	public static String getNiceType(String ext)
 	{
+		RegExp regex;
+		String ret = "Unknown Type";
+		//regex = RegExp.compile(".*(htm|tdf|bam|map|csv|txt|srf|peaks|map)$");
+		regex = RegExp.compile("(.*(htm|tdf|bam|map|wig|csv|txt|srf|peaks|map)($|(\\.(gz|bz2)))$)");
+		MatchResult mResult = regex.exec(ext);
+		if(mResult.getGroupCount()>=1)
+		{
+			String tempRes = mResult.getGroup(1);
+			//System.out.println("The match result group is " + mResult.getInput());
+			//System.out.println("The match result group is " + mResult.getGroup(1));
+			if(tempRes.contains("htm")) return "Web report";
+			if(tempRes.contains("tdf")) return "IGV track";
+			if(tempRes.contains("bam")) return "Bam Alignment";
+			if(tempRes.contains("tdf")) return "IGV Track";
+			if(tempRes.contains("map")) return "Maq Alignment";
+			if(tempRes.contains("csv")) return "CSV Table";
+			if(tempRes.contains("srf")) return "Sequence Archive";
+			if(tempRes.contains("txt")) return "Fastq sequence";
+			if(tempRes.contains("peaks")) return "FindPeaks output";
+			if(tempRes.contains("wig")) return "Wiggle Track";
+		}
+		else 
+		{
+			if(ext.contains("eland")) return "Eland Alignment";
+			if(ext.contains("export")) return "Export Alignment";
+			if(ext.contains("map") && ext.contains("aligntest")) return "Align Contam Test";
+		}
+		return ret;
+	}
+	/*public static String getNiceType(String ext)
+	{
 		String ret = "Unknown Type";
 		if(ext.contains(".htm")) return "Web report";
 		if(ext.contains(".wig")) return "Wiggle Track";
@@ -152,5 +184,5 @@ public class FileTable extends Composite
 		if(ext.contains(".map") && ext.contains("aligntest")) return "Align Contam Test";
 		
 		return ret;
-	}
+	}*/
 }
