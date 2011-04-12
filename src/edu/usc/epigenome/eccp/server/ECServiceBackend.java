@@ -439,7 +439,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				//create statement handle for executing queries
 				Statement stat = myConnection.createStatement();
 				//get the distinct analysis_id's for the given flowcell
-				String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' order by analysis_id";
+				String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' and analysis_id not REGEXP '^\\/storage.+(analysis)' order by analysis_id";
 				ResultSet results = stat.executeQuery(selectQuery);
 			
 				//Iterate over the result set
@@ -587,7 +587,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				String selectQuery ="select file_fullpath from sequencing.flowcell_file where flowcell_serial = '"+serial + "'";
 				ResultSet results = stat.executeQuery(selectQuery);
 			
-				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
+				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|runs|gastorage[1|2])/");
 				Matcher matcher;
 				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
 				Matcher laneNumMatcher;
