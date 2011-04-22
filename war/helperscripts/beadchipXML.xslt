@@ -20,6 +20,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<xsl:attribute name="tissue"><xsl:value-of select="sample/field[@name='Tissue Source']"/></xsl:attribute>
 							<xsl:attribute name="name"><xsl:value-of select="sample/name"/></xsl:attribute>
 							<xsl:attribute name="project"><xsl:value-of select="sample/project/name"/></xsl:attribute>
+							<xsl:attribute name="batch"><xsl:value-of select="sample/type/field[@name='Batch ID']"/></xsl:attribute>
+							<xsl:attribute name="histology"><xsl:value-of select="sample/type/field[@name='Histology']"/></xsl:attribute>
+							<xsl:attribute name="diseaseabr"><xsl:value-of select="sample/type/field[@name='Disease Abbreviation']"/></xsl:attribute>
 							<xsl:attribute name="date"><xsl:value-of select="sample/date-received"/><xsl:text>&#xa0;</xsl:text><xsl:value-of select="sample/date-completed"/></xsl:attribute>
 						</sample>
 				</xsl:for-each>					
