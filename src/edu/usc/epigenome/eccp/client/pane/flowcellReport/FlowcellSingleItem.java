@@ -45,7 +45,7 @@ public class FlowcellSingleItem extends Composite
 		//HEADERS
 		flowcellTableSample.setText(0,0, "Processing");
 		flowcellTableSample.setText(0,1, "Library");
-		flowcellTableSample.setText(0,2, "GeneusID");
+		flowcellTableSample.setText(0,2, "Geneusid");
 		flowcellTableSample.setText(0,3, "Organism");
 		flowcellTableSample.setText(0,4, "Project");
 		for(int i = 1; i<=8;i++)
