@@ -221,7 +221,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							HashMap<String,String> sampleData = new HashMap<String,String>();
 							Statement cellprop = myConnection.createStatement();
 							//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
-							String st2 ="select processing, sample_name, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
+							String st2 ="select processing, sample_name, geneusID_sample, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
 							ResultSet Prop = cellprop.executeQuery(st2);
 							
 							//Iterate over the information and populate the lane information
@@ -229,6 +229,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							{
 								sampleData.put("processing", Prop.getString("processing"));
 								String sample_name = Prop.getString("sample_name");
+								String sampleID = Prop.getString("geneusID_sample");
 								String organism = Prop.getString("organism");
 								if(sampleData.containsKey("name"))
 								{
@@ -247,6 +248,15 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 								}
 								else
 									sampleData.put("organism", Prop.getString("organism"));
+								
+								if(sampleData.containsKey("sampleID"))
+								{
+									String tempSampleID = sampleData.get("sampleID");
+									if(!(tempSampleID.contains(sampleID)))
+										sampleData.put("sampleID", sampleData.get("sampleID").concat("+").concat(sampleID));
+								}
+								else
+									sampleData.put("sampleID", sampleID);
 								
 							    	sampleData.put("project", Prop.getString("project"));
 							}
