@@ -45,16 +45,19 @@ public class FlowcellSingleItem extends Composite
 		//HEADERS
 		flowcellTableSample.setText(0,0, "Processing");
 		flowcellTableSample.setText(0,1, "Library");
-		flowcellTableSample.setText(0,2, "Organism");
-		flowcellTableSample.setText(0,3, "Project");
+		flowcellTableSample.setText(0,2, "GeneusID");
+		flowcellTableSample.setText(0,3, "Organism");
+		flowcellTableSample.setText(0,4, "Project");
 		for(int i = 1; i<=8;i++)
 		{
 			flowcellTableSample.setText(i,0, flowcell.getLaneProperty(i,"processing"));
 			String library = flowcell.getLaneProperty(i, "name").replace("+", "<br/>");
 			flowcellTableSample.setWidget(i,1, new HTML(library));
+			String sampleID = flowcell.getLaneProperty(i, "sampleID").replace("+", "<br/>");
+			flowcellTableSample.setWidget(i, 2, new HTML(sampleID));
 			String organism = flowcell.getLaneProperty(i,"organism").replace("+", "<br/>");
-			flowcellTableSample.setWidget(i,2, new HTML(organism));
-			flowcellTableSample.setText(i,3, flowcell.getLaneProperty(i,"project"));						
+			flowcellTableSample.setWidget(i,3, new HTML(organism));
+			flowcellTableSample.setText(i,4, flowcell.getLaneProperty(i,"project"));						
 		}
 		vp.add(flowcellTable);
 		vp.add(flowcellTableSample);
