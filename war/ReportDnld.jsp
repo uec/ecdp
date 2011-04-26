@@ -56,7 +56,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select geneusID_sample, lane, sample_name, processing, protocol from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
+		String selectQuery ="select geneusID_sample, lane, sample_name, project, processing, protocol from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
 		ResultSet results = stat.executeQuery(selectQuery);
 	
 		ServletOutputStream myOut = null;
@@ -73,6 +73,7 @@ try{
 			{
 				myOut.println();
 				i++;
+				myOut.println("#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + ")");
 				myOut.println("Sample."+ i + ".SampleID = " + results.getString("geneusID_sample"));
 				String lane = results.getString("lane");
 				myOut.println("Sample."+ i + ".Lane = " + lane);
