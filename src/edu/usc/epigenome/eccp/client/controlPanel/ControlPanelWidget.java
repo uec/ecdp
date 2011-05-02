@@ -1,82 +1,80 @@
 package edu.usc.epigenome.eccp.client.controlPanel;
 
-import com.google.gwt.dom.client.Style.Unit;
+import java.util.ArrayList;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.OpenEvent;
-import com.google.gwt.event.logical.shared.OpenHandler;
-
-import com.google.gwt.user.client.DOM;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiConstructor;
+import com.google.gwt.uibinder.client.UiFactory;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.StackLayoutPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
 
-import edu.usc.epigenome.eccp.client.pane.ECPane;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport.ReportType;
 
-import java.util.HashMap;
+public class ControlPanelWidget extends Composite{
 
-public class ControlPanelWidget extends Composite 
-{
-    StackLayoutPanel toolBox = new StackLayoutPanel(Unit.EM);
-    DisclosurePanel mainDropdown = new DisclosurePanel("Tools");
-    HashMap<String,VerticalPanel> headers = new HashMap<String,VerticalPanel>();
-        
-	public ControlPanelWidget() 
-    {
-        // Place the check above the text box using a vertical panel.
-		toolBox.addStyleName("toolbox");
-		DOM.setElementAttribute(mainDropdown.getElement(),"id","controlpanel");
-		mainDropdown.setAnimationEnabled(true);
-		mainDropdown.add(toolBox);
+	private static ControlPanelWidgetUiBinder uiBinder = GWT
+			.create(ControlPanelWidgetUiBinder.class);
+
+	interface ControlPanelWidgetUiBinder extends
+			UiBinder<Widget, ControlPanelWidget> {
+	}
+	
+	@UiField HTMLPanel controlAdd;
+	@UiField Label ShowGeneus;
+	public String initToken = History.getToken();
+	
+	public ControlPanelWidget()
+	{
+		initWidget(uiBinder.createAndBindUi(this));
 		
-        mainDropdown.addOpenHandler(new OpenHandler<DisclosurePanel>(){
-
-			public void onOpen(OpenEvent<DisclosurePanel> event)
-			{
-				toolBox.setHeight("500px");
-				toolBox.setWidth("200px");				
-			}        	
-        });
-        mainDropdown.setOpen(true);
-        // All composites must call initWidget() in their constructors.
-        initWidget(mainDropdown);
-    }
-    public void addPane(final ECPane toolWidget, final String toolGroupName, final DecoratedTabPanel toolTabPanel)
-    {
-		FocusPanel fp = new FocusPanel();
-    	HorizontalPanel hp = new HorizontalPanel();
-		hp.setWidth("200px");
-		hp.add(toolWidget.getToolLogo());
-		hp.add(toolWidget.getToolTitle());
-		fp.add(hp);
-		fp.addClickHandler(new ClickHandler()
-		{
-			public void onClick(ClickEvent event)
-			{			
-				if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
-				{
-					toolTabPanel.add(toolWidget, toolWidget.getToolTitle());
-					toolWidget.showTool();
-				}
-				toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
+		ShowGeneus.addClickHandler(new ClickHandler() {
+			
+			public void onClick(ClickEvent event) {
+				//Window.alert(ShowGeneus.getText());
+				//FcellReport.clear();
+				//controlAdd.clear();
+				controlAdd.add(new FlowcellReport(FlowcellReport.ReportType.ShowGeneus));
+				
 			}
 		});
-		
-    	if(!(headers.containsKey(toolGroupName)))
-    	{
-    				
-    		headers.put(toolGroupName, new VerticalPanel());
-    		headers.get(toolGroupName).add(fp);
-    		toolBox.add(headers.get(toolGroupName), new HTML(toolGroupName), 2);
-    	}
-    	else
-    	{	
-    		headers.get(toolGroupName).add(fp);
-    	}
-    }
+	}
+
+	
+	/*@UiConstructor
+	public ControlPanelWidget(final String typeGeneus, final String typeGroup)
+	{
+		FocusPanel fp = new FocusPanel();
+		initWidget(uiBinder.createAndBindUi(this));
+		fp.setTitle(typeGeneus);
+		fp.add(new HTML(typeGeneus));
+		fp.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) 
+			{
+				Window.alert(typeGeneus);
+				Window.alert(typeGroup);
+			}
+		});
+	}*/
 }
