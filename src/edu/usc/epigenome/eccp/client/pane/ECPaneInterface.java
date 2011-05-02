@@ -7,4 +7,5 @@ public interface ECPaneInterface
 {
 	public Image getToolLogo();
 	public Label getToolTitle();
+	void showTool();
 }
