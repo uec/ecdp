@@ -1,36 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:c="urn:import:edu.usc.epigenome.eccp.client.controlPanel"
-	xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
- 	<g:DockLayoutPanel unit='EM'>
-     	<g:north size="2">
-     		<g:Label></g:Label>
-     	</g:north>
-     	<g:west size="15">
-     		   <g:StackLayoutPanel unit="EM" height="500px">
-     		 	<g:stack>
-     		 		<g:header size='2'>Flowcell Reports</g:header>
-     		 		<g:HTMLPanel ui:field="FcellReport">
-     		 			<g:FocusPanel><g:Label ui:field="showAll">All Flowcells</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label ui:field="ShowGeneus">Flowcells from Geneus</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Flowcells from Disk</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Incomplete Flowcells</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Complete Flowcells</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Merged Analysis</g:Label></g:FocusPanel>
-     		 		</g:HTMLPanel>
-     		 	</g:stack>
-     		 	<g:stack>
-     		 		<g:header size='2'>Methylation Reports</g:header>
-     		 		<g:HTMLPanel ui:field="MethylaReport">
-     		 			<g:FocusPanel><g:Label>Infinium Methylation 27K</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Methylation Sanity Check</g:Label></g:FocusPanel>
-     		 		</g:HTMLPanel>
-     		 	</g:stack>
-     		 </g:StackLayoutPanel>
-     	</g:west>
-     	<g:center>
-     		<g:HTMLPanel ui:field="controlAdd"></g:HTMLPanel>
-     	</g:center>
-     </g:DockLayoutPanel>
- </ui:UiBinder>
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:HTMLPanel>
+	 	<g:FocusPanel ui:field="fp"></g:FocusPanel>				
+	 </g:HTMLPanel>
+</ui:UiBinder> 
