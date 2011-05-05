@@ -24,9 +24,10 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
+import edu.usc.epigenome.eccp.client.pane.ECPane;
 import edu.usc.epigenome.eccp.client.pane.ECPaneInterface;
 
-public class FlowcellReport extends Composite implements ECPaneInterface{
+public class FlowcellReport extends ECPane{
 
 	private static FlowcellReportUiBinder uiBinder = GWT
 			.create(FlowcellReportUiBinder.class);
@@ -41,7 +42,7 @@ public class FlowcellReport extends Composite implements ECPaneInterface{
 	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel searchPanel;
 	@UiField HorizontalPanel searchOptionsPanel;
-	@UiField VerticalPanel vp;
+	@UiField FlowPanel vp;
 	@UiField Button searchButton;
 	
 	public FlowcellReport(){
@@ -53,28 +54,32 @@ public class FlowcellReport extends Composite implements ECPaneInterface{
 	{
 		reportType = reprotTypein;
 		initWidget(uiBinder.createAndBindUi(this));
+		//vp.add(new Image("images/progress.gif"));
 		
 		searchButton.addClickHandler(new ClickHandler() 
 		{	
-			@Override
 			public void onClick(ClickEvent event) 
 			{
 				if(searchPanel.getWidgetCount() > 1)
 				{
 					searchPanel.clear();
 					searchPanel.add(searchOptionsPanel);
-				}	
-			}
-		});
-		showTool();
+				}
+				vp.clear();
+				vp.add(new Image("images/progress.gif"));
+				showTool();
+			}});
 	}
 
 	@Override
 	public void showTool() 
 	{
 		 //Window.alert("The report type is " +reportType);
+		//vp.clear();
+		//FlowcellSingleItem flowcellItem = new FlowcellSingleItem();
+		//vp.add(flowcellItem);
 		 
-		 AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
+		AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
 		  {
 				public void onFailure(Throwable caught)
 				{
@@ -91,11 +96,17 @@ public class FlowcellReport extends Composite implements ECPaneInterface{
 								vp.add(flowcellItem);
 							}
 				}
-		  };remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);
+		  };
+		  
+		  switch(reportType)
+			{
+				case ShowGeneus: remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);break;
+				case ShowFS: remoteService.getFlowcellsFromFS(DisplayFlowcellCallback);break;
+				case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
+				case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
+				default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
+			}		
 			
-		 //VerticalPanel toHold = new VerticalPanel();
-		//FlowcellSingleItem flowcellItem = new FlowcellSingleItem();
-		//vp.add(flowcellItem);
 	}
 
 	@Override
