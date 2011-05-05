@@ -11,8 +11,6 @@
 				<g:Button ui:field="searchButton" text="Search"/>
 			</g:HorizontalPanel>
 		</g:FlowPanel> 
-		<g:ScrollPanel>
-		<g:VerticalPanel ui:field="vp"></g:VerticalPanel>
-		</g:ScrollPanel>
+		<g:FlowPanel ui:field="vp"></g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder> 
