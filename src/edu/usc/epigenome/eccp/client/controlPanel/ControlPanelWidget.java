@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport.ReportType;
 
@@ -38,43 +39,24 @@ public class ControlPanelWidget extends Composite{
 	interface ControlPanelWidgetUiBinder extends
 			UiBinder<Widget, ControlPanelWidget> {
 	}
-	
-	@UiField HTMLPanel controlAdd;
-	@UiField Label ShowGeneus;
-	public String initToken = History.getToken();
+
 	
 	public ControlPanelWidget()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		
-		ShowGeneus.addClickHandler(new ClickHandler() {
-			
-			public void onClick(ClickEvent event) {
-				//Window.alert(ShowGeneus.getText());
-				//FcellReport.clear();
-				//controlAdd.clear();
-				controlAdd.add(new FlowcellReport(FlowcellReport.ReportType.ShowGeneus));
-				
-			}
-		});
 	}
-
+		
+@UiField FocusPanel fp;
 	
-	/*@UiConstructor
+	@UiConstructor
 	public ControlPanelWidget(final String typeGeneus, final String typeGroup)
-	{
-		FocusPanel fp = new FocusPanel();
+	{	
+		fp = new FocusPanel();
 		initWidget(uiBinder.createAndBindUi(this));
 		fp.setTitle(typeGeneus);
 		fp.add(new HTML(typeGeneus));
-		fp.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) 
-			{
-				Window.alert(typeGeneus);
-				Window.alert(typeGroup);
-			}
-		});
-	}*/
+		ECCPBinderWidget.addReport(new FlowcellReport(FlowcellReport.ReportType.valueOf(typeGroup)), fp, typeGeneus);
+	}
+
+		
 }
