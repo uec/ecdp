@@ -3,5 +3,34 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:c="urn:import:edu.usc.epigenome.eccp.client.controlPanel"
 	xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
-	<c:ControlPanelWidget/> 
-</ui:UiBinder> 
+ 	<g:DockLayoutPanel unit='EM'>
+     	<g:north size="2">
+     		<g:Label></g:Label>
+     	</g:north>
+     	<g:west size="15">
+     		   <g:StackLayoutPanel unit="EM" height="500px">
+     		 	<g:stack>
+     		 		<g:header size='2'>Flowcell Reports</g:header>
+     		 		<g:HTMLPanel ui:field="FcellReport">
+     		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
+     		 			<c:ControlPanelWidget typeGeneus="Flowcells from Geneus" typeGroup="ShowGeneus"/>
+     		 			<c:ControlPanelWidget typeGeneus="Flowcells from Disk" typeGroup="ShowFS"/>
+     		 			<c:ControlPanelWidget typeGeneus="Incomplete Flowcells" typeGroup="ShowIncomplete"/>
+     		 		</g:HTMLPanel>
+     		 	</g:stack>
+     		 	<g:stack>
+     		 		<g:header size='2'>Methylation Reports</g:header>
+     		 		<g:HTMLPanel ui:field="MethylaReport">
+     		 			<g:FocusPanel><g:Label>Infinium Methylation 27K</g:Label></g:FocusPanel>
+     		 			<g:FocusPanel><g:Label>Methylation Sanity Check</g:Label></g:FocusPanel>
+     		 		</g:HTMLPanel>
+     		 	</g:stack>
+     		 </g:StackLayoutPanel>
+     	</g:west>
+     	<g:center>
+     		<g:ScrollPanel>
+     			<g:VerticalPanel ui:field="addTabPanel"></g:VerticalPanel>
+     		</g:ScrollPanel>
+     	</g:center>
+     </g:DockLayoutPanel>
+ </ui:UiBinder>
