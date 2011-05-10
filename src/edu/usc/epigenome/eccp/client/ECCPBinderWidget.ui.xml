@@ -4,11 +4,8 @@
 	xmlns:c="urn:import:edu.usc.epigenome.eccp.client.controlPanel"
 	xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
  	<g:DockLayoutPanel unit='EM'>
-     	<g:north size="2">
-     		<g:Label></g:Label>
-     	</g:north>
      	<g:west size="15">
-     		   <g:StackLayoutPanel unit="EM" height="500px">
+     		<g:StackLayoutPanel unit="EM" height="500px">
      		 	<g:stack>
      		 		<g:header size='2'>Flowcell Reports</g:header>
      		 		<g:HTMLPanel ui:field="FcellReport">
@@ -25,12 +22,12 @@
      		 			<g:FocusPanel><g:Label>Methylation Sanity Check</g:Label></g:FocusPanel>
      		 		</g:HTMLPanel>
      		 	</g:stack>
-     		 </g:StackLayoutPanel>
+     		</g:StackLayoutPanel>
      	</g:west>
      	<g:center>
      		<g:ScrollPanel>
      			<g:VerticalPanel ui:field="addTabPanel"></g:VerticalPanel>
      		</g:ScrollPanel>
      	</g:center>
-     </g:DockLayoutPanel>
+    </g:DockLayoutPanel>
  </ui:UiBinder>
