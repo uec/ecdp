@@ -317,9 +317,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 		for(File dir : dirs)
 		{
-			System.out.println(dir.getPath());
-			for (File run : dir.listFiles(filter))
-			{
+			System.out.println(dir.getPath());	
+		  try
+		  {
+			 for (File run : dir.listFiles(filter))
+			 {
 				System.out.println(run.getPath());
 				FlowcellData flowcell = new FlowcellData();
 				try
@@ -349,7 +351,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					System.out.println(e.getMessage());					
 				}
 			}
+			 
+		  }catch (Exception exp) {
+			  System.out.println(exp.getMessage());
 		}
+	  }
 		Collections.sort(flowcells, new Comparator<FlowcellData>()
 				{
 					public int compare(FlowcellData o2, FlowcellData o1)
