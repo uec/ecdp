@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
+import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 import edu.usc.epigenome.eccp.client.pane.ECPaneInterface;
 
@@ -36,7 +37,7 @@ public class FlowcellReport extends ECPane{
 	}
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
-	public enum ReportType 	{ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
+	public enum ReportType 	{showSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType;
 	
 	@UiField FlowPanel mainPanel;
@@ -54,7 +55,7 @@ public class FlowcellReport extends ECPane{
 	{
 		reportType = reprotTypein;
 		initWidget(uiBinder.createAndBindUi(this));
-		//vp.add(new Image("images/progress.gif"));
+		vp.add(new Image("images/progress.gif"));
 		
 		searchButton.addClickHandler(new ClickHandler() 
 		{	
@@ -63,7 +64,7 @@ public class FlowcellReport extends ECPane{
 				if(searchPanel.getWidgetCount() > 1)
 				{
 					searchPanel.clear();
-					searchPanel.add(searchOptionsPanel);
+					//searchPanel.add(searchOptionsPanel);
 				}
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
@@ -74,13 +75,34 @@ public class FlowcellReport extends ECPane{
 	@Override
 	public void showTool() 
 	{
-		 //Window.alert("The report type is " +reportType);
-		//vp.clear();
-		//FlowcellSingleItem flowcellItem = new FlowcellSingleItem();
-		//vp.add(flowcellItem);
+		 String name = reportType.name();
 		 
-		AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
-		  {
+		if(name.equals("showSamples"))
+		{
+			AsyncCallback<ArrayList<SampleData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<SampleData>>()
+		    {
+				public void onFailure(Throwable caught)
+				{
+					vp.clear();	
+					caught.printStackTrace();				
+				}
+
+				public void onSuccess(ArrayList<SampleData> result)
+				{
+					vp.clear();
+					for(SampleData sampl : result)
+					{
+						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(sampl);
+						vp.add(flowcellItem);
+					}
+				}
+		  };remoteService.getSampleDataFromGeneus(DisplayFlowcellCallback);
+			
+		}
+		else
+		{
+			AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
+		    {
 				public void onFailure(Throwable caught)
 				{
 					vp.clear();	
@@ -105,7 +127,8 @@ public class FlowcellReport extends ECPane{
 				case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
 				case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
 				default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
-			}		
+			}
+		}
 			
 	}
 
