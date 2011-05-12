@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.MethylationData;
+import edu.usc.epigenome.eccp.client.data.SampleData;
 
 /**
  * The async counterpart of <code>GreetingService</code>.
@@ -16,6 +17,7 @@ public interface ECServiceAsync
 	void getFlowcellsFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
+	void getSampleFromGeneus(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	void getFilesforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	void getCSVFromDisk(String filePath, AsyncCallback<String> String) throws IllegalArgumentException;
@@ -30,4 +32,6 @@ public interface ECServiceAsync
 	void encryptURLEncoded(String srcText, AsyncCallback<String> callback);
 	void getEncryptedData(String globalText, String laneText, AsyncCallback<ArrayList<String>> callback);
 	void decryptKeyword(String fcellText, String laneText, AsyncCallback<ArrayList<String>> callback);
+	
+	void getSampleDataFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 }
