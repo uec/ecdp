@@ -7,6 +7,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiFactory;
@@ -23,6 +25,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,6 +33,7 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport.ReportType;
+import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
 
 public class ControlPanelWidget extends Composite{
 
@@ -40,7 +44,6 @@ public class ControlPanelWidget extends Composite{
 			UiBinder<Widget, ControlPanelWidget> {
 	}
 
-	
 	public ControlPanelWidget()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
@@ -51,12 +54,16 @@ public class ControlPanelWidget extends Composite{
 	@UiConstructor
 	public ControlPanelWidget(final String typeGeneus, final String typeGroup)
 	{	
-		fp = new FocusPanel();
 		initWidget(uiBinder.createAndBindUi(this));
 		fp.setTitle(typeGeneus);
 		fp.add(new HTML(typeGeneus));
-		ECCPBinderWidget.addReport(new FlowcellReport(FlowcellReport.ReportType.valueOf(typeGroup)), fp, typeGeneus);
-	}
-
-		
+		if(typeGroup.contains("Methylation"))
+		{
+			ECCPBinderWidget.addReport(new MethylationReport(), fp, typeGeneus);
+		}
+		else
+		{
+			ECCPBinderWidget.addReport(new FlowcellReport(FlowcellReport.ReportType.valueOf(typeGroup)), fp, typeGeneus);
+		}
+	}	
 }
