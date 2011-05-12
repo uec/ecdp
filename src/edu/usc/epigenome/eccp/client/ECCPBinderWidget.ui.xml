@@ -9,6 +9,7 @@
      		 	<g:stack>
      		 		<g:header size='2'>Flowcell Reports</g:header>
      		 		<g:HTMLPanel ui:field="FcellReport">
+     		 			<c:ControlPanelWidget typeGeneus="Samples from Geneus" typeGroup="showSamples"/>
      		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
      		 			<c:ControlPanelWidget typeGeneus="Flowcells from Geneus" typeGroup="ShowGeneus"/>
      		 			<c:ControlPanelWidget typeGeneus="Flowcells from Disk" typeGroup="ShowFS"/>
@@ -18,8 +19,8 @@
      		 	<g:stack>
      		 		<g:header size='2'>Methylation Reports</g:header>
      		 		<g:HTMLPanel ui:field="MethylaReport">
-     		 			<g:FocusPanel><g:Label>Infinium Methylation 27K</g:Label></g:FocusPanel>
-     		 			<g:FocusPanel><g:Label>Methylation Sanity Check</g:Label></g:FocusPanel>
+     		 			<c:ControlPanelWidget typeGeneus="Infinium Methylation 27K" typeGroup="MethylationReports"/>
+     		 			<c:ControlPanelWidget typeGeneus="Methylation Sanity Check" typeGroup="MethylationSanity"/>
      		 		</g:HTMLPanel>
      		 	</g:stack>
      		</g:StackLayoutPanel>
