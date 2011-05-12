@@ -12,6 +12,7 @@ public class FlowcellData implements IsSerializable
 	public HashMap<Integer,HashMap<String,String>> lane;
 	public ArrayList<LinkedHashMap<String, String>> fileList;
 	public LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
+	//public HashMap<String, HashMap<String,HashMap<Integer, HashMap<String, String>>>> sample;
 	public String flowcellFilter = "";
 	public String laneFilter = "";
 	
@@ -21,6 +22,7 @@ public class FlowcellData implements IsSerializable
 		lane = new HashMap<Integer,HashMap<String,String>>();
 		laneQC = new LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
 		fileList = new ArrayList<LinkedHashMap<String,String>>();
+		//sample = new HashMap<String,HashMap<String,HashMap<Integer, HashMap<String, String>>>>();
 	}	
 	
 	public String getFlowcellProperty(String key)
