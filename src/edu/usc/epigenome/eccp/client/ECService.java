@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.MethylationData;
+import edu.usc.epigenome.eccp.client.data.SampleData;
 
 /**
  * The client side stub for the RPC service.
@@ -19,6 +20,9 @@ public interface ECService extends RemoteService
 	ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsIncomplete() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException;
+	ArrayList<FlowcellData> getSampleFromGeneus() throws IllegalArgumentException;
+	ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException;
+	
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
