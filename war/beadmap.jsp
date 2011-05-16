@@ -10,11 +10,11 @@ try
 		Collections.sort(keys);
 		for(int i : keys)
 		{
-            out.println(beadArray.getFlowcellProperty("serial") + " " + 
-            beadArray.getLaneProperty(i,"lane").replace(":1","") + "        " +  
-            beadArray.getLaneProperty(i,"name") + " " +
-            beadArray.getLaneProperty(i,"batch") + "        " + 
-            beadArray.getLaneProperty(i,"histology") + "    " + 
+            out.println(beadArray.getFlowcellProperty("serial") + "	" + 
+            beadArray.getLaneProperty(i,"lane").replace(":1","") + "	" +  
+            beadArray.getLaneProperty(i,"name") + "	" +
+            beadArray.getLaneProperty(i,"batch") + "	" + 
+            beadArray.getLaneProperty(i,"histology") + "	" + 
             beadArray.getLaneProperty(i,"diseaseabr")) ;
 		}
 	}
