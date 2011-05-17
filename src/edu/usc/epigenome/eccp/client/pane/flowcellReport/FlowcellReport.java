@@ -3,30 +3,23 @@ package edu.usc.epigenome.eccp.client.pane.flowcellReport;
 import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dev.asm.Label;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
-import edu.usc.epigenome.eccp.client.pane.ECPaneInterface;
+
 
 public class FlowcellReport extends ECPane{
 
@@ -37,7 +30,7 @@ public class FlowcellReport extends ECPane{
 	}
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
-	public enum ReportType 	{showSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
+	public enum ReportType 	{ShowSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType;
 	
 	@UiField FlowPanel mainPanel;
@@ -61,11 +54,13 @@ public class FlowcellReport extends ECPane{
 		{	
 			public void onClick(ClickEvent event) 
 			{
+				Window.alert("Widgets are " + searchPanel.getWidgetCount());
 				if(searchPanel.getWidgetCount() > 1)
-				{
+				{	
 					searchPanel.clear();
-					//searchPanel.add(searchOptionsPanel);
+					searchPanel.add(searchOptionsPanel);
 				}
+				
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
 				showTool();
@@ -75,9 +70,8 @@ public class FlowcellReport extends ECPane{
 	@Override
 	public void showTool() 
 	{
-		 String name = reportType.name();
-		 
-		if(name.equals("showSamples"))
+		String name = reportType.name();
+		if(name.equals("ShowSamples"))
 		{
 			AsyncCallback<ArrayList<SampleData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<SampleData>>()
 		    {
@@ -86,18 +80,16 @@ public class FlowcellReport extends ECPane{
 					vp.clear();	
 					caught.printStackTrace();				
 				}
-
 				public void onSuccess(ArrayList<SampleData> result)
 				{
 					vp.clear();
 					for(SampleData sampl : result)
 					{
-						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(sampl);
+						SampleSingleItem flowcellItem = new SampleSingleItem(sampl);
 						vp.add(flowcellItem);
 					}
 				}
-		  };remoteService.getSampleDataFromGeneus(DisplayFlowcellCallback);
-			
+		    };remoteService.getSampleDataFromGeneus(DisplayFlowcellCallback);
 		}
 		else
 		{
@@ -108,15 +100,14 @@ public class FlowcellReport extends ECPane{
 					vp.clear();	
 					caught.printStackTrace();				
 				}
-
 				public void onSuccess(ArrayList<FlowcellData> result)
 				{
 					vp.clear();
 					for(FlowcellData flowcell : result)
-							{
-								FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
-								vp.add(flowcellItem);
-							}
+					{
+						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
+						vp.add(flowcellItem);
+					}
 				}
 		  };
 		  
@@ -129,18 +120,15 @@ public class FlowcellReport extends ECPane{
 				default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
 			}
 		}
-			
 	}
 
 	@Override
 	public Image getToolLogo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public com.google.gwt.user.client.ui.Label getToolTitle() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
