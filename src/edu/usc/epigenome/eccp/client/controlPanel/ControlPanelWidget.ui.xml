@@ -1,7 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.images.MyBundle"></ui:with>
 	<g:HTMLPanel>
-	 	<g:FocusPanel ui:field="fp"></g:FocusPanel>				
+	 	<g:FocusPanel ui:field="fp">	
+	 	</g:FocusPanel>				
 	 </g:HTMLPanel>
 </ui:UiBinder> 
