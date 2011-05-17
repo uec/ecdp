@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class FlowcellData implements IsSerializable
@@ -160,4 +161,58 @@ public class FlowcellData implements IsSerializable
 		}
 		
 	}
+
+	public void filterSamplesLanes(String sampleID) 
+	{
+		//Window.alert("sampleID is " + sampleID);
+		//Window.alert("flowcell serial is " + flowcellProperties.get("serial"));
+			Object a[] = lane.keySet().toArray();
+			ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
+			ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
+			
+			for(int i=0;i<a.length;i++)
+				 lanesToKeep.add((Integer)a[i]);
+			
+			for(String analysisID : laneQC.keySet())
+				for(Integer i : laneQC.get(analysisID).keySet())
+					if(!lanesToKeep.contains(i))
+						lanesToRemove.add(i);
+			for(String analysisID : laneQC.keySet())
+				for(Integer i : lanesToRemove)
+					laneQC.get(analysisID).remove(i);
+			lanesToRemove.clear();
+			
+			/*for(String analysisID : laneQC.keySet())
+			{
+				for(Integer i : laneQC.get(analysisID).keySet())
+				{
+					LinkedHashMap samples
+				}
+			}*/
+			
+	}
+	
+	public void filterFiles(String sampleID)
+	{
+		Object a[] = lane.keySet().toArray();
+		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
+		ArrayList<HashMap<String, String>> filesToKeep = new ArrayList<HashMap<String,String>>();
+		
+		for(int i=0;i<a.length;i++)
+			lanesToKeep.add((Integer)a[i]);
+		
+		for(HashMap<String, String> file : fileList)
+		{
+			if(!file.get("fullpath").contains(sampleID))
+			{
+				//Check for lane no
+				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
+				{
+					
+				}
+			}
+		}
+		
+	}
+	
 }
