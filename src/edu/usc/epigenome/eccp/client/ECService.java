@@ -24,6 +24,7 @@ public interface ECService extends RemoteService
 	ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException;
 	
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
+	FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	//Flowcell (Merged) Analysis Reporting
