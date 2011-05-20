@@ -1,0 +1,19 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<g:FlowPanel ui:field='vp'>
+		<g:FlowPanel ui:field='menu_items'>
+			<g:MenuBar ui:field='mainbar'>
+				<g:MenuItem ui:field='locationSort'>Organize By File Location</g:MenuItem>
+				<g:MenuItem ui:field='laneSort'>Organize By File Lane</g:MenuItem>
+				<g:MenuItem ui:field='typeSort'>Organize By File Type</g:MenuItem>
+			</g:MenuBar>
+			<g:FlowPanel ui:field='searchPanel'>
+				<g:TextBox ui:field='searchbox' value='search for'></g:TextBox>
+				<g:Button ui:field='searchbutton'></g:Button>
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel ui:field='filePanel'></g:FlowPanel>
+		<g:FlowPanel ui:field='fileGroups'></g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder> 
