@@ -17,11 +17,14 @@ public interface ECServiceAsync
 	void getFlowcellsFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
-	void getSampleFromGeneus(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
+	void getSampleFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
-	void getQCSampleFlowcell(String serial, String sampleID, AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
+	//void getQCSampleFlowcell(String serial, String sampleID, AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
+	void getQCSampleFlowcell(String serial, String sampleID, AsyncCallback<SampleData> callback) throws IllegalArgumentException;
 	
 	void getFilesforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
+	
+	void getFilesforFlowcellLane(String serial, AsyncCallback<SampleData> callback) throws IllegalArgumentException;
 	void getCSVFromDisk(String filePath, AsyncCallback<String> String) throws IllegalArgumentException;
 	void getAnalysisFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	
@@ -36,4 +39,5 @@ public interface ECServiceAsync
 	void decryptKeyword(String fcellText, String laneText, AsyncCallback<ArrayList<String>> callback);
 	
 	void getSampleDataFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
+	void getLaneFlowcellSample(String string, String flowcellSerial,AsyncCallback<SampleData> callback) throws IllegalArgumentException;
 }
