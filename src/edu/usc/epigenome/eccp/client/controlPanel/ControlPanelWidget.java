@@ -34,6 +34,7 @@ import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport.ReportType;
 import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.SampleReport;
 
 public class ControlPanelWidget extends Composite{
 
@@ -57,7 +58,11 @@ public class ControlPanelWidget extends Composite{
 		initWidget(uiBinder.createAndBindUi(this));
 		fp.setTitle(typeGeneus);
 		fp.add(new HTML(typeGeneus));
-		if(typeGroup.contains("Methylation"))
+		if(typeGroup.contains("ShowSamples"))
+		{
+			ECCPBinderWidget.addReport(new SampleReport(), fp, typeGeneus);
+		}
+		else if(typeGroup.contains("Methylation"))
 		{
 			ECCPBinderWidget.addReport(new MethylationReport(), fp, typeGeneus);
 		}
