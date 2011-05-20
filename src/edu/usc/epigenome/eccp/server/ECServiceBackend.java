@@ -96,7 +96,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 	}
 	
-	public ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException
+/*	public ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException
 	{
 		ArrayList<SampleData> samples = new ArrayList<SampleData>();
 		java.sql.Connection myConnection = null;
@@ -217,7 +217,114 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		
 		return samples;
+	}*/
+	
+	public ArrayList<SampleData> getSampleFromGeneus() throws IllegalArgumentException
+	{
+		ArrayList<SampleData> samples = new ArrayList<SampleData>();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+
+			//database connection parameters 
+			String username = "zack";
+			String password = "LQSadm80";
+
+			//URL for database connection
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+
+			//create the connection
+			 myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//Get all the distinct geneusId's 
+			
+			String selectQuery ="select distinct(sample_name) from sequencing.view_run_metric";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			 if(results.next())
+			 {
+			   do
+			   {
+				   String libraryID = results.getString("sample_name");
+				   SampleData sample = new SampleData();
+				   
+				   Statement st1 = myConnection.createStatement();
+				   //ArrayList<FlowcellData> fcells = new ArrayList<FlowcellData>();
+				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusId_sample from sequencing.view_run_metric where sample_name ='"+libraryID + "'";            
+				   ResultSet rs1 = st1.executeQuery(samplePropSelect);
+				   
+				   while(rs1.next())
+				   {
+					   sample.sampleProperties.put("library", libraryID);
+					   sample.sampleProperties.put("project", rs1.getString("project"));
+					   sample.sampleProperties.put("organism", rs1.getString("organism"));
+					   //sample.sampleProperties.put("Date_Sequenced", rs1.getString("Date_Sequenced"));
+					   if(rs1.getString("Date_Sequenced") == null || rs1.getString("Date_Sequenced").equals(""))
+			    			 sample.sampleProperties.put("date", "Unknown");
+			    		 else
+			    		 { 
+			    			 try{
+			    			Date d = new Date(rs1.getString("Date_Sequenced"));
+			    			sample.sampleProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+			    			 }
+			    			 catch(Exception e){
+			    				 e.printStackTrace();
+			    			 }
+			    		 }
+					   sample.sampleProperties.put("geneusID_sample", rs1.getString("geneusID_sample"));
+				   }
+				   rs1.close();
+				   st1.close();
+				   
+				   st1 = myConnection.createStatement();
+				   String sampFlowcell = "select distinct(flowcell_serial) from sequencing.view_run_metric where sample_name = '"+libraryID +"'";
+				   rs1 = st1.executeQuery(sampFlowcell);
+				   
+				   while(rs1.next())
+				   {
+					  String flowcellID = rs1.getString("flowcell_serial");
+					  HashMap<String, String> flowcellProp = new HashMap<String, String>();
+					  Statement st2 = myConnection.createStatement();
+					  String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
+					  ResultSet rs2 = st2.executeQuery(fcellPropSelect);
+					  
+					  while(rs2.next())
+					  {
+						  flowcellProp.put("technician", rs2.getString("technician").replace("å", ""));
+						  flowcellProp.put("geneusId_run", rs2.getString("geneusId_run"));
+					  }
+					  rs2.close();
+					  st2.close();
+					  sample.flowcellInfo.put(flowcellID, flowcellProp);
+				   }
+				   rs1.close();
+				   st1.close();
+				   
+				   samples.add(sample);
+				   
+			     }while(results.next());
+			   	 results.close();
+			   	 stat.close();
+			  }
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally
+		{
+			try {
+				myConnection.close();
+			 } catch (SQLException e) {
+				e.printStackTrace();
+			 }
+		}	   
+		return samples;
+		
 	}
+	
 	
 	/*
 	 * Get flowcells from Geneus information from the database
@@ -601,7 +708,94 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			return flowcell;
 	}
 	
-	public FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
+	
+	public SampleData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
+	{
+		SampleData flowcell = new SampleData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL' order by analysis_id";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the result set
+			if(results.next())
+			{
+			  do	
+			 {
+				String analysis_id = results.getString("analysis_id");
+				//System.out.println("analysis_id is " + analysis_id);
+				Statement st1 = myConnection.createStatement();
+				//for each analysis_id get the QC information from the database
+				String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL'";
+				ResultSet rs = st1.executeQuery(innSelect);
+				ResultSetMetaData rsMetaData = rs.getMetaData();
+				
+				LinkedHashMap<Integer,LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+				while(rs.next())
+				{
+					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
+					qcProperties.put("lane", rs.getString("lane"));
+					qcProperties.put("geneusID_sample", rs.getString("sample_name"));
+					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
+					{
+						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"NA");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i), rs.getString(i));
+						}
+						else
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"0");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
+						}
+					}
+					qcReport.put(rs.getInt("lane"), qcProperties);
+				}
+				rs.close();
+				st1.close();
+				//add the qcReport LinkedHashmap to the flowcell laneQC	
+				flowcell.flowcellLaneQC.put(analysis_id, qcReport);
+			 }while(results.next());
+			
+			 results.close();
+			 stat.close();
+			 myConnection.close();
+		  }
+		}
+		catch( Exception E )
+		{ 
+			System.out.println( E.getMessage());	
+		}			
+		finally
+		{
+			try{myConnection.close();}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+			return flowcell;
+	}
+	
+	/*public FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
 		java.sql.Connection myConnection = null;
@@ -685,8 +879,78 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			}
 		}
 			return flowcell;
+	}*/
+		
+	@Override
+	public SampleData getFilesforFlowcellLane(String serial) throws IllegalArgumentException
+	{
+		SampleData flowcell = new SampleData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+		
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select file_fullpath from sequencing.flowcell_file where flowcell_serial = '"+serial + "'";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
+			Matcher matcher;
+			Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
+			Matcher laneNumMatcher;
+			//Iterate over the result set
+			if(results.next())
+			{
+				do	
+					{
+						String fullPath = results.getString("file_fullpath");
+						LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
+						matcher = pattern.matcher(fullPath);
+						
+						if(matcher.find())
+						{
+							qcFileProperties.put("base", getFileName(fullPath));
+							qcFileProperties.put("fullpath", fullPath);
+							qcFileProperties.put("type", "unknown");
+							qcFileProperties.put("label", fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
+							qcFileProperties.put("encfullpath", encryptURLEncoded(fullPath));
+							
+							laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+							if(laneNumMatcher.find())
+									qcFileProperties.put("lane", laneNumMatcher.group(1));
+							else
+									qcFileProperties.put("lane", "0");
+							
+							flowcell.flowcellFileList.add(qcFileProperties);
+						}
+						
+					}while(results.next());
+			 }
+	 }
+		catch (Exception e) 
+		{
+				e.printStackTrace();
+		}
+		return flowcell;
+ }
+	
+	public String getFileName(String fullPath)
+	{
+		int sep = fullPath.lastIndexOf('/');
+		return fullPath.substring(sep+1,fullPath.length());
 	}
-					
+	
 	@Override
 	public FlowcellData getFilesforFlowcell(String serial)
 			throws IllegalArgumentException {
@@ -694,11 +958,25 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return null;
 	}
 
-	@Override
-	public String getCSVFromDisk(String filePath)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
+	{
+		if(!(filePath.contains("Count") && filePath.endsWith(".csv") || filePath.endsWith("Metrics.txt")))
+			return "security failed, blocked by ECCP access controls";
+		
+		byte[] buffer = new byte[(int) new File(filePath).length()];
+	    BufferedInputStream f = null;
+	    try {
+	        try { f = new BufferedInputStream(new FileInputStream(filePath));} 
+	        catch (FileNotFoundException e) {e.printStackTrace(); }
+	        try { f.read(buffer);} 
+	        catch (IOException e) { e.printStackTrace();}
+	    } 
+	    finally  {
+	        if (f != null) 
+	        	try { f.close(); } 
+	        	catch (IOException ignored) { }
+	    }
+	    return new String(buffer);
 	}
 
 	@Override
@@ -810,12 +1088,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return null;
 	}
 
-	@Override
-	public ArrayList<FlowcellData> getSampleFromGeneus()
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	NumberFormat formatter = NumberFormat.getInstance();
 	public String NoFormat(String temp)
@@ -834,6 +1106,56 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			result = temp;
 		
 		return result;
+	}
+
+	@Override
+	public ArrayList<SampleData> getSampleDataFromGeneus()
+			throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SampleData getLaneFlowcellSample(String Library, String flowcellSerial) throws IllegalArgumentException 
+	{
+		SampleData flowcell = new SampleData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select distinct(lane), processing from sequencing.view_run_metric where flowcell_serial = '"+flowcellSerial + "' and sample_name = '"+Library+ "' and Date_Sequenced !='NULL' order by lane";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the result set
+			if(results.next())
+			{
+			  do	
+			  {
+				  Integer lane_no = results.getInt(1);
+				  HashMap<String, String> laneInfo = new HashMap<String, String>();
+				  laneInfo.put("lane", results.getString("lane"));
+				  laneInfo.put("processing", results.getString("processing"));
+				
+				  flowcell.flowcellLane.put(lane_no, laneInfo);
+			  }while(results.next());
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flowcell;
 	}
 	
 	/*	public ArrayList<FlowcellData> getSampleFromGeneus() throws IllegalArgumentException
