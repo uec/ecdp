@@ -6,73 +6,84 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DecoratedPopupPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+public class FileBrowser extends Composite {
 
+	private static FileBrowserUiBinder uiBinder = GWT
+			.create(FileBrowserUiBinder.class);
 
-public class FileBrowser extends Composite
-{
-	VerticalPanel vp = new VerticalPanel();
-	VerticalPanel filePanel = new VerticalPanel();
-	HorizontalPanel menu_items = new HorizontalPanel();
-	MenuBar mainbar = new MenuBar();
-	Button searchbutton = new Button("Search");
+	interface FileBrowserUiBinder extends UiBinder<Widget, FileBrowser> {
+	}
+
+	@UiField FlowPanel vp;
+	@UiField FlowPanel menu_items;
+	@UiField MenuBar mainbar;
+	@UiField MenuItem locationSort;
+	@UiField MenuItem laneSort;
+	@UiField MenuItem typeSort;
+	@UiField TextBox searchbox;
+	@UiField Button searchbutton;
+	@UiField FlowPanel filePanel;
+	@UiField FlowPanel fileGroups;
 	
-	VerticalPanel fileGroups = new VerticalPanel();
-	
+	public FileBrowser() {
+		initWidget(uiBinder.createAndBindUi(this));
+	}
+
 	ArrayList<LinkedHashMap<String,String>> flowcellFileList;
 	
-	@SuppressWarnings("deprecation")
 	public FileBrowser(ArrayList<LinkedHashMap<String,String>> fileListIn)
 	{
 		flowcellFileList = fileListIn;
+		initWidget(uiBinder.createAndBindUi(this));
+		
 		for(LinkedHashMap<String,String> set_type : flowcellFileList)
 			set_type.put("type", FileTable.getNiceType(set_type.get("base")));
-
-		final HorizontalPanel searchpanel = new HorizontalPanel();
-		searchpanel.addStyleName("displayfilehorizontal");
-		final TextBox searchbox = new TextBox();
-		searchbox.setValue("search for");
-		searchpanel.add(searchbox);
-		searchpanel.add(searchbutton);
 		
-		mainbar.addItem("Organize By File Location", new Command()
-		{
-			public void execute()
+		locationSort.setCommand(new Command()
+		{	
+			public void execute() 
 			{
 				organizeBy("label");
 				searchbox.setValue("");
 			}
 		});
 		
-		mainbar.addItem("Organize By File Lane", new Command()
-		{
-			public void execute()
+		laneSort.setCommand(new Command()
+		{	
+			public void execute() 
 			{
 				organizeBy("lane");
 			}
 		});
 		
-		mainbar.addItem("Organize By File Type", new Command()
+		typeSort.setCommand(new Command()
 		{
-			public void execute()
+			public void execute() 
 			{
 				organizeBy("type");
 			}
 		});
+		
 		
 		searchbox.addClickHandler(new ClickHandler() {
 			
@@ -82,14 +93,7 @@ public class FileBrowser extends Composite
 			}
 		});
 		
-		fileGroups.addStyleName("fileGroupsDisplay");
-		menu_items.add(mainbar);
-		menu_items.add(searchpanel);
-		vp.add(menu_items);
-		vp.add(filePanel);
-		vp.add(fileGroups);
 		organizeBy("type");
-		initWidget(vp);
 		
 		/*
 		 * The search button functionality goes here
@@ -122,7 +126,6 @@ public class FileBrowser extends Composite
 		SubmitListener listenEnterClick = new SubmitListener();
 		searchbox.addKeyboardListener(listenEnterClick);
 	}
-			
 	
 	public void organizeBy(String orgby) 
 	{	
@@ -183,6 +186,5 @@ public class FileBrowser extends Composite
 	       searchbutton.click();
 	    }
 	  }
+	
 }
-
-
