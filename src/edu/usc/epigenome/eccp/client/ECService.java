@@ -20,12 +20,14 @@ public interface ECService extends RemoteService
 	ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsIncomplete() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException;
-	ArrayList<FlowcellData> getSampleFromGeneus() throws IllegalArgumentException;
+	ArrayList<SampleData> getSampleFromGeneus() throws IllegalArgumentException;
 	ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException;
 	
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
-	FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
+	//FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
+	SampleData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
+	SampleData getFilesforFlowcellLane(String serial) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	//Flowcell (Merged) Analysis Reporting
 	ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException;
@@ -43,5 +45,6 @@ public interface ECService extends RemoteService
 	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
 	ArrayList<String> getEncryptedData(String globalText, String laneText) throws IllegalArgumentException;
 	ArrayList<String> decryptKeyword(String fcellText, String laneText)throws IllegalArgumentException;
+	SampleData getLaneFlowcellSample(String string, String flowcellSerial) throws IllegalArgumentException;
 	
 }
