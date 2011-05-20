@@ -4,44 +4,58 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer.ChartType;
 
-public class FileTable extends Composite
-{
-	VerticalPanel main;
-	FlexTable contentTable = new FlexTable();
+public class FileTable extends Composite {
+
+	private static FileTableUiBinder uiBinder = GWT
+			.create(FileTableUiBinder.class);
+
+	interface FileTableUiBinder extends UiBinder<Widget, FileTable> {
+	}
+
 	ArrayList<LinkedHashMap<String, String>> files;
-	HorizontalPanel header;
 	Image headerIcon = new Image("images/rightArrow.png");
-	Label headerText;
+	
+	public FileTable() {
+		initWidget(uiBinder.createAndBindUi(this));
+	}
+	
+	@UiField FlowPanel main;
+	@UiField FlowPanel header;
+	@UiField Label headerText;
+	@UiField Label contentCountText;
+	@UiField FlexTable contentTable;
+	
 	FileTable(String headerIn, ArrayList<LinkedHashMap<String, String>> filesIn)
 	{
 		files = filesIn;
-		main = new VerticalPanel();
-		header = new HorizontalPanel();
-		header.add(headerIcon);
-		headerText= new Label(headerIn);
-		header.add(headerText);
-		Label contentCountText = new Label(" (" + files.size() + " items)");
-		contentCountText.addStyleName("displayContext");
-		header.add(contentCountText);
 		
-		main.add(header);
-		contentTable.addStyleName("contentTableDisplay");
+		initWidget(uiBinder.createAndBindUi(this));
+		
+		headerText.setText(headerIn);
+		contentCountText = new Label(" (" + files.size() + " items)");
+		
 		contentTable.setVisible(false);
 		if(headerIn.contains("Search Res"))
 		{
@@ -49,9 +63,6 @@ public class FileTable extends Composite
 			drawTable();
 			contentTable.setVisible(true);
 		}
-		
-		main.add(contentTable);
-		
 		
 		ClickHandler expand = new ClickHandler(){
 			public void onClick(ClickEvent event)
@@ -70,16 +81,13 @@ public class FileTable extends Composite
 			}};
 			
 		headerText.addClickHandler(expand);
-		headerIcon.addClickHandler(expand);
-		
-			
-		initWidget(main);
+		headerIcon.addClickHandler(expand);	
 	}
 	
 	public void drawTable()
 	{
 		contentTable.clear();
-		contentTable.addStyleName("filelist");
+		//contentTable.addStyleName("filelist");
 		Label fileNameLabel = new Label("File Name");
 		fileNameLabel.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent event)
@@ -135,42 +143,6 @@ public class FileTable extends Composite
 		});
 		drawTable();
 	}
-	
-	/*public static String getNiceType(String ext)
-	{
-		
-		RegExp regex;
-		String ret = "Unknown Type";
-		//regex = RegExp.compile(".*(htm|tdf|bam|map|csv|txt|srf|peaks|map)$");
-		
-		if(ext.contains("eland")) return "Eland Alignment";
-		if(ext.contains("export")) return "Export Alignment";
-	    if(ext.contains("map") && ext.contains("aligntest")) return "Align Contam Test";
-	    else
-	    {
-	    	regex = RegExp.compile(".*(htm|tdf|bam|map|wig|csv|txt|srf|peaks|map)($|\\.(gz|bz2)$)");
-	    	MatchResult mResult = regex.exec(ext);
-	    	if(mResult.getGroupCount()>=1)
-	    	{
-	    		String tempRes = mResult.getGroup(1);
-	    		//System.out.println("The match result group is " + mResult.getInput());
-	    		System.out.println("The match result group 1 is " + mResult.getGroup(1));
-	    		System.out.println("The match result group 2 is " + mResult.getGroup(2));
-	    		System.out.println("The match result groupcount is " + mResult.getGroupCount());
-	    		if(tempRes.contains("htm")) return "Web report";
-	    		if(tempRes.contains("tdf")) return "IGV track";
-	    		if(tempRes.contains("bam")) return "Bam Alignment";
-	    		if(tempRes.contains("tdf")) return "IGV Track";
-	    		if(tempRes.contains("map")) return "Maq Alignment";
-	    		if(tempRes.contains("csv")) return "CSV Table";
-	    		if(tempRes.contains("srf")) return "Sequence Archive";
-	    		if(tempRes.contains("txt")) return "Fastq sequence";
-	    		if(tempRes.contains("peaks")) return "FindPeaks output";
-	    		if(tempRes.contains("wig")) return "Wiggle Track";
-	    	}
-	    }
-			return ret;
-	}*/
 	
 	public static String getNiceType(String ext)
 	{
