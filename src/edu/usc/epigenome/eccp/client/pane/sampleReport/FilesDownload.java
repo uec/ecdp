@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
 
@@ -29,6 +30,9 @@ public class FilesDownload extends Composite {
 	interface FilesDownloadUiBinder extends UiBinder<Widget, FilesDownload> {
 	}
 
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
+	}
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	String flowcellSerial;
 	int laneNo;
@@ -53,7 +57,6 @@ public class FilesDownload extends Composite {
 		laneNo = lane;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		downloadF.addStyleName("viewchartlabel");
 		popup.removeFromParent();
 		
 		closeButton.addClickHandler(new ClickHandler() {
