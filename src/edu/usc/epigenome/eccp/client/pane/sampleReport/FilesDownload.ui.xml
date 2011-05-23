@@ -1,8 +1,10 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+	
 	<g:FlowPanel ui:field='LabPanel'>
-		<g:Label ui:field="downloadF" text="Download Files"></g:Label>
+		<g:Label ui:field="downloadF" text="Download Files" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
 		<g:DecoratedPopupPanel ui:field='popup'>
 			<g:FlowPanel ui:field='mainPanel'>
 				<g:FlowPanel ui:field='summaryChart'></g:FlowPanel>
