@@ -26,7 +26,7 @@ public class SampleSingleItem extends Composite {
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	SampleData sampGeneus;
 	
-	public SampleSingleItem(final SampleData sampleIn)
+	/*public SampleSingleItem(final SampleData sampleIn)
 	{
 		sampGeneus = sampleIn;
 		final VerticalPanel vp = new VerticalPanel();
@@ -192,9 +192,9 @@ public class SampleSingleItem extends Composite {
 						}});
 					}
 				});*/
-			}
-		}
-		initWidget(vp);
-	}
+		//	}
+		//}
+		//initWidget(vp);
+//	}*/
 
 }
