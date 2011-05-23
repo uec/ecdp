@@ -24,8 +24,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
 
 public class FlowcellSingleItem extends Composite  {
 
@@ -34,6 +36,10 @@ public class FlowcellSingleItem extends Composite  {
 
 	interface FlowcellSingleItemUiBinder extends
 			UiBinder<Widget, FlowcellSingleItem> {
+	}
+	
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
 	}
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
@@ -47,8 +53,9 @@ public class FlowcellSingleItem extends Composite  {
 	@UiField FlexTable flowcellTable;
 	@UiField FlexTable flowcellTableSample;
 	@UiField DisclosurePanel qcPanel;
-	//@UiField DisclosurePanel filePanel;
+	@UiField DisclosurePanel filePanel;
 	@UiField FlowPanel qcvp;
+	@UiField FlowPanel filesvp;
 	
 	public FlowcellSingleItem(final FlowcellData flowcellIn)
 	{
@@ -69,7 +76,7 @@ public class FlowcellSingleItem extends Composite  {
 		//HEADERS
 		flowcellTableSample.setText(0,0, "Processing");
 		flowcellTableSample.setText(0,1, "Library");
-		//flowcellTableSample.setText(0,2, "Geneusid");
+		flowcellTableSample.setText(0,2, "Geneusid");
 		flowcellTableSample.setText(0,2, "Organism");
 		flowcellTableSample.setText(0,3, "Project");
 		for(int i = 1; i<=8;i++)
@@ -77,8 +84,8 @@ public class FlowcellSingleItem extends Composite  {
 			flowcellTableSample.setText(i,0, flowcell.getLaneProperty(i,"processing"));
 			String library = flowcell.getLaneProperty(i, "name").replace("+", "<br/>");
 			flowcellTableSample.setWidget(i,1, new HTML(library));
-			//String sampleID = flowcell.getLaneProperty(i, "sampleID").replace("+", "<br/>");
-			//flowcellTableSample.setWidget(i, 2, new HTML(sampleID));
+			String sampleID = flowcell.getLaneProperty(i, "sampleID").replace("+", "<br/>");
+			flowcellTableSample.setWidget(i, 2, new HTML(sampleID));
 			String organism = flowcell.getLaneProperty(i,"organism").replace("+", "<br/>");
 			flowcellTableSample.setWidget(i,2, new HTML(organism));
 			flowcellTableSample.setText(i,3, flowcell.getLaneProperty(i,"project"));						
@@ -137,5 +144,30 @@ public class FlowcellSingleItem extends Composite  {
 					}});
 			}
 		});
+		filePanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
+				{
+
+					public void onOpen(OpenEvent<DisclosurePanel> event)
+					{
+						filesvp.add(new Image("images/progress.gif"));
+						remoteService.getFilesforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>(){
+
+							public void onFailure(Throwable caught)
+							{
+								filesvp.clear();
+								filesvp.add(new Label(caught.getMessage()));
+							}
+
+							public void onSuccess(FlowcellData result)
+							{
+								filesvp.clear();
+								flowcell.fileList = result.fileList;
+								flowcell.filterLanesThatContain();
+								FileBrowser f = new FileBrowser(flowcell.fileList);
+								filesvp.add(f);
+							}});				
+					}			
+				});
+		
 	  }
 	}
