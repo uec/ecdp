@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
@@ -29,6 +30,10 @@ public class FlowcellReport extends ECPane{
 	interface FlowcellReportUiBinder extends UiBinder<Widget, FlowcellReport> {
 	}
 
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
+	}
+	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	public enum ReportType 	{ShowSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType;
@@ -70,7 +75,7 @@ public class FlowcellReport extends ECPane{
 	@Override
 	public void showTool() 
 	{
-		String name = reportType.name();
+		/*String name = reportType.name();
 		if(name.equals("ShowSamples"))
 		{
 			AsyncCallback<ArrayList<SampleData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<SampleData>>()
@@ -92,7 +97,7 @@ public class FlowcellReport extends ECPane{
 		    };remoteService.getSampleDataFromGeneus(DisplayFlowcellCallback);
 		}
 		else
-		{
+		{*/
 			AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
 		    {
 				public void onFailure(Throwable caught)
@@ -119,7 +124,7 @@ public class FlowcellReport extends ECPane{
 				case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
 				default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
 			}
-		}
+		//}
 	}
 
 	@Override
