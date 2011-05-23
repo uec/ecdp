@@ -1,0 +1,17 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+	<g:FlowPanel ui:field="vp">
+		<g:FlexTable ui:field="flowcellTable" styleName='{res.userPanel.flowcellitem}'></g:FlexTable>
+		<g:FlexTable ui:field="flowcellTableSample" styleName='{res.userPanel.flowcellitemlane}'></g:FlexTable>
+		<g:DisclosurePanel ui:field="qcPanel">
+			<g:header>Summary Statistics</g:header>
+			<g:FlowPanel ui:field="qcvp"></g:FlowPanel>
+		</g:DisclosurePanel>
+		<g:DisclosurePanel ui:field="filePanel">
+			<g:header>Download Files</g:header>
+			<g:FlowPanel ui:field="filesvp"></g:FlowPanel>
+		</g:DisclosurePanel>
+	</g:FlowPanel>
+</ui:UiBinder> 
