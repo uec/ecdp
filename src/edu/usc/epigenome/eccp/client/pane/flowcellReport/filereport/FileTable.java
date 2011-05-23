@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer.ChartType;
 
@@ -34,16 +35,20 @@ public class FileTable extends Composite {
 	interface FileTableUiBinder extends UiBinder<Widget, FileTable> {
 	}
 
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
+	}
+	
 	ArrayList<LinkedHashMap<String, String>> files;
-	Image headerIcon = new Image("images/rightArrow.png");
 	
 	public FileTable() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
 	@UiField FlowPanel main;
-	@UiField FlowPanel header;
+	@UiField HorizontalPanel header;
 	@UiField Label headerText;
+	@UiField Image headerIcon;
 	@UiField Label contentCountText;
 	@UiField FlexTable contentTable;
 	
@@ -53,8 +58,9 @@ public class FileTable extends Composite {
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		
+		//headerIcon = new Image("images/rightArrow.png");
 		headerText.setText(headerIn);
-		contentCountText = new Label(" (" + files.size() + " items)");
+		contentCountText.setText(" (" + files.size() + " items)");
 		
 		contentTable.setVisible(false);
 		if(headerIn.contains("Search Res"))
@@ -116,7 +122,7 @@ public class FileTable extends Composite {
 		{
 			LinkedHashMap<String, String> f = files.get(n);
 			HorizontalPanel chartLaunchPanel = new HorizontalPanel();
-			chartLaunchPanel.addStyleName("deshorizontalpanel");
+			//chartLaunchPanel.addStyleName("deshorizontalpanel");
 			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
 			
 			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
