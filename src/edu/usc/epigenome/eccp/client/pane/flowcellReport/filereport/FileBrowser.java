@@ -19,12 +19,15 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 
 public class FileBrowser extends Composite {
 
@@ -33,9 +36,13 @@ public class FileBrowser extends Composite {
 
 	interface FileBrowserUiBinder extends UiBinder<Widget, FileBrowser> {
 	}
+	
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
+	}
 
 	@UiField FlowPanel vp;
-	@UiField FlowPanel menu_items;
+	@UiField HorizontalPanel menu_items;
 	@UiField MenuBar mainbar;
 	@UiField MenuItem locationSort;
 	@UiField MenuItem laneSort;
