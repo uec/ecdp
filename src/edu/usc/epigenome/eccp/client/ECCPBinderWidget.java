@@ -33,6 +33,25 @@ public class ECCPBinderWidget extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
+	public static void addReport(final ECPane toolWidget, FocusPanel fpanel, final String typeGe)
+	{
+		fpanel.addClickHandler(new ClickHandler() {
+		
+			public void onClick(ClickEvent event) 
+			{
+				//if(toolTabPanel.)
+				if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
+				{
+					toolTabPanel.add(toolWidget, typeGe);
+					toolWidget.showTool();
+				}	
+					toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
+					addTabPanel.add(toolTabPanel);
+			}
+		});
+	}
+	
+	
 	//@UiField
 	//public static TabLayoutPanel toolTabPanel;
 	/*@UiField
@@ -53,32 +72,5 @@ public class ECCPBinderWidget extends Composite {
 
 	public static  HTMLPanel getControlAdd() {
 		return controlAdd;
-	}*/
-	
-	public static void addReport(final ECPane toolWidget, FocusPanel fpanel, final String typeGe)
-	{
-		fpanel.addClickHandler(new ClickHandler() {
-		
-			public void onClick(ClickEvent event) 
-			{
-				//if(toolTabPanel.)
-				
-					toolTabPanel.add(toolWidget, typeGe);
-					toolWidget.showTool();
-					
-					toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
-					addTabPanel.add(toolTabPanel);
-			}
-		});
-	}
-	
-	/*public static void addReport(ECPane toolWidget, String typeGe)
-	{
-		if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
-		{
-			toolTabPanel.add(toolWidget, typeGe);
-			controlAdd.add(toolWidget);
-		}
-		toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
 	}*/
 }
