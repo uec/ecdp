@@ -399,7 +399,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					HashMap<String,String> sampleData = new HashMap<String,String>();
 					Statement cellprop = myConnection.createStatement();
 					//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
-					String st2 ="select processing, sample_name, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
+					String st2 ="select processing, sample_name, geneusID_sample, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
 					ResultSet Prop = cellprop.executeQuery(st2);
 						
 					//Iterate over the information and populate the lane information
@@ -407,6 +407,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					{
 						sampleData.put("processing", Prop.getString("processing"));
 						String sample_name = Prop.getString("sample_name");
+						String sampleID = Prop.getString("geneusID_sample");
 						String organism = Prop.getString("organism");
 						if(sampleData.containsKey("name"))
 						{
@@ -425,6 +426,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						}
 						else
 							sampleData.put("organism", Prop.getString("organism"));
+						
+						if(sampleData.containsKey("sampleID"))
+						{
+							String tempSampleID = sampleData.get("sampleID");
+							if(!(tempSampleID.contains(sampleID)))
+								sampleData.put("sampleID", sampleData.get("sampleID").concat("+").concat(sampleID));
+						}
+						else
+							sampleData.put("sampleID", sampleID);
+						
 						    sampleData.put("project", Prop.getString("project"));
 					}
 					Prop.close();
@@ -880,7 +891,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 			return flowcell;
 	}*/
-		
+	
+	/*
+	 * Get files for the flowcell and add to the sampleData object
+	 */
 	@Override
 	public SampleData getFilesforFlowcellLane(String serial) throws IllegalArgumentException
 	{
@@ -952,10 +966,46 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	}
 	
 	@Override
-	public FlowcellData getFilesforFlowcell(String serial)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException 
+	{
+		FlowcellData flowcell = new FlowcellData();
+		try
+		{
+			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/report.pl", serial};
+			Process execQc = Runtime.getRuntime().exec(qcCommand);
+			InputStream inputStream = execQc.getInputStream();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db;
+			
+			db = dbf.newDocumentBuilder();
+			//URL url = new URL("http://www.epigenome.usc.edu/gareports/report.php?flowcell=" + serial + "&xmlfiles");
+			//InputStream inputStream = url.openStream();
+			Document document = db.parse(inputStream);
+			NodeList qcFileList = document.getElementsByTagName("file");
+			for(int i = 0; i < qcFileList.getLength(); i++)
+			{
+				Node qcFile = qcFileList.item(i);
+				LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();				
+				for(int j = 0; j < qcFile.getAttributes().getLength(); j++)
+				{
+					qcFileProperties.put(qcFile.getAttributes().item(j).getNodeName(), qcFile.getAttributes().item(j).getNodeValue());
+				}
+				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
+				Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+				qcFileProperties.put("encfullpath",  encryptURLEncoded(qcFileProperties.get("fullpath")));
+				if(laneNumMatcher.find())
+					qcFileProperties.put("lane", laneNumMatcher.group(1));
+				else
+					qcFileProperties.put("lane", "0");
+				flowcell.fileList.add(qcFileProperties);
+			}
+			inputStream.close();			
+		}
+		catch (Exception e)
+		{
+						e.printStackTrace();
+		}
+		return flowcell;
 	}
 
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
