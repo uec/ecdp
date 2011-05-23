@@ -1,11 +1,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.MyImages"></ui:with>
+	
 	<g:FlowPanel ui:field='main'>
-		<g:FlowPanel ui:field='header'>
+		<g:HorizontalPanel ui:field='header'>
+			<g:Image ui:field='headerIcon'  resource='{resources.rightArrow}'></g:Image>
 			<g:Label ui:field='headerText'></g:Label>
-			<g:Label ui:field='contentCountText'></g:Label>
-		</g:FlowPanel>
-		<g:FlexTable ui:field='contentTable'></g:FlexTable>
+			<g:Label ui:field='contentCountText' styleName='{res.userPanel.displayContext}'></g:Label>
+		</g:HorizontalPanel>
+		<g:FlexTable ui:field='contentTable' styleName='{res.userPanel.contentTableDisplay}'></g:FlexTable>
 	</g:FlowPanel>
 </ui:UiBinder> 
