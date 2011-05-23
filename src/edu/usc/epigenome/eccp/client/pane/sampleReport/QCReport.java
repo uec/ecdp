@@ -20,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 
@@ -29,6 +30,10 @@ public class QCReport extends Composite {
 			.create(QCReportUiBinder.class);
 
 	interface QCReportUiBinder extends UiBinder<Widget, QCReport> {
+	}
+	
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
 	}
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
@@ -54,7 +59,6 @@ public class QCReport extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		popup.removeFromParent();
-		Statistics.addStyleName("viewchartlabel");
 		
 		closeButton.addClickHandler(new ClickHandler() {
 			
