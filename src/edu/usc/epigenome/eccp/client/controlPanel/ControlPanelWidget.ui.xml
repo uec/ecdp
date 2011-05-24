@@ -7,7 +7,7 @@
 	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.MyImages"></ui:with>
 	<g:HTMLPanel>
 	 	<g:FocusPanel ui:field="fp">
-	 		<g:HorizontalPanel ui:field='hp' width="200px">
+	 		<g:HorizontalPanel ui:field='hp'>
 	 		<g:Image url="images/report.jpg" styleName='{style.myImage}'></g:Image>
 	 			<!--  <g:Image ui:field='report' resource='{resources.report}' styleName='{style.myImage}'></g:Image>-->
 	 		</g:HorizontalPanel>	
