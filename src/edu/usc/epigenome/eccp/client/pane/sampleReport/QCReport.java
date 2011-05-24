@@ -39,6 +39,7 @@ public class QCReport extends Composite {
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	String flowcellSerial;
 	SampleData sample;
+	int laneNo;
 	
 	@UiField FlowPanel LabPanel;
 	@UiField Label Statistics;
@@ -52,10 +53,11 @@ public class QCReport extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	public QCReport(final SampleData sampleIn, final String flowcellSerialIn)
+	public QCReport(final SampleData sampleIn, final String flowcellSerialIn, final int lane)
 	{
 		flowcellSerial = flowcellSerialIn;
 		sample = sampleIn;
+		laneNo = lane;
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		popup.removeFromParent();
@@ -74,7 +76,7 @@ public class QCReport extends Composite {
 			public void onClick(ClickEvent arg0) 
 			{
 				//popup.showRelativeTo(Statistics);
-				popup.showRelativeTo(LabPanel);
+				popup.showRelativeTo(Statistics);
 				//Window.open(arg0, arg1, arg2)
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
@@ -90,6 +92,8 @@ public class QCReport extends Composite {
 					{
 						summaryChart.clear();
 						sample.flowcellLaneQC = result.flowcellLaneQC;
+						sample.filterQC(lane);
+						sample.filterAnalysis(flowcellSerial, laneNo);
 						
 						for(String location : sample.flowcellLaneQC.keySet())
 						{
@@ -122,6 +126,7 @@ public class QCReport extends Composite {
 									}
 								}
 							}
+							qcFlexTable.addStyleName("qctable");
 							summaryChart.add(qcFlexTable);
 						}
 					}});
