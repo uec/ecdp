@@ -139,6 +139,7 @@ public class FlowcellSingleItem extends Composite  {
 									}
 								}
 							}
+							qcFlexTable.addStyleName("qctable");
 							qcvp.add(qcFlexTable);
 						}
 					}});
