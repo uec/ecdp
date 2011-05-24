@@ -73,7 +73,7 @@ public class FilesDownload extends Composite {
 			public void onClick(ClickEvent arg0) 
 			{
 				//popup.showRelativeTo(Statistics);
-				popup.showRelativeTo(LabPanel);
+				popup.showRelativeTo(downloadF);
 				//Window.open(arg0, arg1, arg2)
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
