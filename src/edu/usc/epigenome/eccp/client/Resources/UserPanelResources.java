@@ -23,6 +23,7 @@ public interface UserPanelResources extends ClientBundle
 		String samplereportitem();
 		String viewdisplaylabel();
 		String samplereportvp();
+		String popupdisplaypanel();
 	}
 	
 	@NotStrict
