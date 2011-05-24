@@ -11,6 +11,7 @@ import java.util.*;
 		public HashMap<Integer, HashMap<String, String>> flowcellLane;
 		public LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, String>>> flowcellLaneQC;
 		public ArrayList<LinkedHashMap<String, String>> flowcellFileList;
+		public LinkedHashMap<String, LinkedHashMap<String,String>> laneQC;
 		
 		public SampleData()
 		{
@@ -20,6 +21,7 @@ import java.util.*;
 			flowcellLane = new HashMap<Integer, HashMap<String, String>>();
 			flowcellLaneQC = new LinkedHashMap<String, LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
 			flowcellFileList = new ArrayList<LinkedHashMap<String,String>>();
+			laneQC = new LinkedHashMap<String, LinkedHashMap<String,String>>();
 		}
 		
 		
@@ -35,6 +37,45 @@ import java.util.*;
 			}
 		}
 		
+		public void filterQC(int lane)
+		{
+			ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
+			ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
+			
+			lanesToKeep.add(lane);
+			
+			for(String locaiton : flowcellLaneQC.keySet())
+				for(Integer i : flowcellLaneQC.get(locaiton).keySet())
+					if(!lanesToKeep.contains(i))
+						lanesToRemove.add(i);
+			
+			for(String location : flowcellLaneQC.keySet())
+				for(Integer i : lanesToRemove)
+				flowcellLaneQC.get(location).remove(i);
+			lanesToRemove.clear();
+			
+		}
+		
+		public void filterAnalysis(String flowcell, int lane)
+		{
+			ArrayList<String> analysisToRemove = new ArrayList<String>();
+			
+			for(String location : flowcellLaneQC.keySet())
+			{
+				if(location.contains(flowcell+"_"+lane+"_"))
+				{
+					if(!location.contains(sampleProperties.get("geneusID_sample")))
+					{
+						analysisToRemove.add(location);
+					}
+				}
+			}
+			
+				for(String rem : analysisToRemove)
+					flowcellLaneQC.remove(rem);
+				
+			analysisToRemove.clear();
+		}
 		
 		public void filterFiles(int lane)
 		{
