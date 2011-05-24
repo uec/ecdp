@@ -254,7 +254,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				   
 				   Statement st1 = myConnection.createStatement();
 				   //ArrayList<FlowcellData> fcells = new ArrayList<FlowcellData>();
-				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusId_sample from sequencing.view_run_metric where sample_name ='"+libraryID + "'";            
+				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusID_sample from sequencing.view_run_metric where sample_name ='"+libraryID + "'";            
 				   ResultSet rs1 = st1.executeQuery(samplePropSelect);
 				   
 				   while(rs1.next())
@@ -719,7 +719,100 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			return flowcell;
 	}
 	
-	
+	public SampleData getQCforLane(String serial, String sampleID, int lane) throws IllegalArgumentException
+	{
+		return null;
+	}
+	/*public SampleData getQCforLane(String serial, String sampleID, int lane) throws IllegalArgumentException
+	{
+		SampleData flowcell = new SampleData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell
+			String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and lane = '"+lane+"' and Date_Sequenced !='NULL' order by analysis_id";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the result set
+			if(results.next())
+			{
+			  do	
+			 {
+				String analysis_id = results.getString("analysis_id");
+				Statement st1 = myConnection.createStatement();
+				//for each analysis_id get the QC information from the database
+				String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and lane = '"+lane+ "' and Date_Sequenced !='NULL'";
+				ResultSet rs = st1.executeQuery(innSelect);
+				ResultSetMetaData rsMetaData = rs.getMetaData();
+				
+				//LinkedHashMap<LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+				while(rs.next())
+				{
+					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
+					qcProperties.put("lane", rs.getString("lane"));
+					qcProperties.put("geneusID_sample", rs.getString("sample_name"));
+					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
+					{
+						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"NA");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i), rs.getString(i));
+						}
+						else
+						{
+							if(rs.getString(i) == null || rs.getString(i).equals(""))
+								qcProperties.put(rsMetaData.getColumnName(i),"0");
+							else
+							    qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
+						}
+					}
+					qcReport.put(rs.getInt("lane"), qcProperties);
+				}
+				rs.close();
+				st1.close();
+				//add the qcReport LinkedHashmap to the flowcell laneQC	
+				flowcell.flowcellLaneQC.put(analysis_id, qcReport);
+			 }while(results.next());
+			
+			 results.close();
+			 stat.close();
+			 myConnection.close();
+		  }
+		}
+		catch( Exception E )
+		{ 
+			System.out.println( E.getMessage());	
+		}			
+		finally
+		{
+			try{myConnection.close();}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+			return flowcell;
+	}
+				
+				
+				
+		return null;
+		
+	}*/
 	public SampleData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
 	{
 		SampleData flowcell = new SampleData();
@@ -761,7 +854,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
 					qcProperties.put("lane", rs.getString("lane"));
-					qcProperties.put("geneusID_sample", rs.getString("sample_name"));
+					qcProperties.put("geneusID_sample", rs.getString("geneusID_sample"));
 					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
 					{
 						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
@@ -1091,18 +1184,90 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 	}
 
-	@Override
-	public MethylationData getFilesForMeth(String serial)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	public MethylationData getFilesForMeth(final String serial) throws IllegalArgumentException
+	{
+		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/methylation/meth27k"),new File("/storage/hpcc/uec-02/shared/production/methylation/meth450k")};
+		ArrayList<LinkedHashMap<String, String>> fileList = new ArrayList<LinkedHashMap<String, String>>() ;
+		MethylationData flowcell = new MethylationData();
+		FilenameFilter filter = new FilenameFilter()
+		{
+			public boolean accept(File dir, String name)
+			{
+				return (name.contains(serial) && !name.contains(".")); 
+			}
+		};
+		
+		for(File topDir : dirs)
+			for(File IntermediateDir : topDir.listFiles())
+				for(File dataDir : IntermediateDir.listFiles(filter))
+				{
+					
+					try
+					{
+						if(dataDir.isDirectory())
+						{
+							for(File dataFile : dataDir.listFiles())
+							{
+								LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();
+								qcFileProperties.put("base", dataFile.getName());
+								qcFileProperties.put("fullpath", dataFile.getAbsolutePath());
+								qcFileProperties.put("encfullpath",  encryptURLEncoded(dataFile.getAbsolutePath()));
+								qcFileProperties.put("dir", "/" + topDir.getName() + "/" + IntermediateDir.getName() + "/" + dataDir.getName());
+								qcFileProperties.put("label", IntermediateDir.getName() + "/" + dataDir.getName());
+								qcFileProperties.put("type", "unknown");
+								Pattern laneNumPattern = Pattern.compile("_(\\d+)[\\._]+");
+								Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+								if(laneNumMatcher.find())
+									qcFileProperties.put("lane", laneNumMatcher.group(1));
+								else
+									qcFileProperties.put("lane", "0");
+								fileList.add(qcFileProperties);
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						System.out.println(e.getMessage());					
+					}
+					
+				}
+		flowcell.fileList = fileList;
+		return flowcell;
 	}
-
-	@Override
-	public MethylationData getQCforMeth(String serial)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	public MethylationData getQCforMeth(String serial) throws IllegalArgumentException
+	{
+		MethylationData flowcell = new MethylationData();
+		try
+		{
+			for (HashMap<String,String> file : getFilesForMeth(serial).fileList)
+			{
+				if(file.get("base").contentEquals("Metrics.txt"))
+				{
+					//LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
+					LinkedHashMap<Integer,LinkedHashMap<String,String>> row = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
+					String contentsRaw = getCSVFromDisk(file.get("fullpath"));
+					String[] contentLines = contentsRaw.split("\\n");
+					String[] headers = contentLines[0].split("\\t");
+					for(int i = 1; i < contentLines.length; i++)
+					{
+						String[] rowRaw = contentLines[i].split("\\t");
+						LinkedHashMap<String,String> entry = new LinkedHashMap<String,String>();
+						for(int j = 0; j < rowRaw.length; j++)
+						{
+							entry.put(headers[j], rowRaw[j]);
+						}
+						row.put(i, entry);						
+					}
+					flowcell.laneQC.put(file.get("fullpath"), row);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+						e.printStackTrace();
+						System.out.println(e.getMessage());
+		}
+		return flowcell;
 	}
 
 	@Override
