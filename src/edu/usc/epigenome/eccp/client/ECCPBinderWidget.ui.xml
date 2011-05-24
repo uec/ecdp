@@ -9,10 +9,10 @@
      		 	<g:stack>
      		 		<g:header size='2'>Flowcell Reports</g:header>
      		 		<g:HTMLPanel ui:field="FcellReport">
-     		 			<c:ControlPanelWidget typeGeneus="Samples from Geneus" typeGroup="ShowSamples"/>
+     		 			<c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>
      		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
-     		 			<c:ControlPanelWidget typeGeneus="Flowcells from Geneus" typeGroup="ShowGeneus"/>
-     		 			<c:ControlPanelWidget typeGeneus="Flowcells from Disk" typeGroup="ShowFS"/>
+     		 			<c:ControlPanelWidget typeGeneus="Flowcells From Geneus" typeGroup="ShowGeneus"/>
+     		 			<c:ControlPanelWidget typeGeneus="Flowcells From Disk" typeGroup="ShowFS"/>
      		 			<c:ControlPanelWidget typeGeneus="Incomplete Flowcells" typeGroup="ShowIncomplete"/>
      		 		</g:HTMLPanel>
      		 	</g:stack>
