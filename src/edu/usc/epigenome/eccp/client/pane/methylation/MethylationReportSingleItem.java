@@ -94,7 +94,7 @@ public class MethylationReportSingleItem extends Composite {
 		{
 			public void onOpen(OpenEvent<DisclosurePanel> event)
 			{
-				qcPanel.add(new Image("images/progress.gif"));
+				qcvp.add(new Image("images/progress.gif"));
 				remoteService.getQCforMeth(beadArray.getFlowcellProperty("serial"), new AsyncCallback<MethylationData>() {
 
 				public void onFailure(Throwable caught)
@@ -105,11 +105,9 @@ public class MethylationReportSingleItem extends Composite {
 				}
 				public void onSuccess(MethylationData result)
 				{
-					qcPanel.clear();
+					qcvp.clear();
 					beadArray.laneQC = result.laneQC;
 					beadArray.filterLanesThatContain();
-					VerticalPanel qcvp = new VerticalPanel();
-					qcPanel.add(qcvp);
 					for(String location : beadArray.laneQC.keySet())
 					{
 						qcvp.add(new Label("QC Metrics from " + location));
