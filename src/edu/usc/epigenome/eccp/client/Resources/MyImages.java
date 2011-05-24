@@ -16,5 +16,11 @@ public interface MyImages extends ClientBundle {
 	
 	@Source("rightArrow.png")
 	ImageResource rightArrow();
+	
+	@Source("panelopen.png")
+	ImageResource panelOpen();
+	
+	@Source("panelclosed.png")
+	ImageResource panelClose();
 
 }
