@@ -99,20 +99,20 @@ public class SampleSingleReport extends Composite {
 		{	
 			public void onClose(CloseEvent<DisclosurePanel> arg0) 
 			{
-				headerIcon.setUrl("images/rightArrow.png");
+				headerIcon.setUrl("images/panelclosed.png");
 			}
 		});
 		sampleInfoPanel.addOpenHandler(new OpenHandler<DisclosurePanel>() 
 		{
 			public void onOpen(OpenEvent<DisclosurePanel> arg0) 
 			{
-				headerIcon.setUrl("images/downArrow.png");
+				headerIcon.setUrl("images/panelopen.png");
 				dataDisplay.clear();
 				for(final String flowcellSerial : sampGeneus.flowcellInfo.keySet())
 				{
 					HorizontalPanel fcellPanel = new HorizontalPanel();
 					FlexTable fcellInfo  = new FlexTable();
-					final Image fcellInfoImage = new Image("images/rightArrow.png");
+					final Image fcellInfoImage = new Image("images/panelclosed.png");
 					fcellInfo.setText(0,0,"Flowcell ID: " + flowcellSerial);
 					fcellInfo.setText(0, 1, "Technician: " + sampGeneus.flowcellInfo.get(flowcellSerial).get("technician"));
 					
@@ -127,14 +127,14 @@ public class SampleSingleReport extends Composite {
 
 						public void onClose(CloseEvent<DisclosurePanel> arg0) {
 								
-							fcellInfoImage.setUrl("images/rightArrow.png");
+							fcellInfoImage.setUrl("images/panelclosed.png");
 						}});
 					
 					flowcellShow.addOpenHandler(new OpenHandler<DisclosurePanel>() 
 					{
 						public void onOpen(OpenEvent<DisclosurePanel> arg0) 
 						{
-							fcellInfoImage.setUrl("images/downArrow.png");
+							fcellInfoImage.setUrl("images/panelopen.png");
 							remoteService.getLaneFlowcellSample(sampGeneus.sampleProperties.get("library"), flowcellSerial, new AsyncCallback<SampleData>() 
 							{
 								public void onFailure(Throwable arg0) 
@@ -154,7 +154,7 @@ public class SampleSingleReport extends Composite {
 										//content of flowcellshow panel is holdLane (consisting of lanes and images)
 										
 										FlexTable laneInfoTable = new FlexTable();
-										final Image laneInfoImage = new Image("images/rightArrow.png");
+										final Image laneInfoImage = new Image("images/panelclosed.png");
 										laneInfoTable.setText(0,0,"Lane No: " + laneNo);
 										laneInfoTable.setText(0,1,"Processing: " + sampGeneus.flowcellLane.get(laneNo).get("processing"));
 										holdLanePanel.add(laneInfoImage);
@@ -167,14 +167,14 @@ public class SampleSingleReport extends Composite {
 										
 										laneInfoPanel.addCloseHandler(new CloseHandler<DisclosurePanel>(){
 											public void onClose(CloseEvent<DisclosurePanel> arg0) {
-												laneInfoImage.setUrl("images/downArrow.png");
+												laneInfoImage.setUrl("images/panelclosed.png");
 											}});
 										
 										laneInfoPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
 										{
 											public void onOpen(OpenEvent<DisclosurePanel> arg0) 
 											{
-												laneInfoImage.setUrl("images/downArrow.png");
+												laneInfoImage.setUrl("images/panelopen.png");
 												laneInfoPanel.clear();
 												
 												FlowPanel ReportPanel = new FlowPanel();
@@ -183,7 +183,7 @@ public class SampleSingleReport extends Composite {
 												laneInfoPanel.add(QCDownloadPanel);
 												QCDownloadPanel.add(ReportPanel);
 												QCDownloadPanel.add(DownloadPanel);
-												ReportPanel.add(new QCReport(sampGeneus, flowcellSerial));
+												ReportPanel.add(new QCReport(sampGeneus, flowcellSerial, laneNo));
 												DownloadPanel.add(new FilesDownload(sampGeneus, flowcellSerial, laneNo));
 											}
 										});
