@@ -9,7 +9,7 @@
 		<g:DisclosurePanel ui:field='sampleInfoPanel' animationEnabled='true'>
 			<g:customHeader>
 				<g:HorizontalPanel ui:field='sampHeader' styleName='{res.userPanel.samplereportvp}'>
-					<g:Image ui:field='headerIcon'  resource='{resources.rightArrow}'></g:Image>
+					<g:Image ui:field='headerIcon'  resource='{resources.panelClose}'></g:Image>
 					<g:FlexTable ui:field='sampleData' styleName='{res.userPanel.samplereportitem}'></g:FlexTable>
 				</g:HorizontalPanel>
 			</g:customHeader>
