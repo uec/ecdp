@@ -605,7 +605,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|runs|gastorage[1|2])/");
 				Matcher matcher;
-				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
+				Pattern laneNumPattern = Pattern.compile("(s|"+serial+")_(\\d+)[\\._]+");
 				Matcher laneNumMatcher;
 				//Iterate over the result set
 				if(results.next())
@@ -626,7 +626,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							
 								laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
 								if(laneNumMatcher.find())
-										qcFileProperties.put("lane", laneNumMatcher.group(1));
+										qcFileProperties.put("lane", laneNumMatcher.group(2));
 								else
 										qcFileProperties.put("lane", "0");
 							
