@@ -178,7 +178,7 @@ public class FileTable extends Composite
 		if(ext.contains(".htm")) return "Web report";
 		if(ext.contains(".wig")) return "Wiggle Track";
 		if(ext.contains(".tdf")) return "IGV track";
-		if(ext.contains(".bam")) return "Bam Alignment";
+		if(ext.endsWith(".bam") || ext.endsWith(".bai")) return "Bam Alignment";
 		if(ext.contains(".tdf")) return "IGV Track";
 		if(ext.contains(".map")) return "Maq Alignment";
 		if(ext.contains(".csv")) return "CSV Table";
