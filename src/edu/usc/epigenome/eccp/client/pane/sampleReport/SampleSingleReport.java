@@ -91,8 +91,8 @@ public class SampleSingleReport extends Composite {
 		//headerIcon.setUrl("images/rightArrow.png");
 		sampleData.setText(0, 0, "Library: " + sampGeneus.getSampleProperty("library"));
 		sampleData.setText(0, 1, "Project: " + sampGeneus.getSampleProperty("project"));
-		sampleData.setText(0, 2, "Organism: " + sampGeneus.getSampleProperty("organism"));
-		sampleData.setText(0, 3, "Date: " + sampGeneus.getSampleProperty("date"));
+		//sampleData.setText(0, 2, "Organism: " + sampGeneus.getSampleProperty("organism"));
+		//sampleData.setText(0, 3, "Date: " + sampGeneus.getSampleProperty("date"));
 		
 		
 		sampleInfoPanel.addCloseHandler(new CloseHandler<DisclosurePanel>() 
@@ -180,11 +180,14 @@ public class SampleSingleReport extends Composite {
 												FlowPanel ReportPanel = new FlowPanel();
 												FlowPanel DownloadPanel = new FlowPanel();
 												FlowPanel QCDownloadPanel = new FlowPanel();
+												FlowPanel QCPlotsPanel = new FlowPanel();
 												laneInfoPanel.add(QCDownloadPanel);
 												QCDownloadPanel.add(ReportPanel);
 												QCDownloadPanel.add(DownloadPanel);
+												QCDownloadPanel.add(QCPlotsPanel);
 												ReportPanel.add(new QCReport(sampGeneus, flowcellSerial, laneNo));
 												DownloadPanel.add(new FilesDownload(sampGeneus, flowcellSerial, laneNo));
+												QCPlotsPanel.add(new QCPlots(sampGeneus, flowcellSerial, laneNo));
 											}
 										});
 										holdLane.add(laneInfoPanel);
