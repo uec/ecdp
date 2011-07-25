@@ -985,6 +985,35 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			return flowcell;
 	}*/
 	
+	public SampleData getCSVFiles(String serial) throws IllegalArgumentException
+	{
+		SampleData flowcell = getFilesforFlowcellLane(serial);
+		ArrayList<LinkedHashMap<String,String>> filesList = flowcell.flowcellFileList;
+		ArrayList<LinkedHashMap<String, String>> filesToRemove = new ArrayList<LinkedHashMap<String,String>>();
+		
+		for(int i=0;i<filesList.size();i++)
+		{
+			LinkedHashMap<String, String>f = filesList.get(i);
+			if(!f.get("base").contains(".csv"))
+			{
+				filesToRemove.add(f);
+			}
+		}
+		System.out.println("The size of filesToRemove " + filesToRemove.size());
+		
+		for(HashMap<String, String> file : filesToRemove)
+		{
+			filesList.remove(file);
+		}
+		
+		System.out.println("The size of filesList is  " + filesList.size());
+		
+		return flowcell;
+		
+	}
+	
+	
+	
 	/*
 	 * Get files for the flowcell and add to the sampleData object
 	 */
@@ -1014,7 +1043,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 			Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
 			Matcher matcher;
-			Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
+			Pattern laneNumPattern = Pattern.compile("(s|"+serial+")_(\\d+)[\\._]+");
 			Matcher laneNumMatcher;
 			//Iterate over the result set
 			if(results.next())
@@ -1035,7 +1064,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							
 							laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
 							if(laneNumMatcher.find())
-									qcFileProperties.put("lane", laneNumMatcher.group(1));
+									qcFileProperties.put("lane", laneNumMatcher.group(2));
 							else
 									qcFileProperties.put("lane", "0");
 							
@@ -1101,6 +1130,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 
+	
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
 	{
 		if(!(filePath.contains("Count") && filePath.endsWith(".csv") || filePath.endsWith("Metrics.txt")))
