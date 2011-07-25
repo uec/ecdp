@@ -25,6 +25,8 @@ public interface ECServiceAsync
 	void getFilesforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	
 	void getFilesforFlowcellLane(String serial, AsyncCallback<SampleData> callback) throws IllegalArgumentException;
+	void getCSVFiles(String serial, AsyncCallback<SampleData> callback) throws IllegalArgumentException;
+	
 	void getCSVFromDisk(String filePath, AsyncCallback<String> String) throws IllegalArgumentException;
 	void getAnalysisFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	
