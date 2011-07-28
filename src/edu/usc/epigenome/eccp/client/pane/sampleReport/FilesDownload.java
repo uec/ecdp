@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
@@ -40,10 +41,10 @@ public class FilesDownload extends Composite {
 	
 	@UiField FlowPanel LabPanel;
 	@UiField Label downloadF;
-	@UiField DecoratedPopupPanel popup;
+	@UiField FlowPanel popup;
 	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel summaryChart;
-	@UiField Button closeButton;
+	//@UiField Button closeButton;
 	
 	
 	public FilesDownload() {
@@ -59,21 +60,22 @@ public class FilesDownload extends Composite {
 		
 		popup.removeFromParent();
 		
-		closeButton.addClickHandler(new ClickHandler() {
+	/*	closeButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent arg0) 
 			{
-				popup.hide();
+				//popup.hide();
 			}
-		});
+		});*/
 		
 		downloadF.addClickHandler(new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
 			{
 				//popup.showRelativeTo(Statistics);
-				popup.showRelativeTo(downloadF);
+				ECCPBinderWidget.addtoTab(popup, sample.getSampleProperty("library") + " " + flowcellSerial + " " + lane);
+				//popup.showRelativeTo(downloadF);
 				//Window.open(arg0, arg1, arg2)
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
