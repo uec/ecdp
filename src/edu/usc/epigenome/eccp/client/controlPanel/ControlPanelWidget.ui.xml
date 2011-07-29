@@ -8,9 +8,10 @@
 	<g:HTMLPanel>
 	 	<g:FocusPanel ui:field="fp">
 	 		<g:HorizontalPanel ui:field='hp'>
-	 		<g:Image url="images/report.jpg" styleName='{style.myImage}'></g:Image>
+	 			<g:Image url="images/report.jpg" styleName='{style.myImage}'></g:Image>	
 	 			<!--  <g:Image ui:field='report' resource='{resources.report}' styleName='{style.myImage}'></g:Image>-->
 	 		</g:HorizontalPanel>	
-	 	</g:FocusPanel>					
+	 	</g:FocusPanel>	
+     <!--  <g:FlowPanel ui:field="holder"></g:FlowPanel> -->
 	 </g:HTMLPanel>
 </ui:UiBinder> 
