@@ -18,6 +18,7 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
@@ -43,10 +44,10 @@ public class QCReport extends Composite {
 	
 	@UiField FlowPanel LabPanel;
 	@UiField Label Statistics;
-	@UiField DecoratedPopupPanel popup;
+	@UiField FlowPanel popup;
 	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel summaryChart;
-	@UiField Button closeButton;
+	//@UiField Button closeButton;
 	
 	
 	public QCReport() {
@@ -62,21 +63,21 @@ public class QCReport extends Composite {
 		
 		popup.removeFromParent();
 		
-		closeButton.addClickHandler(new ClickHandler() {
+	/*	closeButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent arg0) 
 			{
 				popup.hide();
 			}
-		});
+		});*/
 		
 		Statistics.addClickHandler(new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
 			{
+				ECCPBinderWidget.addtoTab(popup, "QCReport"+sample.getSampleProperty("library") + " " + flowcellSerial + " " + lane);
 				//popup.showRelativeTo(Statistics);
-				popup.showRelativeTo(Statistics);
 				//Window.open(arg0, arg1, arg2)
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
