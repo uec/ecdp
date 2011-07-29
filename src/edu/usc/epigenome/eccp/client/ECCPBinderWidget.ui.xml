@@ -3,32 +3,37 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:c="urn:import:edu.usc.epigenome.eccp.client.controlPanel"
 	xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
- 	<g:DockLayoutPanel unit='EM'>
-     	<g:west size="15">
-     		<g:StackLayoutPanel unit="EM" height="500px">
-     		 	<g:stack>
-     		 		<g:header size='2'>Flowcell Reports</g:header>
+ 	<g:SplitLayoutPanel>
+     	<g:west size="250">
+     	  <!--  <g:StackLayoutPanel unit="EM" height="500px">
+     		 <g:stack>
+     		 		<g:header size='2'>Flowcell Reports</g:header>-->
+     		 		<g:ScrollPanel>
      		 		<g:HTMLPanel ui:field="FcellReport">
-     		 			<c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>
-     		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
      		 			<c:ControlPanelWidget typeGeneus="Flowcells From Geneus" typeGroup="ShowGeneus"/>
+     					<g:FlowPanel>
+     		 				<c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>
+     		 				<g:VerticalPanel ui:field="clean"></g:VerticalPanel>
+     		 			</g:FlowPanel>
+     		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
      		 			<c:ControlPanelWidget typeGeneus="Flowcells From Disk" typeGroup="ShowFS"/>
-     		 			<c:ControlPanelWidget typeGeneus="Incomplete Flowcells" typeGroup="ShowIncomplete"/>
+     		 			<c:ControlPanelWidget typeGeneus="Incomplete Flowcells" typeGroup="ShowIncomplete"/> 
      		 		</g:HTMLPanel>
-     		 	</g:stack>
-     		 	<g:stack>
+     		 		</g:ScrollPanel>
+     		 <!--	</g:stack>
+     		   	<g:stack>
      		 		<g:header size='2'>Methylation Reports</g:header>
      		 		<g:HTMLPanel ui:field="MethylaReport">
      		 			<c:ControlPanelWidget typeGeneus="Infinium Methylation 27K" typeGroup="MethylationReports"/>
      		 			<c:ControlPanelWidget typeGeneus="Methylation Sanity Check" typeGroup="MethylationSanity"/>
      		 		</g:HTMLPanel>
      		 	</g:stack>
-     		</g:StackLayoutPanel>
+     		</g:StackLayoutPanel>-->
      	</g:west>
      	<g:center>
      		<g:ScrollPanel>
      			<g:VerticalPanel ui:field="addTabPanel"></g:VerticalPanel>
      		</g:ScrollPanel>
      	</g:center>
-    </g:DockLayoutPanel>
+    </g:SplitLayoutPanel>
  </ui:UiBinder>
