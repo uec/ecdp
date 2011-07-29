@@ -3,32 +3,35 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:c="urn:import:edu.usc.epigenome.eccp.client.controlPanel"
 	xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
+	
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+	
  	<g:SplitLayoutPanel>
      	<g:west size="250">
-     	  <!--  <g:StackLayoutPanel unit="EM" height="500px">
+     	<g:ScrollPanel>
+     	<g:HTMLPanel ui:field="layoutReport">
+     		<!--  <c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>-->
+     		 <g:Label ui:field="label" text="Switch to Sample View" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
+     	    <g:StackLayoutPanel unit="EM" height="500px" ui:field="mainStack">
      		 <g:stack>
-     		 		<g:header size='2'>Flowcell Reports</g:header>-->
-     		 		<g:ScrollPanel>
+     		 		<g:header size='2'>Flowcell Reports</g:header>
      		 		<g:HTMLPanel ui:field="FcellReport">
      		 			<c:ControlPanelWidget typeGeneus="Flowcells From Geneus" typeGroup="ShowGeneus"/>
-     					<g:FlowPanel>
-     		 				<c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>
-     		 				<g:VerticalPanel ui:field="clean"></g:VerticalPanel>
-     		 			</g:FlowPanel>
      		 			<c:ControlPanelWidget typeGeneus="All Flowcells" typeGroup="ShowAll"/>
      		 			<c:ControlPanelWidget typeGeneus="Flowcells From Disk" typeGroup="ShowFS"/>
      		 			<c:ControlPanelWidget typeGeneus="Incomplete Flowcells" typeGroup="ShowIncomplete"/> 
      		 		</g:HTMLPanel>
-     		 		</g:ScrollPanel>
-     		 <!--	</g:stack>
-     		   	<g:stack>
+     		 	</g:stack>
+     		  	<g:stack>
      		 		<g:header size='2'>Methylation Reports</g:header>
      		 		<g:HTMLPanel ui:field="MethylaReport">
      		 			<c:ControlPanelWidget typeGeneus="Infinium Methylation 27K" typeGroup="MethylationReports"/>
      		 			<c:ControlPanelWidget typeGeneus="Methylation Sanity Check" typeGroup="MethylationSanity"/>
      		 		</g:HTMLPanel>
      		 	</g:stack>
-     		</g:StackLayoutPanel>-->
+     		</g:StackLayoutPanel>
+     	</g:HTMLPanel>	
+     	</g:ScrollPanel>
      	</g:west>
      	<g:center>
      		<g:ScrollPanel>
