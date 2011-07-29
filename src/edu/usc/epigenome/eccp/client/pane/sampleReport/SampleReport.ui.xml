@@ -4,14 +4,13 @@
 	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
 	
 	<g:FlowPanel ui:field="mainPanel">
-		<g:FlowPanel ui:field="searchPanel" styleName='{res.userPanel.samplesearch}'>
+		 <g:FlowPanel ui:field="searchPanel" styleName='{res.userPanel.samplesearch}'>
 			<g:HorizontalPanel ui:field="searchOptionsPanel">
 				<g:Label text="Sample Properties: "/>
-				<g:TextBox ui:field="globalSearchBox"/>
+				<g:TextBox ui:field="sampleSearchBox"/>
 				<g:Button ui:field="searchButton" text="Search"/>
 			</g:HorizontalPanel>
 		</g:FlowPanel> 
-		<g:FlowPanel ui:field="vp">
-		</g:FlowPanel>
+		<g:FlowPanel ui:field="vp"></g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder> 
