@@ -25,6 +25,7 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.AreaChartViewer;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartBrowser;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ColumnChartViewer;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.MotionChartViewer;
@@ -66,9 +67,9 @@ public class QCPlots extends Composite {
 			public void onClick(ClickEvent arg0) 
 			{
 				
-				ECCPBinderWidget.addtoTab(popup, "Plots" + sample.getSampleProperty("library") + " " + flowcellSerial + " " + lane);
-				summaryChart.clear();
-				summaryChart.add(new Image("images/progress.gif"));
+				ECCPBinderWidget.addtoTab(popup, "Plots  " + sample.getSampleProperty("library") + " " + flowcellSerial + " " + lane);
+				//summaryChart.clear();
+				//summaryChart.add(new Image("images/progress.gif"));
 				
 				remoteService.getCSVFiles(flowcellSerial, new AsyncCallback<SampleData>() 
 				{	
@@ -82,38 +83,21 @@ public class QCPlots extends Composite {
 						summaryChart.clear();
 						sample.flowcellFileList = result.flowcellFileList;
 						sample.filterFiles(lane);
-						sortBy("base");
-						
-						
-						for(int n=0; n<sample.flowcellFileList.size(); n++)
+						//sortBy("base");
+						ChartBrowser chBrowse = new ChartBrowser(sample.flowcellFileList);
+						summaryChart.add(chBrowse);
+						/*for(int n=0; n<sample.flowcellFileList.size(); n++)
 						{
 							LinkedHashMap<String, String> f = sample.flowcellFileList.get(n);
-							//Window.alert("size of file list is " + f);
-							//chartLaunchPanel.addStyleName("deshorizontalpanel");
 							String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
 							summaryChart.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
-							String base = f.get("base");
-							//summaryChart.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
-							/*if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
-								showChart(f.get("fullpath"), ChartType.Area, fileURI, base);
-							else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
-								showChart(f.get("fullpath"), ChartType.Column, fileURI, base);*/
-							if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
-								summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.Area));
-							else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
-								summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.Column));
-							else if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
-							{
-								//summaryChart.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
-								summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
-							}
-						}
+						}*/
 					}	
 			});
 		}});
 	}
 	
-	public void showChart(final String csvPath,final ChartType t, final String fileURI, final String base)
+/*	public void showChart(final String csvPath,final ChartType t, final String fileURI, final String base)
 	{
 		remoteService.getCSVFromDisk(csvPath, new AsyncCallback<String>()
 		{
@@ -132,16 +116,28 @@ public class QCPlots extends Composite {
 					summaryChart.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + base + "</a>"));
 				}
 			});	
-	}
+	}*/
 	
-	public void sortBy(final String key)
+
+	
+	
+	/*for(int n=0; n<sample.flowcellFileList.size(); n++)
 	{
-		Collections.sort(sample.flowcellFileList, new Comparator<LinkedHashMap<String, String>>()
-		{
-			public int compare(LinkedHashMap<String, String> o1, LinkedHashMap<String, String> o2)
-			{
-				return o1.get(key).compareTo(o2.get(key));
-			}
-		});
-	}
+		LinkedHashMap<String, String> f = sample.flowcellFileList.get(n);
+		String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
+		summaryChart.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
+		//String base = f.get("base");
+	/*	if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
+			showChart(f.get("fullpath"), ChartType.Area, fileURI, base);
+		else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
+			showChart(f.get("fullpath"), ChartType.Column, fileURI, base);*/
+	/*	if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
+			summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.Area));
+		else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
+			summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.Column));
+		else if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
+		
+			//summaryChart.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
+		
+	}*/
 }
