@@ -12,11 +12,13 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -34,13 +36,45 @@ public class ECCPBinderWidget extends Composite {
 	}
 	
 	@UiField public static VerticalPanel addTabPanel;
-	@UiField static VerticalPanel clean;
+	@UiField static StackLayoutPanel mainStack;
+	@UiField static HTMLPanel layoutReport;
+	@UiField static Label label;
 	static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
 	
 	public ECCPBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
+		label.setText("Switch to Sample View");
+		int viewChange = 0; //switch to sample view
+		
+		label.addClickHandler( new ClickHandler() 
+		{	
+			public void onClick(ClickEvent arg0) 
+			{
+				if(label.getText().contains("Flowcell"))
+				{
+					addTabPanel.clear();
+					layoutReport.clear();
+					layoutReport.add(label);
+					layoutReport.add(mainStack);
+					label.setText("Switch to Sample View");
+				}
+				else if(label.getText().contains("Sample"))
+				{
+					addTabPanel.clear();
+					layoutReport.clear();
+					SampleReport sp = new SampleReport();
+					layoutReport.add(label);
+					if(!sp.isAttached())
+					{	
+						layoutReport.add(sp);
+						sp.showTool();
+					}
+					label.setText("Switch to Flowcell View");
+				}	
+			}
+			});
 	}
 	
 	public static void clearaddTabPanel()
@@ -54,17 +88,19 @@ public class ECCPBinderWidget extends Composite {
 		
 			public void onClick(ClickEvent event) 
 			{
-				//if(toolTabPanel.)
-				if(typeGe.contains("Samples From Geneus"))
+				/*if(typeGe.contains("Samples From Geneus"))
 				{
-					//Window.alert("is visible " + clean.isVisible());
-					//Window.alert("No of widgets " + clean.getWidgetCount());
 					addTabPanel.clear();
-					clean.add(toolWidget);
-					toolWidget.showTool();
+					mainStack.clear();
+					label.setText("Switch to Flowcell View");
+					if(!toolWidget.isAttached())
+					{	
+						layoutReport.add(toolWidget);
+						toolWidget.showTool();
+					}
 				}	
 				else
-				{
+				{*/
 					if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
 					{
 						toolTabPanel.add(toolWidget, typeGe);
@@ -73,7 +109,7 @@ public class ECCPBinderWidget extends Composite {
 					toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
 					addTabPanel.add(toolTabPanel);
 				}
-			}
+			//}
 		});
 	}
 	
@@ -84,8 +120,6 @@ public class ECCPBinderWidget extends Composite {
 		Label label = new Label(displayName);
 		hp.add(label);
 		hp.add(image);
-		//fp.set
-		//Panel tab = new Panel();
 	
 		image.setUrl("images/close_icon.gif");
 		if(tabQCDownload.getWidgetIndex(fp) < 0)
@@ -95,19 +129,6 @@ public class ECCPBinderWidget extends Composite {
 		tabQCDownload.setTitle(displayName);
 		tabQCDownload.selectTab(tabQCDownload.getWidgetIndex(fp));
 		addTabPanel.add(tabQCDownload);
-		
-		/*tabQCDownload.addSelectionHandler(new SelectionHandler<Integer>() 
-		{	
-			public void onSelection(SelectionEvent<Integer> arg0) 
-			{
-				int tabId = arg0.getSelectedItem();
-				Widget tabWidget = tabQCDownload.getWidget(tabId);
-				Window.alert("THE tabwidget is " + tabWidget.toString());
-				//Window.alert("the tab selected is " + tabQCDownload.getTitle());
-				
-			}
-		});*/
-		
 		
 		/*
 		 * Tabbed Browsing 
