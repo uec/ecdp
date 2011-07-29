@@ -17,9 +17,11 @@ import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.SampleData;
@@ -40,6 +42,7 @@ public class SampleReport extends ECPane{
 	@UiField FlowPanel searchPanel;
 	@UiField HorizontalPanel searchOptionsPanel;
 	@UiField FlowPanel vp;
+	@UiField TextBox sampleSearchBox;
 	@UiField Button searchButton;
 	
 	public SampleReport() {
@@ -51,10 +54,9 @@ public class SampleReport extends ECPane{
 			public void onClick(ClickEvent event) 
 			{
 				if(searchPanel.getWidgetCount() > 1)
-				{
 					searchPanel.clear();
-					//searchPanel.add(searchOptionsPanel);
-				}
+					
+				ECCPBinderWidget.clearaddTabPanel();
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
 				showTool();
@@ -76,8 +78,12 @@ public class SampleReport extends ECPane{
 				vp.clear();
 				for(SampleData sampl : result)
 				{
-					SampleSingleReport flowcellItem = new SampleSingleReport(sampl);
-					vp.add(flowcellItem);
+					if(sampl.sampleContains(sampleSearchBox.getText()))
+					{
+						SampleTreeView flowcellItem = new SampleTreeView(sampl);
+						//SampleSingleReport flowcellItem = new SampleSingleReport(sampl);
+						vp.add(flowcellItem);
+					}
 				}
 			}
 	    };remoteService.getSampleFromGeneus(DisplayFlowcellCallback);
