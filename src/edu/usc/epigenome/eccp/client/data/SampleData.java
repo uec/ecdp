@@ -12,7 +12,7 @@ import java.util.*;
 		public LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, String>>> flowcellLaneQC;
 		public ArrayList<LinkedHashMap<String, String>> flowcellFileList;
 		public LinkedHashMap<String, LinkedHashMap<String,String>> laneQC;
-		
+		String sampleFilter = "";
 		public SampleData()
 		{
 			//sampleInfo = new HashMap<String, ArrayList<FlowcellData>>();
@@ -115,5 +115,29 @@ import java.util.*;
 				}
 				
 			}*/	
+		}
+		
+		public boolean sampleContains(String query)
+		{
+			sampleFilter = query;
+			if(query == null || query.length() < 1 || query.equals(""))
+				return true;
+			ArrayList<Boolean> foundList = new ArrayList<Boolean>();
+			String[] words = query.split("\\s+");
+			
+			for(String word : words)
+			{
+				Boolean found = false;
+				for(String v : sampleProperties.values())
+				{
+					if(v.toLowerCase().contains(word.toLowerCase()))
+							found = true;
+				}
+				foundList.add(found);
+			}
+			if(foundList.contains(true) && !foundList.contains(false))
+				return true;
+			else 
+				return false;
 		}
 	}
