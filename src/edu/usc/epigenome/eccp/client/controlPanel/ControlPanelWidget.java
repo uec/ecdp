@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
@@ -53,6 +54,8 @@ public class ControlPanelWidget extends Composite{
 		
 @UiField FocusPanel fp;
 @UiField HorizontalPanel hp;
+//@UiField Label headerText;
+//@UiField Image headerIcon;
 	
 	@UiConstructor
 	public ControlPanelWidget(final String typeGeneus, final String typeGroup)
@@ -60,6 +63,20 @@ public class ControlPanelWidget extends Composite{
 		initWidget(uiBinder.createAndBindUi(this));
 		hp.setTitle(typeGeneus);
 		hp.add(new HTML(typeGeneus));
+		
+	/*	ClickHandler expand = new ClickHandler()
+		{	
+			public void onClick(ClickEvent arg0) 
+			{
+				if()
+				
+			}};
+			
+			headerText.addClickHandler(expand);
+			headerText.addClickHandler(expand);*/
+			
+			
+			
 		if(typeGroup.contains("ShowSamples"))
 		{
 			ECCPBinderWidget.addReport(new SampleReport(), fp, typeGeneus);
