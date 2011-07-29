@@ -51,7 +51,6 @@ public class SampleTreeView extends Composite
 	public SampleTreeView() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-
 	
 	public SampleTreeView(final SampleData sampleIn)
 	{
@@ -60,7 +59,6 @@ public class SampleTreeView extends Composite
 		
 		//Tree t = new Tree();
 		TreeItemClick sampleCellItem = new TreeItemClick("Library", sampGeneus.getSampleProperty("library"), "Project", sampGeneus.getSampleProperty("project"));
-		//sampleRoot = new TreeItem(sampleCellItem);
 		TreeItem sampleRoot = new TreeItem(sampleCellItem);
 		t.addItem(sampleRoot);
 		
