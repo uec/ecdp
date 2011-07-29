@@ -34,7 +34,6 @@
 }
 
 .samplereportitem{
-	padding: 3px;
 	border-style: dotted;
 	border-width: 1px;
 	border-color: #BBCCEE;
@@ -45,7 +44,7 @@
 }
 
 .samplereportitem td {
-	padding: 4px;
+	font-weight:normal;
 	word-spacing: 1px;	
 }
 
@@ -169,8 +168,8 @@ h1 {
 }
 
 .popupdisplaypanel{
-	background-color: #CAE1FF;
-	border : 3px;
+	
+	
 }
 
 .viewchartlabel {
