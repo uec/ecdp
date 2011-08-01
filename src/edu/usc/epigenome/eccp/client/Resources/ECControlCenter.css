@@ -165,6 +165,14 @@ h1 {
 	color: #0000BB;
 	padding-bottom: 3px;
 	
+	
+}
+
+.viewSwitchlabel {
+	font-size: 11px;
+	color: #0000BB;
+	text-decoration: underline;
+	text-align: right;
 }
 
 .popupdisplaypanel{
