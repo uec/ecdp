@@ -11,7 +11,7 @@
      	<g:ScrollPanel>
      	<g:HTMLPanel ui:field="layoutReport">
      		<!--  <c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>-->
-     		 <g:Label ui:field="label" text="Switch to Sample View" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
+     		 <g:Label ui:field="label" text="Switch to Sample View" styleName='{res.userPanel.viewSwitchlabel}'></g:Label>
      	    <g:StackLayoutPanel unit="EM" height="500px" ui:field="mainStack">
      		 <g:stack>
      		 		<g:header size='2'>Flowcell Reports</g:header>
