@@ -22,6 +22,7 @@ public interface UserPanelResources extends ClientBundle
 		String displayfilehorizontal();
 		String samplereportitem();
 		String viewdisplaylabel();
+		String viewSwitchlabel();
 		String samplereportvp();
 		String popupdisplaypanel();
 	}
