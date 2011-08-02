@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
@@ -38,9 +39,9 @@ public class FlowcellReport extends ECPane{
 	public enum ReportType 	{ShowSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType;
 	
-	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel searchPanel;
-	@UiField HorizontalPanel searchOptionsPanel;
+	@UiField TextBox laneSearchBox;
+	@UiField TextBox globalSearchBox;
 	@UiField FlowPanel vp;
 	@UiField Button searchButton;
 	
@@ -59,11 +60,9 @@ public class FlowcellReport extends ECPane{
 		{	
 			public void onClick(ClickEvent event) 
 			{
-				Window.alert("Widgets are " + searchPanel.getWidgetCount());
 				if(searchPanel.getWidgetCount() > 1)
 				{	
 					searchPanel.clear();
-					searchPanel.add(searchOptionsPanel);
 				}
 				
 				vp.clear();
@@ -109,10 +108,12 @@ public class FlowcellReport extends ECPane{
 				{
 					vp.clear();
 					for(FlowcellData flowcell : result)
-					{
-						FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
-						vp.add(flowcellItem);
-					}
+						if(flowcell.flowcellContains(globalSearchBox.getText()))
+							if(flowcell.filterLanesThatContain(laneSearchBox.getText()))
+							{
+								FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
+								vp.add(flowcellItem);
+							}
 				}
 		  };
 		  
