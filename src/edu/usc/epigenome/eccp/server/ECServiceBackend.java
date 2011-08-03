@@ -1300,40 +1300,186 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 
-	@Override
-	public String[] qstat(String queue) {
-		// TODO Auto-generated method stub
+	public String[] qstat(String queue) throws IllegalArgumentException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		arr.add("Job ID^Job Name^User^State^Submit Time^queue");
+		try
+		{
+			String line;
+			Process p = Runtime.getRuntime().exec("/usr/bin/zstatremote");
+			
+			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((line = input.readLine()) != null)
+			{
+				if(line.contains("^"+ queue +"^"))
+					arr.add(line);
+				else if(queue.contains("all"))
+					arr.add(line);
+			}
+			input.close();
+		} catch (Exception err)
+		{
+			err.printStackTrace();
+		}		
+		return (String[])arr.toArray(new String[arr.size()]);
+	}
+/*
+ * (non-Javadoc)
+ * @see edu.usc.epigenome.eccp.client.ECService#clearCache(java.lang.String)
+ * function to clear the contents of cache in the /tmp directory
+ */
+	public String clearCache(String cachefile)
+	{
+		String[] cachefiles = {"/tmp/genFileCache", "/tmp/genURLcache"};
+		for(String f : cachefiles)
+			if(cachefile.contentEquals(f))
+				new File(f).delete();
+		
+		return "cache cleared";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#encryptURLEncoded(java.lang.String)
+	 * URLEncode the md5 and AES encrypted string
+	 */
+	@SuppressWarnings("deprecation")
+	public String encryptURLEncoded(String srcText) throws IllegalArgumentException
+	{
+		return java.net.URLEncoder.encode(encryptString(srcText));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#getEncryptedData(java.lang.String, java.lang.String)
+	 * remote method to md5 and then encrypt and url encode the input.
+	 * returns an ArrayList of the encrypted data. 
+	 */
+	public ArrayList<String> getEncryptedData(String globalText, String laneText) throws IllegalArgumentException 
+	{
+		try
+		{
+			ArrayList<String> retCipher = new ArrayList<String>();
+			String mdGlobal = md5(globalText);
+			String mdLane = md5(laneText);
+			String tempGlobal = globalText.concat(mdGlobal);
+			String tempLane = laneText.concat(mdLane);
+			retCipher.add(encryptURLEncoded(tempGlobal));
+			retCipher.add(encryptURLEncoded(tempLane));
+			return retCipher;
+		}		
+		catch (Exception e)
+		{			
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	@Override
-	public String clearCache(String cachefile) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * Method to get the md5 hash of the input string
+	 * takes string as an input parameter
+	 * and returns the md5 hash of the input string
+	 */
+	private static String md5(String text)
+	{
+		MessageDigest md;
+		try
+		{
+			md = MessageDigest.getInstance("MD5");
+			
+	        md.update(text.getBytes());
+	 
+	        byte byteData[] = md.digest();
+	 
+	        //convert the byte to hex format method 1
+	        StringBuffer sb = new StringBuffer();
+	        for (int i = 0; i < byteData.length; i++) 
+	        	sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+	        return sb.toString();
+		} 
+		catch (NoSuchAlgorithmException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return text;		
 	}
 
-	@Override
-	public String encryptURLEncoded(String srcText)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#decryptKeyword(java.lang.String, java.lang.String)
+	 * Method to decrypt the string parameters passed to the function.
+	 */
+	public ArrayList<String> decryptKeyword(String fcellData, String laneData)
+	{
+		ArrayList<String> decryptedContents = new ArrayList<String>();
+		String fcellAfterDecrypt = null;
+		String laneAfterDecrypt = null;
+		try
+		{
+			//Decode the text using cipher
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.DECRYPT_MODE,keySpec,desCipher.getParameters());
+			
+			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
+			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(fcellData);
+			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
+			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
+			laneAfterDecrypt = new String(laneBytes);
+			fcellAfterDecrypt = new String(fcellBytes);
+			System.out.println("laneAfterDecrypt is " + laneAfterDecrypt + "   fcellAfterDecrypt is " + fcellAfterDecrypt);
+			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
+			String tempFcell = fcellAfterDecrypt.substring(0,fcellAfterDecrypt.length()-32);
+			System.out.println("tempLane is " + tempLane + "   tempFcell is " + tempFcell);
+			
+			if(md5(tempLane).equals(laneAfterDecrypt.substring(laneAfterDecrypt.length()-32, laneAfterDecrypt.length())) && 
+					md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length()-32, fcellAfterDecrypt.length())))
+			{
+				//System.out.println("laneAfterDecrypt is " + laneAfterDecrypt + "   fcellAfterDecrypt is " + fcellAfterDecrypt);
+				System.out.println("tempLane is " + tempLane + "   tempFcell is " + tempFcell);
+				decryptedContents.add(tempFcell);
+				decryptedContents.add(tempLane);
+				return decryptedContents;
+			}
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		decryptedContents.add(fcellData);
+		decryptedContents.add(laneData);
+		return decryptedContents;
 	}
 
-	@Override
-	public ArrayList<String> getEncryptedData(String globalText, String laneText)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * Method to AES encrypt the given string.
+	 * return the cipher text after AES encryption. 
+	 */
+	private String encryptString(String srcText)
+	{		
+		try
+		{
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.ENCRYPT_MODE,keySpec);
+			byte[] byteDataToEncrypt = srcText.getBytes();
+			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt); 
+			String strCipherText = new BASE64Encoder().encode(byteCipherText);
+			return strCipherText;
+		}		
+		catch (Exception e)
+		{			
+			e.printStackTrace();
+		}
+		return srcText;
 	}
-
-	@Override
-	public ArrayList<String> decryptKeyword(String fcellText, String laneText)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
+	/*
+	 * Method to format the given input string.
+	 */
 	NumberFormat formatter = NumberFormat.getInstance();
 	public String NoFormat(String temp)
 	{
