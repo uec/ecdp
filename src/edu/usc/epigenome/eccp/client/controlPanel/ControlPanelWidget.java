@@ -54,8 +54,6 @@ public class ControlPanelWidget extends Composite{
 		
 @UiField FocusPanel fp;
 @UiField HorizontalPanel hp;
-//@UiField Label headerText;
-//@UiField Image headerIcon;
 	
 	@UiConstructor
 	public ControlPanelWidget(final String typeGeneus, final String typeGroup)
@@ -63,19 +61,6 @@ public class ControlPanelWidget extends Composite{
 		initWidget(uiBinder.createAndBindUi(this));
 		hp.setTitle(typeGeneus);
 		hp.add(new HTML(typeGeneus));
-		
-	/*	ClickHandler expand = new ClickHandler()
-		{	
-			public void onClick(ClickEvent arg0) 
-			{
-				if()
-				
-			}};
-			
-			headerText.addClickHandler(expand);
-			headerText.addClickHandler(expand);*/
-			
-			
 			
 		if(typeGroup.contains("ShowSamples"))
 		{
