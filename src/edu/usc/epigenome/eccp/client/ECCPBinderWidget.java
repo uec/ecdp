@@ -46,8 +46,8 @@ public class ECCPBinderWidget extends Composite {
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		label.setText("Switch to Sample View");
-		int viewChange = 0; //switch to sample view
 		
+		//Window.alert("the user " + ECControlCenter.getUserType());
 		label.addClickHandler( new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
