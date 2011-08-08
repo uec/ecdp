@@ -1,21 +1,13 @@
 package edu.usc.epigenome.eccp.client;
-import edu.usc.epigenome.eccp.client.controlPanel.ControlPanelWidget;
-import edu.usc.epigenome.eccp.client.pane.ECPane;
-import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
-import edu.usc.epigenome.eccp.client.pane.analysisReport.AnalysisReport;
-import edu.usc.epigenome.eccp.client.pane.cacheManagement.CacheManager;
-import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
-import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
-import edu.usc.epigenome.eccp.client.pane.methylation.MethylationSanityCheck;
-import edu.usc.epigenome.eccp.client.pane.systemStatus.StatusSummary;
+
+
+import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.DecoratedTabPanel;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 
 
 
@@ -24,14 +16,46 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class ECControlCenter implements EntryPoint
 {
-ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
-	
+	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
+	public static String userType = null;
+
+	public static String getUserType() {
+		return userType;
+	}
+
+	public static void setUserType(String userType) {
+		ECControlCenter.userType = userType;
+	}
+
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() 
 	{
-		ECCPBinderWidget sbw = new ECCPBinderWidget();
-	    RootLayoutPanel.get().add(sbw);
+		if(Window.Location.getQueryString().equals("") && Window.Location.getPath().endsWith("/ECCP/"))
+		{
+		//if(Window.Location.getQueryString().contains("gwt"))
+		//{
+			userType = "super";
+			ECCPBinderWidget sbw = new ECCPBinderWidget();
+			RootLayoutPanel.get().add(sbw);
+		}
+		else
+		{
+			userType = "guest";
+			//Map<String, java.util.List<String>> m = Window.Location.getParameterMap();
+			if(Window.Location.getParameter("au").contentEquals("sol"))
+			{
+				if((Window.Location.getParameter("t").length() > 0) &&(Window.Location.getParameter("q").length() > 0))
+				{
+					GenUserBinderWidget gubw = new GenUserBinderWidget();
+					RootLayoutPanel.get().add(gubw);
+				}
+			}
+			else
+			{
+				RootLayoutPanel.get().add(new Label("Your access code is expired or does not exist. Please contact Zack Ramjan (ramjan @ usc edu) at the USC Epigenome Center for a new code"));
+			}
+		}
 	}
 }
