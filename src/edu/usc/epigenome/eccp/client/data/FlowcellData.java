@@ -192,27 +192,106 @@ public class FlowcellData implements IsSerializable
 			
 	}
 	
-	public void filterFiles(String sampleID)
+	
+	public void filterFiles(int lane, String sampleId, String runId)
 	{
-		Object a[] = lane.keySet().toArray();
 		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
-		ArrayList<HashMap<String, String>> filesToKeep = new ArrayList<HashMap<String,String>>();
+		ArrayList<HashMap<String, String>> filesToRemove = new ArrayList<HashMap<String,String>>();
+		//ArrayList<HashMap<String, String>> filesToKeep = new ArrayList<HashMap<String,String>>();
 		
-		for(int i=0;i<a.length;i++)
-			lanesToKeep.add((Integer)a[i]);
+		lanesToKeep.add(lane);
 		
 		for(HashMap<String, String> file : fileList)
 		{
-			if(!file.get("fullpath").contains(sampleID))
+			if(!file.get("fullpath").contains(sampleId))
+			{
+				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
+					filesToRemove.add(file);
+			}
+			else
+			{
+				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
+					filesToRemove.add(file);
+			}
+		}
+		for(HashMap<String, String> file : filesToRemove)
+		{
+			fileList.remove(file);
+		}
+		/*for(HashMap<String, String> file : flowcellFileList)
+		{
+			if(!file.get("fullpath").contains(sampleProperties.get("geneusID_sample")))
 			{
 				//Check for lane no
 				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
+					filesToRemove.add(file);
+			}
+			
+		}*/	
+	}
+	
+	public void filterQC(int lane)
+	{
+		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
+		ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
+		
+		//Window.alert("the lane received is " + lane);
+		lanesToKeep.add(lane);
+		
+		for(String locaiton : laneQC.keySet())
+			for(Integer i : laneQC.get(locaiton).keySet())
+				if(!lanesToKeep.contains(i))
+					lanesToRemove.add(i);
+		
+		for(String location : laneQC.keySet())
+			for(Integer i : lanesToRemove)
+			laneQC.get(location).remove(i);
+		lanesToRemove.clear();
+		
+	}
+	
+	public void filterAnalysis(String flowcell, int lane, String libraryID)
+	{
+		ArrayList<String> analysisToRemove = new ArrayList<String>();
+		
+		for(String location : laneQC.keySet())
+		{
+			if(laneQC.get(location) != null)
+			{
+			if(location.contains(flowcell+"_"+lane+"_"))
+			{
+				if(!location.contains(libraryID))
 				{
-					
+					analysisToRemove.add(location);
 				}
+			}
+			}
+		}	
+		
+			for(String rem : analysisToRemove)
+				laneQC.remove(rem);
+			
+		analysisToRemove.clear();
+	}
+	
+	public void filterRuns(String runId)
+	{
+		ArrayList<String> analysisToKeep = new ArrayList<String>();
+		ArrayList<String> analysisToRemove = new ArrayList<String>();
+		
+		analysisToKeep.add(runId);
+		for(String location : laneQC.keySet())
+		{
+			if(!analysisToKeep.contains(location))
+			{
+				analysisToRemove.add(location);
 			}
 		}
 		
+		for(String remove : analysisToRemove)
+			laneQC.remove(remove);
+		
+		analysisToRemove.clear();
 	}
 	
 }
