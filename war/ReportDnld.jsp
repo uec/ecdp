@@ -56,7 +56,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
+		String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
 		ResultSet results = stat.executeQuery(selectQuery);
 	
 		ServletOutputStream myOut = null;
@@ -67,7 +67,7 @@ try{
 			response.addHeader("Content-Disposition", "inline; filename=" + fcell_serial + "_pipeline.txt");
 			int i=0;
 		
-			myOut.print("ClusterSize = 8" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
+			myOut.print("ClusterSize = 2" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
 			myOut.println();
 			while(results.next())
 			{
@@ -103,7 +103,18 @@ try{
 				else
 					myOut.println("Sample."+ i + ".Workflow = regular");
 				
-				myOut.println("Sample."+ i + ".Reference = hg18");
+				
+				if(results.getString("organism").contains("Mus"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa");
+				else if(results.getString("organism").contains("Phi"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa");
+				else if(results.getString("processing").contains("RNA-seq"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/bowtie/hg19");
+				else if(results.getString("processing").contains("BS-seq"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg18_unmasked/hg18_unmasked.plusContam.fa");
+				else
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa");
+	
 			}
 			myOut.println();
 		}
@@ -121,4 +132,3 @@ try{
   }
 }catch(Exception exp){out.println("No project exists by this name");}
 	%>
-	
