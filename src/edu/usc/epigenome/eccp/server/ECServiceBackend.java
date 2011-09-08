@@ -232,7 +232,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			//URL for database connection
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 
 			//create the connection
@@ -242,7 +242,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Statement stat = myConnection.createStatement();
 			//Get all the distinct geneusId's 
 			
-			String selectQuery ="select distinct(sample_name) from sequencing.view_run_metric";
+			String selectQuery ="select distinct(sample_name) from sequencing_devel.view_run_metric";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			 if(results.next())
@@ -254,7 +254,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				   
 				   Statement st1 = myConnection.createStatement();
 				   //ArrayList<FlowcellData> fcells = new ArrayList<FlowcellData>();
-				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusID_sample from sequencing.view_run_metric where sample_name ='"+libraryID + "'";            
+				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusID_sample from sequencing_devel.view_run_metric where sample_name ='"+libraryID + "'";            
 				   ResultSet rs1 = st1.executeQuery(samplePropSelect);
 				   
 				   while(rs1.next())
@@ -281,7 +281,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				   st1.close();
 				   
 				   st1 = myConnection.createStatement();
-				   String sampFlowcell = "select distinct(flowcell_serial) from sequencing.view_run_metric where sample_name = '"+libraryID +"'";
+				   String sampFlowcell = "select distinct(flowcell_serial) from sequencing_devel.view_run_metric where sample_name = '"+libraryID +"'";
 				   rs1 = st1.executeQuery(sampFlowcell);
 				   
 				   while(rs1.next())
@@ -290,7 +290,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					  FlowcellData flowcellProp = new FlowcellData();
 					  //HashMap<String, String> flowcellProp = new HashMap<String, String>();
 					  Statement st2 = myConnection.createStatement();
-					  String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
+					  String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing_devel.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
 					  ResultSet rs2 = st2.executeQuery(fcellPropSelect);
 					  
 					  while(rs2.next())
@@ -343,7 +343,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			//URL for database connection
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 
 			//create the connection
@@ -351,7 +351,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
-			String sampFlowcell = "select distinct(flowcell_serial) from sequencing.view_run_metric where sample_name = '"+libraryID +"'";
+			String sampFlowcell = "select distinct(flowcell_serial) from sequencing_devel.view_run_metric where sample_name = '"+libraryID +"'";
 			 ResultSet  rs1 = stat.executeQuery(sampFlowcell);
 			   
 			   while(rs1.next())
@@ -360,7 +360,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				   FlowcellData flowcell = new FlowcellData();
 				   
 				   Statement st2 = myConnection.createStatement();
-				   String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
+				   String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing_devel.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
 				   ResultSet rs2 = st2.executeQuery(fcellPropSelect);
 					  
 					while(rs2.next())
@@ -407,7 +407,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			//URL
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 
 			//create the connection
@@ -416,7 +416,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//Get all the distinct geneusId's 
-			String selectQuery ="select distinct(geneusID_run) from sequencing.view_run_metric";
+			String selectQuery ="select distinct(geneusID_run) from sequencing_devel.view_run_metric";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the resultset consisting of GeneusID(limsid)
@@ -428,7 +428,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		    	 String lims_id = results.getString("geneusId_run");
 		    	 Statement st1 = myConnection.createStatement();
 		    	 //for each geneusid get the flowcell serial no, protocol, technician, the date and the control lane 
-		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing.view_run_metric where geneusID_run ='"+lims_id + "' group by geneusId_run";            
+		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing_devel.view_run_metric where geneusID_run ='"+lims_id + "' group by geneusId_run";            
 		    	 ResultSet rs = st1.executeQuery(innSelect);
 		    	 //Iterate over the resultset and add the flowcellproperties for each of the flowcells
 		    	 while(rs.next())
@@ -454,7 +454,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					
 				//Select distinct lanes for each of the flowcells
 				Statement statLane = myConnection.createStatement();
-				String LaneProp ="select distinct(lane) from sequencing.view_run_metric where geneusID_run ='"+lims_id+"'";
+				String LaneProp ="select distinct(lane) from sequencing_devel.view_run_metric where geneusID_run ='"+lims_id+"'";
 				ResultSet RsProp = statLane.executeQuery(LaneProp);	
 				//Iterate over the lane numbers 
 				while(RsProp.next())
@@ -463,7 +463,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					HashMap<String,String> sampleData = new HashMap<String,String>();
 					Statement cellprop = myConnection.createStatement();
 					//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
-					String st2 ="select processing, sample_name, geneusID_sample, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
+					String st2 ="select processing, sample_name, geneusID_sample, organism, project from sequencing_devel.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
 					ResultSet Prop = cellprop.executeQuery(st2);
 						
 					//Iterate over the information and populate the lane information
@@ -701,7 +701,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 			
 			//URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 			//create the connection
 			myConnection = DriverManager.getConnection(dbURL);
@@ -709,7 +709,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//get the distinct analysis_id's for the given flowcell
-			String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' order by analysis_id";
+			String selectQuery ="select distinct(analysis_id) from sequencing_devel.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' order by analysis_id";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the result set
@@ -721,7 +721,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				//System.out.println("analysis_id is " + analysis_id);
 				Statement st1 = myConnection.createStatement();
 				//for each analysis_id get the QC information from the database
-				String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "'and Date_Sequenced !='NULL' group by lane";
+				String innSelect = "select  * from sequencing_devel.view_run_metric where analysis_id ='" +  analysis_id + "'and Date_Sequenced !='NULL' group by lane";
 				ResultSet rs = st1.executeQuery(innSelect);
 				ResultSetMetaData rsMetaData = rs.getMetaData();
 				
@@ -800,7 +800,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 			
 			//URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 			//create the connection
 			myConnection = DriverManager.getConnection(dbURL);
@@ -808,7 +808,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//get the distinct analysis_id's for the given flowcell
-			String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL' order by analysis_id";
+			String selectQuery ="select distinct(analysis_id) from sequencing_devel.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL' order by analysis_id";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the result set
@@ -820,7 +820,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				//System.out.println("analysis_id is " + analysis_id);
 				Statement st1 = myConnection.createStatement();
 				//for each analysis_id get the QC information from the database
-				String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL'";
+				String innSelect = "select  * from sequencing_devel.view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL'";
 				ResultSet rs = st1.executeQuery(innSelect);
 				ResultSetMetaData rsMetaData = rs.getMetaData();
 				
@@ -1019,7 +1019,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 			
 			//URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 			//create the connection
 			myConnection = DriverManager.getConnection(dbURL);
@@ -1027,7 +1027,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//get the distinct analysis_id's for the given flowcell
-			String selectQuery ="select distinct(lane), processing from sequencing.view_run_metric where flowcell_serial = '"+flowcellSerial + "' and sample_name = '"+Library+ "' and Date_Sequenced !='NULL' order by lane";
+			String selectQuery ="select distinct(lane), processing from sequencing_devel.view_run_metric where flowcell_serial = '"+flowcellSerial + "' and sample_name = '"+Library+ "' and Date_Sequenced !='NULL' order by lane";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the result set
