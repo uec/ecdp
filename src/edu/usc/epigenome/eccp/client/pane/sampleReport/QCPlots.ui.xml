@@ -7,7 +7,9 @@
 		<g:Label ui:field="showPlots" text="QC Plots" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
 		<g:FlowPanel ui:field="popup" styleName='{res.userPanel.popupdisplaypanel}'>
 			<g:FlowPanel ui:field='mainPanel' styleName='{res.userPanel.popupdisplaypanel}'>
-				<g:FlowPanel ui:field='summaryChart'></g:FlowPanel>
+				<g:FlowPanel ui:field='summaryChart'>
+					<g:Label ui:field='path'></g:Label>
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
