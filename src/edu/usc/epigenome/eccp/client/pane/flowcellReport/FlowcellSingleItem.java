@@ -27,6 +27,7 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
+import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartBrowser;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
 
 public class FlowcellSingleItem extends Composite  {
@@ -54,16 +55,15 @@ public class FlowcellSingleItem extends Composite  {
 	@UiField FlexTable flowcellTableSample;
 	@UiField DisclosurePanel qcPanel;
 	@UiField DisclosurePanel filePanel;
+	//@UiField DisclosurePanel plotPanel;
 	@UiField FlowPanel qcvp;
 	@UiField FlowPanel filesvp;
+	//@UiField FlowPanel plotvp;
 	
 	public FlowcellSingleItem(final FlowcellData flowcellIn)
 	{
 		flowcell=flowcellIn;
 		initWidget(uiBinder.createAndBindUi(this));
-		//VerticalPanel vp = new VerticalPanel();
-		//FlexTable flowcellTable = new FlexTable();
-		//flowcellTable.addStyleName("flowcellitem");
 		flowcellTable.setText(0,0, "Flowcell ID: " + flowcell.getFlowcellProperty("serial"));
 		flowcellTable.setText(0,1, "Lims ID: " + flowcell.getFlowcellProperty("limsID"));
 		flowcellTable.setText(0,2, flowcell.getFlowcellProperty("technician") +" " + flowcell.getFlowcellProperty("date"));
@@ -146,29 +146,49 @@ public class FlowcellSingleItem extends Composite  {
 			}
 		});
 		filePanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
+		{
+			public void onOpen(OpenEvent<DisclosurePanel> event)
+			{
+				filesvp.add(new Image("images/progress.gif"));
+				remoteService.getFilesforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>()
 				{
-
-					public void onOpen(OpenEvent<DisclosurePanel> event)
+					public void onFailure(Throwable caught)
 					{
-						filesvp.add(new Image("images/progress.gif"));
-						remoteService.getFilesforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>(){
+						filesvp.clear();
+						filesvp.add(new Label(caught.getMessage()));
+					}
+					public void onSuccess(FlowcellData result)
+					{
+						filesvp.clear();
+						flowcell.fileList = result.fileList;
+						flowcell.filterLanesThatContain();
+						FileBrowser f = new FileBrowser(flowcell.fileList);
+						filesvp.add(f);
+					}});				
+			}			
+		});
+	/*  plotPanel.addOpenHandler(new OpenHandler<DisclosurePanel>() 
+	  {
 
-							public void onFailure(Throwable caught)
-							{
-								filesvp.clear();
-								filesvp.add(new Label(caught.getMessage()));
-							}
-
-							public void onSuccess(FlowcellData result)
-							{
-								filesvp.clear();
-								flowcell.fileList = result.fileList;
-								flowcell.filterLanesThatContain();
-								FileBrowser f = new FileBrowser(flowcell.fileList);
-								filesvp.add(f);
-							}});				
-					}			
-				});
-		
+		@Override
+		public void onOpen(OpenEvent<DisclosurePanel> arg0)
+		{
+			remoteService.getCSVFiles("", flowcell.getFlowcellProperty("serial"), "", new AsyncCallback<FlowcellData>()
+			{
+				public void onFailure(Throwable arg0) 
+				{
+					plotvp.clear();
+					plotvp.add(new Label(arg0.getMessage()));
+				}
+				public void onSuccess(FlowcellData result) 
+				{
+					plotvp.clear();
+					flowcell.fileList = result.fileList;
+					flowcell.filterLanesThatContain();
+					ChartBrowser chBrowse = new ChartBrowser(flowcell.fileList);
+					plotvp.add(chBrowse);
+			   }});
+		}  
+	});*/	
 	  }
 	}
