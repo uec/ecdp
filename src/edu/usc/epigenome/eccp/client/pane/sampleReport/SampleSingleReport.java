@@ -83,7 +83,7 @@ public class SampleSingleReport extends Composite {
 	@UiField HorizontalPanel sampHeader;
 	@UiField Image headerIcon;
 	
-	public SampleSingleReport(final SampleData sampleIn)
+	/*public SampleSingleReport(final SampleData sampleIn)
 	{
 		sampGeneus = sampleIn;
 		initWidget(uiBinder.createAndBindUi(this));
@@ -135,7 +135,7 @@ public class SampleSingleReport extends Composite {
 						public void onOpen(OpenEvent<DisclosurePanel> arg0) 
 						{
 							fcellInfoImage.setUrl("images/panelopen.png");
-							remoteService.getLaneFlowcellSample(sampGeneus.sampleProperties.get("library"), flowcellSerial, new AsyncCallback<SampleData>() 
+							remoteService.getLaneFlowcellSample(sampGeneus.sampleProperties.get("library"), flowcellSerial, new AsyncCallback<FlowcellData>() 
 							{
 								public void onFailure(Throwable arg0) 
 								{
@@ -197,5 +197,5 @@ public class SampleSingleReport extends Composite {
 					dataDisplay.add(flowcellShow);
 				}
 			}});
-	}
+	}*/
 }
