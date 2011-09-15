@@ -122,8 +122,7 @@ public class FileTable extends Composite {
 		{
 			LinkedHashMap<String, String> f = files.get(n);
 			HorizontalPanel chartLaunchPanel = new HorizontalPanel();
-			//chartLaunchPanel.addStyleName("deshorizontalpanel");
-			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
+			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
 			
 			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
 			if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
