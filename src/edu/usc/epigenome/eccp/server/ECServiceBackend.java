@@ -242,24 +242,24 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Statement stat = myConnection.createStatement();
 			//Get all the distinct geneusId's 
 			
-			String selectQuery ="select distinct(sample_name) from sequencing_devel.view_run_metric";
+			String selectQuery ="select distinct(geneus_id) from sample order by id";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			 if(results.next())
 			 {
 			   do
 			   {
-				   String libraryID = results.getString("sample_name");
+				   String libraryID = results.getString("geneus_id");
 				   SampleData sample = new SampleData();
 				   
 				   Statement st1 = myConnection.createStatement();
 				   //ArrayList<FlowcellData> fcells = new ArrayList<FlowcellData>();
-				   String samplePropSelect = "select project, organism, Date_Sequenced, geneusID_sample from sequencing_devel.view_run_metric where sample_name ='"+libraryID + "'";            
+				   String samplePropSelect = "select project, organism, Date_Sequenced, sample_name from sequencing_devel.view_run_metric where geneusID_sample ='"+libraryID + "'";            
 				   ResultSet rs1 = st1.executeQuery(samplePropSelect);
 				   
 				   while(rs1.next())
 				   {
-					   sample.sampleProperties.put("library", libraryID);
+					   sample.sampleProperties.put("geneusID_sample", libraryID);
 					   sample.sampleProperties.put("project", rs1.getString("project"));
 					   sample.sampleProperties.put("organism", rs1.getString("organism"));
 					   //sample.sampleProperties.put("Date_Sequenced", rs1.getString("Date_Sequenced"));
@@ -275,13 +275,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			    				 e.printStackTrace();
 			    			 }
 			    		 }
-					   sample.sampleProperties.put("geneusID_sample", rs1.getString("geneusID_sample"));
+					   sample.sampleProperties.put("library", rs1.getString("sample_name"));
 				   }
 				   rs1.close();
 				   st1.close();
 				   
-				   st1 = myConnection.createStatement();
-				   String sampFlowcell = "select distinct(flowcell_serial) from sequencing_devel.view_run_metric where sample_name = '"+libraryID +"'";
+				 /*  st1 = myConnection.createStatement();
+				   String sampFlowcell = "select distinct(flowcell_serial) from sequencing_devel.view_run_metric where geneusID_sample = '"+libraryID +"'";
 				   rs1 = st1.executeQuery(sampFlowcell);
 				   
 				   while(rs1.next())
@@ -290,7 +290,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					  FlowcellData flowcellProp = new FlowcellData();
 					  //HashMap<String, String> flowcellProp = new HashMap<String, String>();
 					  Statement st2 = myConnection.createStatement();
-					  String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing_devel.view_run_metric where sample_name ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
+					  String fcellPropSelect = "select technician, geneusId_run, protocol, ControlLane from sequencing_devel.view_run_metric where geneusID_sample ='"+libraryID+"' and flowcell_serial ='"+flowcellID+"'";
 					  ResultSet rs2 = st2.executeQuery(fcellPropSelect);
 					  
 					  while(rs2.next())
@@ -306,7 +306,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					  //sample.flowcellInfo.put(flowcellID, flowcellProp);
 				   }
 				   rs1.close();
-				   st1.close();
+				   st1.close();*/
 				   
 				   samples.add(sample);
 				   
@@ -787,7 +787,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	{
 		return null;
 	}
-	
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.ECService#getQCSampleFlowcell(java.lang.String, java.lang.String)
+	 * Get the QC for a given flowcell and sample
+	 */
 	public FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
@@ -960,9 +964,17 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			return flowcell;
 	}*/
 	
-	public FlowcellData getCSVFiles(String serial) throws IllegalArgumentException
+	
+	
+	public FlowcellData getCSVFiles(String run_id, String serial, String sampleID) throws IllegalArgumentException
 	{
-		FlowcellData flowcell = getFilesforFlowcell(serial);
+		FlowcellData flowcell;
+		System.out.println("The runID and sample ID is " + run_id + sampleID);
+		if(run_id.equals("") && sampleID.equals(""))
+			flowcell = getFilesforFlowcell(serial);
+		else
+		 flowcell = getFilesforRunSample(run_id, serial, sampleID);
+		
 		ArrayList<LinkedHashMap<String,String>> filesList = flowcell.fileList;
 		ArrayList<LinkedHashMap<String, String>> filesToRemove = new ArrayList<LinkedHashMap<String,String>>();
 		
@@ -984,7 +996,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		System.out.println("The size of filesList is  " + filesList.size());
 		
 		return flowcell;
-		
 	}
 	
 	/*
@@ -1091,6 +1102,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcell;
 	}
 
+	/*
+	 * Get files for the flowcell specific view
+	 * Takes the flowcell as the input parameter and returns the files for the particular flowcell
+	 */
 	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
@@ -1103,7 +1118,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 			
 			//URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing?user="
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
 				+ username + "&password=" + password;
 			//create the connection
 			myConnection = DriverManager.getConnection(dbURL);
@@ -1112,8 +1127,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			{
 				//create statement handle for executing queries
 				Statement stat = myConnection.createStatement();
-				//get the distinct analysis_id's for the given flowcell
-				String selectQuery ="select file_fullpath from sequencing.flowcell_file where flowcell_serial = '"+serial + "'";
+				//get the distinct files and their category from the file table for the given flowcell
+				String selectQuery ="select distinct(f.file_fullpath), file_type.id_category, c.name from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.file_fullpath like'%"+serial + "%'";            
 				ResultSet results = stat.executeQuery(selectQuery);
 			
 				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
@@ -1125,16 +1140,20 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					do	
 						{
-							String fullPath = results.getString("file_fullpath");
+							String fullPath = results.getString("f.file_fullpath");
+							String category = results.getString("c.name");
 							LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
 							matcher = pattern.matcher(fullPath);
 						
 							if(matcher.find())
 							{
 								qcFileProperties.put("base", getFileName(fullPath));
-								//qcFileProperties.put("path", getFilePath(fullPath));
 								qcFileProperties.put("fullpath", fullPath);
-								qcFileProperties.put("type", "unknown");
+								if(category == null)
+									qcFileProperties.put("type", "Unknown");
+								else
+									qcFileProperties.put("type", category);
+								
 								qcFileProperties.put("label", fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
 								qcFileProperties.put("encfullpath", encryptURLEncoded(fullPath));
 							
@@ -1174,6 +1193,104 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 }
 		return flowcell;
  }
+	
+	/*
+	 * Sample specific View
+	 * Function to get Files for a given run and sampleID 
+	 * Input: takes Run_id, the flowcell serial and the SampleID 
+	 * output: Gets the files with their properties for the given input 
+	 */
+	public FlowcellData getFilesforRunSample(String run_id, String serial, String sampleID) throws IllegalArgumentException
+	{
+		FlowcellData flowcell = new FlowcellData();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+			
+			if(myConnection != null)
+			{
+				//create statement handle for executing queries
+				Statement stat = myConnection.createStatement();
+				//get the run_sample_id from the run_sample table for the given analysis_id and the given sampleID
+				String selectQuery ="select id from sequencing_devel.run_sample where analysis_id = '"+run_id + "' and id_sample = (select id from sample where geneus_id = '"+sampleID +"')";
+				ResultSet results = stat.executeQuery(selectQuery);
+				
+				if(results.next())
+				{
+					do
+					{
+						String run_sample_id = results.getString("id");
+						
+						Statement st1 = myConnection.createStatement();
+						String selectFiles = "select f.file_fullpath, file_type.id_category, c.name from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample ='"+run_sample_id + "'";            
+						ResultSet rs1 = st1.executeQuery(selectFiles);
+						
+						Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
+						Matcher matcher;
+						Pattern laneNumPattern = Pattern.compile("(s|"+serial+")_(\\d+)[\\._]+");
+						Matcher laneNumMatcher;
+						
+						while(rs1.next())
+						{
+							String fullPath = rs1.getString("f.file_fullpath");
+							String category = rs1.getString("c.name");
+							LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
+							matcher = pattern.matcher(fullPath);
+							
+							if(matcher.find())
+							{
+								qcFileProperties.put("base", getFileName(fullPath));
+								qcFileProperties.put("fullpath", fullPath);
+								if(category == null)
+									qcFileProperties.put("type", "Unknown");
+								else
+									qcFileProperties.put("type", category);
+								
+								qcFileProperties.put("label", fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
+								qcFileProperties.put("encfullpath", encryptURLEncoded(fullPath));
+							
+								laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
+								if(laneNumMatcher.find())
+										qcFileProperties.put("lane", laneNumMatcher.group(2));
+								else
+										qcFileProperties.put("lane", "0");
+							
+								flowcell.fileList.add(qcFileProperties);
+							}
+						}
+						rs1.close();
+						st1.close();
+						
+					}while(results.next());
+					results.close();
+					stat.close();
+				}
+			}		
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		 finally{
+			 try {
+				myConnection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		 }
+		return flowcell;
+	}
+	
 	
 	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
 	{
