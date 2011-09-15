@@ -63,8 +63,8 @@ public class FileBrowser extends Composite {
 		flowcellFileList = fileListIn;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		for(LinkedHashMap<String,String> set_type : flowcellFileList)
-			set_type.put("type", FileTable.getNiceType(set_type.get("base")));
+		//for(LinkedHashMap<String,String> set_type : flowcellFileList)
+			//set_type.put("type", FileTable.getNiceType(set_type.get("base")));
 		
 		locationSort.setCommand(new Command()
 		{	
