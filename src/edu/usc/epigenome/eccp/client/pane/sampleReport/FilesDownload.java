@@ -14,13 +14,17 @@ import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
+import edu.usc.epigenome.eccp.client.ECControlCenter;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.GenUserBinderWidget;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.SampleData;
+import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
 
 public class FilesDownload extends Composite {
@@ -37,11 +41,12 @@ public class FilesDownload extends Composite {
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	String flowcellSerial;
 	int laneNo;
+	String run;
 	SampleData sample;
 	
 	@UiField FlowPanel LabPanel;
 	@UiField Label downloadF;
-	@UiField FlowPanel popup;
+	@UiField VerticalPanel popup;
 	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel summaryChart;
 	//@UiField Button closeButton;
@@ -51,11 +56,12 @@ public class FilesDownload extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	public FilesDownload(final SampleData sampleIn, final String flowcellSerialIn, final int lane)
+	public FilesDownload(final SampleData sampleIn, final String flowcellSerialIn, final int lane, final String runId)
 	{
 		flowcellSerial = flowcellSerialIn;
 		sample = sampleIn;
 		laneNo = lane;
+		run = runId;
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		popup.removeFromParent();
@@ -73,14 +79,16 @@ public class FilesDownload extends Composite {
 		{	
 			public void onClick(ClickEvent arg0) 
 			{
-				//popup.showRelativeTo(Statistics);
-				ECCPBinderWidget.addtoTab(popup, sample.getSampleProperty("library") + " " + flowcellSerial + " " + lane);
+				if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
+					ECCPBinderWidget.addtoTab(popup, "Files" +sample.getSampleProperty("library") + "_" + flowcellSerial);
+				else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
+					GenUserBinderWidget.addtoTab(popup, "Files" + sample.getSampleProperty("library") + "_" + flowcellSerial);
 				//popup.showRelativeTo(downloadF);
 				//Window.open(arg0, arg1, arg2)
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
 				
-				remoteService.getFilesforFlowcellLane(flowcellSerial, new AsyncCallback<SampleData>()
+				remoteService.getFilesforRunSample(run, flowcellSerial, sample.getSampleProperty("geneusID_sample"), new AsyncCallback<FlowcellData>()
 				{
 					
 					public void onFailure(Throwable caught)
@@ -90,12 +98,15 @@ public class FilesDownload extends Composite {
 					}
 
 					@Override
-					public void onSuccess(SampleData result) {
+					public void onSuccess(FlowcellData result) {
 						// TODO Auto-generated method stub
 						summaryChart.clear();
-						sample.flowcellFileList = result.flowcellFileList;
-						sample.filterFiles(lane);
-						FileBrowser f = new FileBrowser(sample.flowcellFileList);
+						Window.alert("the size of result set is " + result.fileList.size());
+						summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
+						sample.sampleFlowcells.get(flowcellSerial).fileList = result.fileList;
+						//sample.flowcellFileList = result.fileList;
+						sample.sampleFlowcells.get(flowcellSerial).filterFiles(lane, sample.getSampleProperty("geneusID_sample"), run);
+						FileBrowser f = new FileBrowser(sample.sampleFlowcells.get(flowcellSerial).fileList);
 						summaryChart.add(f);
 					}	
 				});
