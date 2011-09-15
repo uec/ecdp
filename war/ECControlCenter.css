@@ -90,14 +90,13 @@
 
 .gwt-DecoratedTabPanel {
 	min-width: 600px;
-	min-height: 500px; 	
+	min-height: 500px; 
+	
 }
 
 .gwt-DecoratedTabBar .gwt-Label{
 	white-space:nowrap;
-
 }
-
 
 .filelist {
 	font-weight: normal;
@@ -226,7 +225,6 @@
 	background-color:#D3D3D3
 	margin-left: 5px;
 }
-
 
 
 
