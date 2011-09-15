@@ -13,5 +13,9 @@
 			<g:header>Download Files</g:header>
 			<g:FlowPanel ui:field="filesvp"></g:FlowPanel>
 		</g:DisclosurePanel>
+		<!--  <g:DisclosurePanel ui:field="plotPanel">
+			<g:header>QC Plots</g:header>
+			<g:FlowPanel ui:field="plotvp"></g:FlowPanel>
+		</g:DisclosurePanel>-->
 	</g:FlowPanel>
 </ui:UiBinder> 
