@@ -5,11 +5,11 @@
 	
 	<g:FlowPanel ui:field='LabPanel'>
 		<g:Label ui:field="Statistics" text="Summary Statistics" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
-		<g:FlowPanel ui:field='popup' styleName='{res.userPanel.popupdisplaypanel}'>
+		<g:VerticalPanel ui:field='popup' styleName='{res.userPanel.popupdisplaypanel}'>
 			<g:FlowPanel ui:field='mainPanel'>
 				<g:FlowPanel ui:field='summaryChart'></g:FlowPanel>
 			<!-- <g:Button ui:field='closeButton' text="Close"></g:Button>-->
 			</g:FlowPanel>
-		</g:FlowPanel>
+		</g:VerticalPanel>
 	</g:FlowPanel>
 </ui:UiBinder> 
