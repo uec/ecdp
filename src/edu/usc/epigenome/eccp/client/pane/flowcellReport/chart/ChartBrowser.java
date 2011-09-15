@@ -48,12 +48,22 @@ public class ChartBrowser extends Composite {
 		for(int n=0; n<fileList.size(); n++)
 		{
 			LinkedHashMap<String, String> f = fileList.get(n);
-			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCP/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
-			addCharts.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
+			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
 			if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
+			{
+				addCharts.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
 				addCharts.add(new ChartViewer(f.get("fullpath"), ChartType.Area));
+			}
 			else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
+			{
+				addCharts.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
 				addCharts.add(new ChartViewer(f.get("fullpath"), ChartType.Column));
+			}
+			else if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
+			{
+				addCharts.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
+				addCharts.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
+			}
 		}
 	}
 	
