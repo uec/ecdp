@@ -3,11 +3,10 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	
 	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
-	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.MyImages"></ui:with>
 	
 	<g:FlowPanel ui:field='main'>
 		<g:HorizontalPanel ui:field='header'>
-			<g:Image ui:field='headerIcon'  resource='{resources.rightArrow}'></g:Image>
+			<g:Image url="images/rightArrow.png" ui:field='headerIcon'></g:Image>
 			<g:Label ui:field='headerText'></g:Label>
 			<g:Label ui:field='contentCountText' styleName='{res.userPanel.displayContext}'></g:Label>
 		</g:HorizontalPanel>
