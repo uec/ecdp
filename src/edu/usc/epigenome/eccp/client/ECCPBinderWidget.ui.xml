@@ -29,6 +29,14 @@
      		 			<c:ControlPanelWidget typeGeneus="Methylation Sanity Check" typeGroup="MethylationSanity"/>
      		 		</g:HTMLPanel>
      		 	</g:stack>
+     		 	<g:stack>
+     		 		<g:header size='2'>HPCC PBS</g:header>
+     		 		<g:HTMLPanel ui:field="HpccPbs">
+     		 			<c:ControlPanelWidget typeGeneus="PBS Jobs: all" typeGroup="PBSall"/>
+     		 			<c:ControlPanelWidget typeGeneus="PBS Jobs: laird" typeGroup="PBSlaird"/>
+     		 			<c:ControlPanelWidget typeGeneus="PBS Jobs: lairdprio" typeGroup="PBSlairdprio"/>
+     		 		</g:HTMLPanel>
+     		 	</g:stack>
      		</g:StackLayoutPanel>
      	</g:HTMLPanel>	
      	</g:ScrollPanel>
