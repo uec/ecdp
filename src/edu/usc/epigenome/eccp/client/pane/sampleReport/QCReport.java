@@ -89,7 +89,7 @@ public class QCReport extends Composite {
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
 				
-				remoteService.getQCSampleFlowcell(flowcellSerial, sample.sampleProperties.get("library"), new AsyncCallback<FlowcellData>()
+				remoteService.getQCSampleFlowcell(flowcellSerial, sample.sampleProperties.get("library"),laneNo,  new AsyncCallback<FlowcellData>()
 				{	
 					public void onFailure(Throwable arg0) 
 					{
@@ -101,7 +101,6 @@ public class QCReport extends Composite {
 						summaryChart.clear();
 						sample.sampleFlowcells.get(flowcellSerial).laneQC = result.laneQC;
 						summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
-						//Window.alert("the result set has size " + result.laneQC.size());
 						sample.sampleFlowcells.get(flowcellSerial).filterQC(lane);
 						sample.sampleFlowcells.get(flowcellSerial).filterAnalysis(flowcellSerial, laneNo, sample.getSampleProperty("geneusID_sample"));
 						sample.sampleFlowcells.get(flowcellSerial).filterRuns(run);
