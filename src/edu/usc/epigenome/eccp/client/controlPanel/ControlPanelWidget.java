@@ -33,9 +33,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECCPBinderWidget;
+import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport.ReportType;
 import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
+import edu.usc.epigenome.eccp.client.pane.methylation.MethylationSanityCheck;
 import edu.usc.epigenome.eccp.client.pane.sampleReport.SampleReport;
 
 public class ControlPanelWidget extends Composite{
@@ -66,9 +68,17 @@ public class ControlPanelWidget extends Composite{
 		{
 			ECCPBinderWidget.addReport(new SampleReport(), fp, typeGeneus);
 		}
-		else if(typeGroup.contains("Methylation"))
+		else if(typeGroup.contains("MethylationReports"))
 		{
 			ECCPBinderWidget.addReport(new MethylationReport(), fp, typeGeneus);
+		}
+		else if(typeGroup.contains("MethylationSanity"))
+		{
+			ECCPBinderWidget.addReport(new MethylationSanityCheck(), fp, typeGeneus);
+		}
+		else if(typeGroup.contains("PBS"))
+		{
+			ECCPBinderWidget.addReport(new PBSreport(typeGroup), fp, typeGeneus);
 		}
 		else
 		{
