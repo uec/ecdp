@@ -49,7 +49,7 @@ public class QCPlots extends Composite {
 	@UiField VerticalPanel popup;
 	@UiField FlowPanel summaryChart;
 	@UiField FlowPanel mainPanel;
-	@UiField Label path;
+	//@UiField Label path;
 	
 	public QCPlots() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -78,8 +78,7 @@ public class QCPlots extends Composite {
 					public void onFailure(Throwable caught) 
 					{
 						summaryChart.clear();
-						path.setText(caught.getMessage());
-						//summaryChart.add(new Label(caught.getMessage()));
+						summaryChart.add(new Label(caught.getMessage()));
 					}
 					public void onSuccess(FlowcellData result) 
 					{
