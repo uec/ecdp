@@ -24,12 +24,12 @@ public interface ECService extends RemoteService
 	ArrayList<SampleData> getSampleDataFromGeneus() throws IllegalArgumentException;
 	
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
-	//FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
-	FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException;
+	FlowcellData getQCSampleFlowcell(String serial, String sampleID, int laneNo) throws IllegalArgumentException;
 	FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException;
 	//SampleData getFilesforFlowcellLane(String serial) throws IllegalArgumentException;
+	FlowcellData getFilesforRunSample(String run_id, String serial, String sampleID) throws IllegalArgumentException;
 	
-	FlowcellData getCSVFiles(String serial) throws IllegalArgumentException;
+	FlowcellData getCSVFiles(String run_id, String serial, String sampleID) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	//Flowcell (Merged) Analysis Reporting
 	ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException;
