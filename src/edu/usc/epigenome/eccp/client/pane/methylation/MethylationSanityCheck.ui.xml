@@ -1,0 +1,10 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+	
+	<g:FlowPanel ui:field="vp">
+		<g:TextArea ui:field="ta" styleName='{res.userPanel.sanityta}'></g:TextArea>
+	</g:FlowPanel>
+</ui:UiBinder> 
