@@ -52,7 +52,7 @@ public class GenUserBinderWidget extends Composite {
 		addTabPanel.clear();
 	}
 	
-	public static void addtoTab(final FlowPanel fp, String displayName)
+	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
 		HorizontalPanel hp = new HorizontalPanel();
 		Image image = new Image();
