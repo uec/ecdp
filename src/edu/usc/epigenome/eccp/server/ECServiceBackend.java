@@ -792,7 +792,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * @see edu.usc.epigenome.eccp.client.ECService#getQCSampleFlowcell(java.lang.String, java.lang.String)
 	 * Get the QC for a given flowcell and sample
 	 */
-	public FlowcellData getQCSampleFlowcell(String serial, String sampleID) throws IllegalArgumentException
+	public FlowcellData getQCSampleFlowcell(String serial, String sampleID, int laneNo) throws IllegalArgumentException
 	{
 		FlowcellData flowcell = new FlowcellData();
 		java.sql.Connection myConnection = null;
@@ -812,7 +812,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			//get the distinct analysis_id's for the given flowcell
-			String selectQuery ="select distinct(analysis_id) from sequencing_devel.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and Date_Sequenced !='NULL' order by analysis_id";
+			String selectQuery ="select distinct(analysis_id) from sequencing_devel.view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleID+ "' and lane = '"+laneNo +"' and Date_Sequenced !='NULL' order by analysis_id";
 			ResultSet results = stat.executeQuery(selectQuery);
 			
 			//Iterate over the result set
