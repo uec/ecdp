@@ -93,7 +93,6 @@ public class FileTable extends Composite {
 	public void drawTable()
 	{
 		contentTable.clear();
-		//contentTable.addStyleName("filelist");
 		Label fileNameLabel = new Label("File Name");
 		fileNameLabel.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent event)
