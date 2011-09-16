@@ -4,12 +4,12 @@
 	<ui:style>
     .myImage {width: 23px; height: 23px; }
   	</ui:style>
-	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.MyImages"></ui:with>
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
 	<g:HTMLPanel>
 	 	<g:FocusPanel ui:field="fp">
 	 		<g:HorizontalPanel ui:field='hp'>
 	 			<g:Image url="images/report.jpg" styleName='{style.myImage}'></g:Image>	
-	 			<!--  <g:Image ui:field='report' resource='{resources.report}' styleName='{style.myImage}'></g:Image>-->
+	 			<!--  <g:Image ui:field='report' resource='{res.report}' styleName='{style.myImage}'></g:Image>-->
 	 		</g:HorizontalPanel>	
 	 	</g:FocusPanel>	
      <!--  <g:FlowPanel ui:field="holder"></g:FlowPanel> -->
