@@ -1,15 +1,13 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	
-	<ui:with field="resources" type="edu.usc.epigenome.eccp.client.Resources.MyImages"></ui:with>
-	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
-	
+	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>	
+
 	<g:FlowPanel ui:field ='vp'>
 		<g:DisclosurePanel ui:field='sampleInfoPanel' animationEnabled='true'>
 			<g:customHeader>
 				<g:HorizontalPanel ui:field='sampHeader' styleName='{res.userPanel.samplereportvp}'>
-					<g:Image ui:field='headerIcon'  resource='{resources.panelClose}'></g:Image>
+					<g:Image url="images/rightArrow.png" ui:field='headerIcon'></g:Image>
 					<g:FlexTable ui:field='sampleData' styleName='{res.userPanel.samplereportitem}'></g:FlexTable>
 				</g:HorizontalPanel>
 			</g:customHeader>
