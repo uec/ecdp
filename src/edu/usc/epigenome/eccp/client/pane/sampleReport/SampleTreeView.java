@@ -79,10 +79,7 @@ public class SampleTreeView extends Composite
 			   {
 				 sampGeneus.sampleFlowcells = sData.sampleFlowcells;
 				 if(sData.sampleFlowcells.isEmpty())
-				 {
-				   TreeItem flowcellItem = new TreeItem("");
-				   sampleRoot.addItem(flowcellItem);
-				 }
+				   sampleRoot.addItem(new TreeItem(""));
 				 else
 				 {
 				   for(final String flowcellSerial : sampGeneus.sampleFlowcells.keySet())
@@ -107,10 +104,7 @@ public class SampleTreeView extends Composite
 						  {
 							sampGeneus.sampleFlowcells.get(flowcellSerial).lane = result.lane;
 							if(result.lane.isEmpty())
-							{
-							  TreeItem laneItem = new TreeItem("");
-							  flowcellItem.addItem(laneItem);
-							}
+							  flowcellItem.addItem(new TreeItem(""));
 							else
 							{
 							  for(final Integer laneNo : result.lane.keySet())
@@ -128,8 +122,8 @@ public class SampleTreeView extends Composite
 								  {
 								   String str = innerItem.getText().substring(9, 10);
 								   //final int i = Integer.parseInt(str);
-								   //laneItem.removeItems();
-								   remoteService.getQCSampleFlowcell(flowcellSerial, sampGeneus.getSampleProperty("library"), new AsyncCallback<FlowcellData>()
+								   laneItem.removeItems();
+								   remoteService.getQCSampleFlowcell(flowcellSerial, sampGeneus.getSampleProperty("library"), laneNo, new AsyncCallback<FlowcellData>()
 								   {
 									 public void onFailure(Throwable caught) {
 									  caught.printStackTrace();
@@ -141,22 +135,19 @@ public class SampleTreeView extends Composite
 									  sampGeneus.sampleFlowcells.get(flowcellSerial).filterQC(laneNo);
 														
 									  if(sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.isEmpty())
-									  {
-										TreeItem runItem = new TreeItem("");
-										laneItem.addItem(runItem);
-									  }
+										  laneItem.addItem(new TreeItem(""));
 									  else
 									  {
 									    for(String runId : sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
 										{
 										  TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
-										  TreeItem runItem = new TreeItem(runClick);		 
+										  TreeItem runItem = new TreeItem(runClick);	
 										  laneItem.addItem(runItem);
 										  runItem.addItem(new QCReport(sampGeneus, flowcellSerial, laneNo, runId));
 										  runItem.addItem(new FilesDownload(sampGeneus, flowcellSerial, laneNo, runId));
 										  runItem.addItem(new QCPlots(sampGeneus, flowcellSerial, laneNo, runId));
 										}
-									 }	
+									  }	
 								 }});
 								 }
 							  }});
