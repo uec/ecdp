@@ -1,12 +1,14 @@
 package edu.usc.epigenome.eccp.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
@@ -19,6 +21,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,13 +44,18 @@ public class ECCPBinderWidget extends Composite {
 	@UiField static Label label;
 	static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
+	//static TabLayoutPanel tabQCDownload = new TabLayoutPanel(2, Unit.EM);
+
 	
 	public ECCPBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
+		//tabQCDownload.addStyleName("tabStyle");
+		
+		//DOM.setElementProperty(tabQCDownload.getElement(),"hideMode", "nosize");
+		//DOM.setElementProperty(tabQCDownload.getElement(),"position", "absolute");
 		label.setText("Switch to Sample View");
 		
-		//Window.alert("the user " + ECControlCenter.getUserType());
 		label.addClickHandler( new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
@@ -82,6 +90,11 @@ public class ECCPBinderWidget extends Composite {
 		addTabPanel.clear();
 	}
 	
+	/*
+	 * For the Flowcell View
+	 * Function to add different reports to the tab
+	 * Input: the Widget to be added, focus panel and the String to be represented on the Tab
+	 */
 	public static void addReport(final ECPane toolWidget, FocusPanel fpanel, final String typeGe)
 	{
 		fpanel.addClickHandler(new ClickHandler() {
@@ -112,8 +125,11 @@ public class ECCPBinderWidget extends Composite {
 			//}
 		});
 	}
-	
-	public static void addtoTab(final FlowPanel fp, String displayName)
+	/*
+	 * Function to add tabs based on the selection made on the left hand side of the panel 
+	 *Input: Takes the flowpanel to be added and the displayName for the tab
+	 */
+	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
 		HorizontalPanel hp = new HorizontalPanel();
 		Image image = new Image();
@@ -132,7 +148,8 @@ public class ECCPBinderWidget extends Composite {
 		
 		/*
 		 * Tabbed Browsing 
-		 * Logic to navigate tabs while closing them
+		 * Logic to navigate tabs while closing them 
+		 * Click handler on the click of the x mark on the Tab
 		 */
 		image.addClickHandler(new ClickHandler()
 		{
