@@ -90,21 +90,16 @@ public class FilesDownload extends Composite {
 				
 				remoteService.getFilesforRunSample(run, flowcellSerial, sample.getSampleProperty("geneusID_sample"), new AsyncCallback<FlowcellData>()
 				{
-					
 					public void onFailure(Throwable caught)
 					{
 						summaryChart.clear();
 						summaryChart.add(new Label(caught.getMessage()));				
 					}
-
-					@Override
 					public void onSuccess(FlowcellData result) {
-						// TODO Auto-generated method stub
 						summaryChart.clear();
-						Window.alert("the size of result set is " + result.fileList.size());
+						//Window.alert("the size of result set is " + result.fileList.size());
 						summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
 						sample.sampleFlowcells.get(flowcellSerial).fileList = result.fileList;
-						//sample.flowcellFileList = result.fileList;
 						sample.sampleFlowcells.get(flowcellSerial).filterFiles(lane, sample.getSampleProperty("geneusID_sample"), run);
 						FileBrowser f = new FileBrowser(sample.sampleFlowcells.get(flowcellSerial).fileList);
 						summaryChart.add(f);
