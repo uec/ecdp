@@ -49,6 +49,7 @@ public class PBSreport extends ECPane {
 	@UiField Label runningCountLabel;
 	@UiField Label heldCountLabel;
 	
+	
 	String queue = "laird";
 	int queuedCount = 0;
 	int runningCount = 0;
