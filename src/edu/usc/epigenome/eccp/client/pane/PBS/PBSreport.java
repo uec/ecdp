@@ -60,7 +60,7 @@ public class PBSreport extends ECPane {
 	
 	public PBSreport(String queueIn)
 	{
-		queue = queueIn;
+		queue = queueIn.substring(3);
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
