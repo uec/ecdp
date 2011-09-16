@@ -3,101 +3,95 @@ package edu.usc.epigenome.eccp.client.pane.PBS;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.Widget;
+
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 
-public class PBSreport extends ECPane
-{
+public class PBSreport extends ECPane {
+
+	private static PBSreportUiBinder uiBinder = GWT
+			.create(PBSreportUiBinder.class);
+
+	interface PBSreportUiBinder extends UiBinder<Widget, PBSreport> {
+	}
+	
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
+	}
+	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
-	final VerticalPanel vp = new VerticalPanel();
-	VerticalPanel vPanel = new VerticalPanel();
-	HorizontalPanel jobCounts = new HorizontalPanel();
-	FlexTable pbsTable = new FlexTable();
-	final DecoratedPopupPanel loadingGraphic = new DecoratedPopupPanel(false);
-	final Image loadingGraphicImg = new Image("images/progress.gif");
-	MenuBar menu = new MenuBar();
+
+	@UiField FlowPanel vp;
+	@UiField MenuItem Refresh;
+	@UiField HorizontalPanel jobCounts;
+	@UiField FlexTable pbsTable;
+	@UiField Label queuedCountLabel;
+	@UiField Label runningCountLabel;
+	@UiField Label heldCountLabel;
+	
 	String queue = "laird";
 	int queuedCount = 0;
 	int runningCount = 0;
 	int heldCount = 0;
-	Label queuedCountLabel = new Label(" 0 jobs queued ");
-	Label runningCountLabel = new Label(" 0 jobs running ");
-	Label heldCountLabel = new Label(" 0 jobs held ");
 	
+	public PBSreport() {
+		initWidget(uiBinder.createAndBindUi(this));
+	}
 	
 	public PBSreport(String queueIn)
 	{
 		queue = queueIn;
-		vp.add(new Label("Loading"));
-		initWidget(vp);	
+		initWidget(uiBinder.createAndBindUi(this));
 	}
-	@Override
-	public Image getToolLogo()
-	{
-		return new Image("images/pbs.png");
-	}
+	
 
 	@Override
-	public Label getToolTitle()
+	public void showTool() 
 	{
-		return new Label("PBS Jobs: " + queue);
-	}
-
-	@Override
-	public void showTool()
-	{
-		vp.clear();
-		vPanel.setWidth("100%");
-		vPanel.addStyleName("pbs");
-		vp.add(vPanel);
-		menu.addItem("Refresh", new Command()
-		{
-			public void execute()
+		Refresh.setCommand(new Command()
+		{	
+			public void execute() 
 			{
-				doPBS();				
+				doPBS();
 			}
 		});
-		vPanel.add(menu);
-		//vPanel.setWidth("600");
-		jobCounts.add(runningCountLabel);
-		jobCounts.add(new Label(" - "));
-		jobCounts.add(heldCountLabel);
-		jobCounts.add(new Label(" - "));
-		jobCounts.add(queuedCountLabel);
-		vPanel.add(jobCounts);
-		vPanel.add(pbsTable);
-		loadingGraphic.add(loadingGraphicImg);
-		pbsTable.addStyleName("Lane-Table");
 		doPBS();
 	}
+	
 	public void doPBS()
 	{
 		queuedCount = 0;
 		runningCount = 0;
 		heldCount = 0;
-		loadingGraphic.center();
 		pbsTable.clear();
-		remoteService.qstat(queue, new AsyncCallback<String[]>()
+		
+		remoteService.qstat(queue, new AsyncCallback<String[]>() 
 		{
-
-			public void onFailure(Throwable caught)
+			public void onFailure(Throwable arg0) 
 			{
-
-				caught.printStackTrace();
-				loadingGraphic.hide();
+				arg0.printStackTrace();
 			}
-
-			public void onSuccess(String[] result)
+			public void onSuccess(String[] result) 
 			{
 				for (int i = 0; i < result.length; i++)
 				{
@@ -106,38 +100,38 @@ public class PBSreport extends ECPane
 					{
 						final Label label = new Label(line[j]);
 						if (i == 0)
-							label.addStyleName("Title-Header");
-						else if (j == 1)
+							label.addStyleName(UserPanelResources.INSTANCE.userPanel().TitleHeader());
+						 if (j == 1)
 						{
 							if (line[3].contains("r"))
 							{
-								label.addStyleName("Running");
+								label.addStyleName(UserPanelResources.INSTANCE.userPanel().Running());
 								runningCount++;
 							}
 							else if (line[3].contains("qw"))
 							{
-								label.addStyleName("Queued");
+								label.addStyleName(UserPanelResources.INSTANCE.userPanel().Queued());
 								queuedCount++;
 							}
 							else if (line[3].contains("h"))
 							{
-								label.addStyleName("Hold");
+								label.addStyleName(UserPanelResources.INSTANCE.userPanel().Hold());
 								heldCount++;
 							}
 								else if (line[3].contains("e"))
-								label.addStyleName("Error");
+								label.addStyleName(UserPanelResources.INSTANCE.userPanel().Error());
 						} 
 						else if(j==0)
 						{
-							label.addStyleName("Jobid");
+							label.addStyleName(UserPanelResources.INSTANCE.userPanel().Jobid());
 						}
 						else
-							label.addStyleName("Normal");
-
-						if(i>0 && j==0)
-						{
-							label.addClickHandler(new ClickHandler(){
-
+							label.addStyleName(UserPanelResources.INSTANCE.userPanel().Normal());
+						 
+						 if(i>0 && j==0)
+						 {
+							label.addClickHandler(new ClickHandler()
+							{
 								public void onClick(ClickEvent event)
 								{
 									DecoratedPopupPanel p = new DecoratedPopupPanel(true);
@@ -156,24 +150,31 @@ public class PBSreport extends ECPane
 									details.setWidget(5, 1, new Label(line[11]));
 									p.add(details);
 									p.setPopupPosition(label.getAbsoluteLeft() + 80, label.getAbsoluteTop());
-									p.show();
-									
+									p.show();			
 								}});							
+							}
+							if(j<6)
+								pbsTable.setWidget(i, j, label);
 						}
-						
-						if(j<6)
-							pbsTable.setWidget(i, j, label);
 					}
-				}
-				loadingGraphic.hide();
-				queuedCountLabel.setText("- " + queuedCount + " jobs queued ");
-				runningCountLabel.setText(" " + runningCount + " jobs running -");
-				heldCountLabel.setText("- " + heldCount + " jobs held -");
-				
-			}
-		});
-
+					queuedCountLabel.setText( "- " + queuedCount + " jobs queued ");
+					runningCountLabel.setText(" " + runningCount + " jobs running - ");
+					heldCountLabel.setText("- " + heldCount + " jobs held ");
+			}});
 	}
 
+	@Override
+	public Image getToolLogo() 
+	{
+		return null;
+	}
+
+	@Override
+	public Label getToolTitle() 
+	{
+		return null;
+	}
+
+	
 
 }
