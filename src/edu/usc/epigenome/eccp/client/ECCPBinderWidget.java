@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 import edu.usc.epigenome.eccp.client.pane.sampleReport.SampleReport;
 
@@ -36,6 +37,10 @@ public class ECCPBinderWidget extends Composite {
 
 	interface ECCPBinderWidgetUiBinder extends
 			UiBinder<Widget, ECCPBinderWidget> {
+	}
+	
+	static {
+	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
 	}
 	
 	@UiField public static VerticalPanel addTabPanel;
@@ -131,6 +136,7 @@ public class ECCPBinderWidget extends Composite {
 	 */
 	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
+		//fp.addStyleName(UserPanelResources.INSTANCE.userPanel().closeTabs());
 		HorizontalPanel hp = new HorizontalPanel();
 		Image image = new Image();
 		Label label = new Label(displayName);
