@@ -44,7 +44,8 @@ public class ECCPBinderWidget extends Composite {
 	}
 	
 	@UiField public static VerticalPanel addTabPanel;
-	@UiField static StackLayoutPanel mainStack;
+	//@UiField static StackLayoutPanel mainStack;
+	@UiField static HTMLPanel FcellReport;
 	@UiField static HTMLPanel layoutReport;
 	@UiField static Label label;
 	static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
@@ -70,7 +71,7 @@ public class ECCPBinderWidget extends Composite {
 					addTabPanel.clear();
 					layoutReport.clear();
 					layoutReport.add(label);
-					layoutReport.add(mainStack);
+					layoutReport.add(FcellReport);
 					label.setText("Switch to Sample View");
 				}
 				else if(label.getText().contains("Sample"))
@@ -106,6 +107,8 @@ public class ECCPBinderWidget extends Composite {
 		
 			public void onClick(ClickEvent event) 
 			{
+				layoutReport.add(toolWidget);
+				toolWidget.showTool();
 				/*if(typeGe.contains("Samples From Geneus"))
 				{
 					addTabPanel.clear();
@@ -118,14 +121,14 @@ public class ECCPBinderWidget extends Composite {
 					}
 				}	
 				else
-				{*/
+				{
 					if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
 					{
 						toolTabPanel.add(toolWidget, typeGe);
 						toolWidget.showTool();
 					}	
 					toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
-					addTabPanel.add(toolTabPanel);
+					addTabPanel.add(toolTabPanel);*/
 				}
 			//}
 		});
