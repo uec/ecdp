@@ -17,6 +17,8 @@ public interface ECServiceAsync
 	void getFlowcellsFromFS(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
+	//Get projects from sample view
+	void getProjectsFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	void getSampleFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	//Get QC for given flowcell (flowcell view)
 	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
@@ -42,7 +44,6 @@ public interface ECServiceAsync
 	void getEncryptedData(String globalText, String laneText, AsyncCallback<ArrayList<String>> callback);
 	void decryptKeyword(String fcellText, String laneText, AsyncCallback<ArrayList<String>> callback);
 	
-	void getSampleDataFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	void getLaneFlowcellSample(String string, String flowcellSerial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	void getFlowcellsforSample(String sampleProperty,AsyncCallback<SampleData> asyncCallback)throws IllegalArgumentException;
 }
