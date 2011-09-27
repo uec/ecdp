@@ -58,8 +58,7 @@ public class SampleTreeView extends Composite
 		sampGeneus = sampleIn;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		//Tree t = new Tree();
-		TreeItemClick sampleCellItem = new TreeItemClick("Library", sampGeneus.getSampleProperty("library"), "Project", sampGeneus.getSampleProperty("project"));
+		TreeItemClick sampleCellItem = new TreeItemClick("Library", sampGeneus.getSampleProperty("library"), "Date", sampGeneus.getSampleProperty("date"));
 		final TreeItem sampleRoot = new TreeItem(sampleCellItem);
 		t.addItem(sampleRoot);
 		sampleRoot.addItem("");
@@ -69,109 +68,104 @@ public class SampleTreeView extends Composite
 		 @Override
 		 public void onOpen(OpenEvent<TreeItem> event)
 		 {
-		   TreeItem libName = event.getTarget();
-		   if(libName.getText().contains("Library"))
-		   {
-			 sampleRoot.removeItems();
-			 remoteService.getFlowcellsforSample(sampGeneus.getSampleProperty("library"), new AsyncCallback<SampleData>() 
-			 {
-			   public void onSuccess(SampleData sData)
+			if(sampleRoot.getChildCount() > 0 && sampleRoot.getChildCount()<=1)
+			{
+			   remoteService.getFlowcellsforSample(sampGeneus.getSampleProperty("library"), new AsyncCallback<SampleData>() 
 			   {
-				 sampGeneus.sampleFlowcells = sData.sampleFlowcells;
-				 if(sData.sampleFlowcells.isEmpty())
-				   sampleRoot.addItem(new TreeItem(""));
+				 public void onFailure(Throwable arg1)
+				 {
+					arg1.printStackTrace();
+				 }
+				public void onSuccess(SampleData sData)
+				{
+				  sampGeneus.sampleFlowcells = sData.sampleFlowcells;
+				  if(sData.sampleFlowcells.isEmpty())
+					sampleRoot.addItem(new TreeItem(""));
 				 else
 				 {
 				   for(final String flowcellSerial : sampGeneus.sampleFlowcells.keySet())
 				   {
-					 final TreeItemClick cellItem = new TreeItemClick("Flowcell ID", flowcellSerial, "Technician", sampGeneus.sampleFlowcells.get(flowcellSerial).flowcellProperties.get("technician"));
-					 final TreeItem flowcellItem = new TreeItem(cellItem);
-					 flowcellItem.addItem("");
-
-					 t.addOpenHandler(new OpenHandler<TreeItem>() 
-					{	
-					 @Override
-				     public void onOpen(OpenEvent<TreeItem> event) 
-				     {
-					   TreeItem item = event.getTarget();
-					   if(item.getText().contains("Flowcell"))
-					   {
-						//if(item.getChildCount()<=sampGeneus.sampleFlowcells.keySet().size())
-						flowcellItem.removeItems();
-						remoteService.getLaneFlowcellSample(sampGeneus.getSampleProperty("library"), flowcellSerial, new AsyncCallback<FlowcellData>()
+					final TreeItemClick cellItem = new TreeItemClick("Flowcell ID", flowcellSerial, "Technician", sampGeneus.sampleFlowcells.get(flowcellSerial).flowcellProperties.get("technician"));
+					final TreeItem flowcellItem = new TreeItem(cellItem);
+					flowcellItem.addItem("");
+								 
+				   t.addOpenHandler(new OpenHandler<TreeItem>() 
+				   {	
+					@Override
+					public void onOpen(OpenEvent<TreeItem> event) 
+					{
+						if(flowcellItem.getChildCount() > 0 && flowcellItem.getChildCount() <=1)
 						{
-						  public void onSuccess(FlowcellData result) 
+						  remoteService.getLaneFlowcellSample(sampGeneus.getSampleProperty("library"), flowcellSerial, new AsyncCallback<FlowcellData>()
 						  {
-							sampGeneus.sampleFlowcells.get(flowcellSerial).lane = result.lane;
-							if(result.lane.isEmpty())
-							  flowcellItem.addItem(new TreeItem(""));
-							else
+							public void onFailure(Throwable arg1)
 							{
-							  for(final Integer laneNo : result.lane.keySet())
-							  {
-								TreeItemClick laneClick = new TreeItemClick("Lane No", laneNo.toString(), "Processing", sampGeneus.sampleFlowcells.get(flowcellSerial).lane.get(laneNo).get("processing"));
-								final TreeItem laneItem = new TreeItem(laneClick);
-								laneItem.addItem("");
-								t.addOpenHandler(new OpenHandler<TreeItem>()
-								{
-								 @Override
-								 public void onOpen(OpenEvent<TreeItem> innerEvent) 
-								 {
-								  TreeItem innerItem = innerEvent.getTarget();
-								  if(innerItem.getText().contains("Lane"))
-								  {
-								   String str = innerItem.getText().substring(9, 10);
-								   //final int i = Integer.parseInt(str);
-								   laneItem.removeItems();
-								   remoteService.getQCSampleFlowcell(flowcellSerial, sampGeneus.getSampleProperty("library"), laneNo, new AsyncCallback<FlowcellData>()
-								   {
-									 public void onFailure(Throwable caught) {
-									  caught.printStackTrace();
-									  }
-									 public void onSuccess(FlowcellData QCGot) 
-									 {
-									  sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC = QCGot.laneQC;
-									  sampGeneus.sampleFlowcells.get(flowcellSerial).filterAnalysis(flowcellSerial, laneNo, sampGeneus.getSampleProperty("geneusID_sample"));
-									  sampGeneus.sampleFlowcells.get(flowcellSerial).filterQC(laneNo);
-														
-									  if(sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.isEmpty())
-										  laneItem.addItem(new TreeItem(""));
-									  else
-									  {
-									    for(String runId : sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
-										{
-										  TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
-										  TreeItem runItem = new TreeItem(runClick);	
-										  laneItem.addItem(runItem);
-										  runItem.addItem(new QCReport(sampGeneus, flowcellSerial, laneNo, runId));
-										  runItem.addItem(new FilesDownload(sampGeneus, flowcellSerial, laneNo, runId));
-										  runItem.addItem(new QCPlots(sampGeneus, flowcellSerial, laneNo, runId));
-										}
-									  }	
-								 }});
-								 }
-							  }});
-							  flowcellItem.addItem(laneItem);		
+							  arg1.printStackTrace();
 							}
-						  }
-						}
-						public void onFailure(Throwable arg0) 
-						{
-						 arg0.printStackTrace();
-						}			
-				     });
-				   }
-			    }});
-				sampleRoot.addItem(flowcellItem);
-				}
-			}
+						   public void onSuccess(FlowcellData result) 
+						   {
+							 sampGeneus.sampleFlowcells.get(flowcellSerial).lane = result.lane;
+							 if(result.lane.isEmpty())
+							 flowcellItem.addItem(new TreeItem(""));
+							 else
+							 {
+							   for(final Integer laneNo : result.lane.keySet())
+							   {
+		   					     TreeItemClick laneClick = new TreeItemClick("Lane No", laneNo.toString(), "Processing", sampGeneus.sampleFlowcells.get(flowcellSerial).lane.get(laneNo).get("processing"));
+			  				     final TreeItem laneItem = new TreeItem(laneClick);
+			  				     laneItem.addItem("");
+			  				     t.addOpenHandler(new OpenHandler<TreeItem>()
+								 {
+								  @Override
+								   public void onOpen(OpenEvent<TreeItem> innerEvent) 
+								   {
+									  if(laneItem.getChildCount() > 0 && laneItem.getChildCount() <=1)
+									  {
+										  remoteService.getQCSampleFlowcell(flowcellSerial, sampGeneus.getSampleProperty("library"), laneNo, new AsyncCallback<FlowcellData>()
+										  {
+											public void onFailure(Throwable caught) {
+											  caught.printStackTrace();
+											}
+											public void onSuccess(FlowcellData QCGot) 
+											{
+											  sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC = QCGot.laneQC;
+											  sampGeneus.sampleFlowcells.get(flowcellSerial).filterAnalysis(flowcellSerial, laneNo, sampGeneus.getSampleProperty("geneusID_sample"));
+											  sampGeneus.sampleFlowcells.get(flowcellSerial).filterQC(laneNo);
+																			
+											  if(sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.isEmpty())
+												  laneItem.addItem(new TreeItem(""));
+											  else
+											  {
+												for(String runId : sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
+												{
+												  TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
+												  TreeItem runItem = new TreeItem(runClick);	
+												  laneItem.addItem(runItem);
+												  //Window.alert("Now the flowcell is " + sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.toString());
+												  runItem.addItem(new QCReport(sampGeneus.sampleFlowcells.get(flowcellSerial), flowcellSerial, laneNo, runId, sampGeneus.getSampleProperty("library"), sampGeneus.getSampleProperty("geneusID_sample")));
+												  runItem.addItem(new FilesDownload(sampGeneus.sampleFlowcells.get(flowcellSerial), flowcellSerial, laneNo, runId, sampGeneus.getSampleProperty("library"), sampGeneus.getSampleProperty("geneusID_sample")));
+												  runItem.addItem(new QCPlots(sampGeneus, flowcellSerial, laneNo, runId));
+												}
+											  }
+											}}); //End remoteService call for getting analysis_id (getQCSampleFlowcell)
+									    }//End if child count for laneItem
+									  }});//End open Handler for the laneItem
+			  				     	flowcellItem.addItem(laneItem);
+								 }//End for (adding each lane)
+							   }
+							 }});//End remoteService call for getting laneItem information(getLaneFlowcellSample)
+			  			  }//End if child count for flowcellItem				
+					   }});//End open Handler for flowcellItem
+				   	  sampleRoot.addItem(flowcellItem);
+				}//End for adding each flowcell
+			  }
+		 }});//End remoteService call for getting flowcells for sample(getFlowcellsforSample) 
 		}
-		public void onFailure(Throwable arg1)
-		{
-		  arg1.printStackTrace();
-		}
-	 });
+	  }});//End open handler for sampleItem
+    }
+	
+	public void sampPrint()
+	{
+		
 	}
-	}});
- }
 }
