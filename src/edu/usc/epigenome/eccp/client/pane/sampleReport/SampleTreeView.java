@@ -1,25 +1,14 @@
 package edu.usc.epigenome.eccp.client.pane.sampleReport;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.InsertPanel.ForIsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.TreeListener;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECService;
@@ -58,7 +47,7 @@ public class SampleTreeView extends Composite
 		sampGeneus = sampleIn;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		TreeItemClick sampleCellItem = new TreeItemClick("Library", sampGeneus.getSampleProperty("library"), "Date", sampGeneus.getSampleProperty("date"));
+		TreeItemClick sampleCellItem = new TreeItemClick("Library", sampGeneus.getSampleProperty("library"), "Project", sampGeneus.getSampleProperty("project"));
 		final TreeItem sampleRoot = new TreeItem(sampleCellItem);
 		t.addItem(sampleRoot);
 		sampleRoot.addItem("");
@@ -138,7 +127,7 @@ public class SampleTreeView extends Composite
 											  {
 												for(String runId : sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
 												{
-												  TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
+												  TreeItemClick runClick = new TreeItemClick("Run", runId);
 												  TreeItem runItem = new TreeItem(runClick);	
 												  laneItem.addItem(runItem);
 												  //Window.alert("Now the flowcell is " + sampGeneus.sampleFlowcells.get(flowcellSerial).laneQC.toString());
