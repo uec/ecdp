@@ -18,7 +18,10 @@ public interface ECServiceAsync
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	//Get projects from sample view
-	void getProjectsFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
+	void getProjectsFromGeneus(String searchString, boolean yes, AsyncCallback<ArrayList<String>> callback) throws IllegalArgumentException;
+	
+	void getSamplesForProject(String projectName, AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
+	
 	void getSampleFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	//Get QC for given flowcell (flowcell view)
 	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
