@@ -2,7 +2,6 @@ package edu.usc.epigenome.eccp.client;
 
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
@@ -35,7 +34,7 @@ public interface ECService extends RemoteService
 	 */
 	ArrayList<SampleData> getSampleFromGeneus() throws IllegalArgumentException;
 	//Get projects from geneus
-	ArrayList<SampleData> getProjectsFromGeneus() throws IllegalArgumentException;
+	ArrayList<String> getProjectsFromGeneus(String searchString, boolean yes) throws IllegalArgumentException;
 	//Get QC for the given sample, flowcell and laneNo (for tree view flowcell and sample)
 	FlowcellData getQCSampleFlowcell(String serial, String sampleID, int laneNo) throws IllegalArgumentException;
 	//Get the files for given run_id, flowcell serial and sample
@@ -46,6 +45,8 @@ public interface ECService extends RemoteService
 	FlowcellData getLaneFlowcellSample(String sample_name, String flowcellSerial) throws IllegalArgumentException;
 	//Get the flowcells for a given sample_name
 	SampleData getFlowcellsforSample(String sampleProperty) throws IllegalArgumentException;
+	
+	ArrayList<SampleData>getSamplesForProject(String projectName) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	
 	
