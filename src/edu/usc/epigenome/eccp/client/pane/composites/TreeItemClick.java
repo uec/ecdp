@@ -39,6 +39,13 @@ public class TreeItemClick extends Composite implements ClickHandler, HasClickHa
 	public TreeItemClick() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
+	
+	public TreeItemClick(String name)
+	{
+		initWidget(uiBinder.createAndBindUi(this));
+		addData.setText(0, 0, name);
+		this.addClickHandler(this);
+	}
 	public TreeItemClick(String Libname, final String library)
 	{
 		lib = library;
