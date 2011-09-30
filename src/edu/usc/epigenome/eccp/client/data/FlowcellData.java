@@ -2,6 +2,7 @@ package edu.usc.epigenome.eccp.client.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.Window;
@@ -11,6 +12,7 @@ public class FlowcellData implements IsSerializable
 {
 	public HashMap<String,String> flowcellProperties;
 	public HashMap<Integer,HashMap<String,String>> lane;
+	public HashMap<Integer,ArrayList<String>>QClist;
 	public ArrayList<LinkedHashMap<String, String>> fileList;
 	public LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
 	//public HashMap<String, HashMap<String,HashMap<Integer, HashMap<String, String>>>> sample;
@@ -21,11 +23,14 @@ public class FlowcellData implements IsSerializable
 	{
 		flowcellProperties = new HashMap<String,String>();
 		lane = new HashMap<Integer,HashMap<String,String>>();
+		QClist = new HashMap<Integer, ArrayList<String>>();
 		laneQC = new LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
 		fileList = new ArrayList<LinkedHashMap<String,String>>();
 		//sample = new HashMap<String,HashMap<String,HashMap<Integer, HashMap<String, String>>>>();
 	}	
-	
+	/*
+	 * Get the value of the given flowcell property
+	 */
 	public String getFlowcellProperty(String key)
 	{
 		try
@@ -38,6 +43,9 @@ public class FlowcellData implements IsSerializable
 		}
 	}
 	
+	/*
+	 * Get the value for the given lane and property name
+	 */
 	public String getLaneProperty(int laneNumber,String key)
 	{		
 		try
@@ -180,34 +188,30 @@ public class FlowcellData implements IsSerializable
 			for(String analysisID : laneQC.keySet())
 				for(Integer i : lanesToRemove)
 					laneQC.get(analysisID).remove(i);
-			lanesToRemove.clear();
-			
-			/*for(String analysisID : laneQC.keySet())
-			{
-				for(Integer i : laneQC.get(analysisID).keySet())
-				{
-					LinkedHashMap samples
-				}
-			}*/
-			
+			lanesToRemove.clear();		
 	}
 	
-	
+	/*
+	 * Filter files for a given lane, sample and runId
+	 */
 	public void filterFiles(int lane, String sampleId, String runId)
 	{
 		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
 		ArrayList<HashMap<String, String>> filesToRemove = new ArrayList<HashMap<String,String>>();
-		//ArrayList<HashMap<String, String>> filesToKeep = new ArrayList<HashMap<String,String>>();
 		
 		lanesToKeep.add(lane);
 		
+		//Iterate over the fileList
 		for(HashMap<String, String> file : fileList)
 		{
+			//If file's fullpath has sampleId
 			if(!file.get("fullpath").contains(sampleId))
 			{
+				//remove files that don't have the laneNo
 				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
 					filesToRemove.add(file);
 			}
+			//Remove files that don't have the laneNo
 			else
 			{
 				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
@@ -218,24 +222,17 @@ public class FlowcellData implements IsSerializable
 		{
 			fileList.remove(file);
 		}
-		/*for(HashMap<String, String> file : flowcellFileList)
-		{
-			if(!file.get("fullpath").contains(sampleProperties.get("geneusID_sample")))
-			{
-				//Check for lane no
-				if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
-					filesToRemove.add(file);
-			}
-			
-		}*/	
 	}
 	
+	/*
+	 * Filter QC data for the given lane
+	 * Remove lanes from flowcell.laneQC that don't match the laneNo provided
+	 */
 	public void filterQC(int lane)
 	{
 		ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
 		ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
 		
-		//Window.alert("the lane received is " + lane);
 		lanesToKeep.add(lane);
 		
 		for(String locaiton : laneQC.keySet())
@@ -250,26 +247,33 @@ public class FlowcellData implements IsSerializable
 		
 	}
 	
+	/*
+	 * Filter the analysis_id with respect to the flowcell, lane 
+	 * and geneusID_sample
+	 */
 	public void filterAnalysis(String flowcell, int lane, String libraryID)
 	{
 		ArrayList<String> analysisToRemove = new ArrayList<String>();
 		
+		//Iterate over each key in laneQC
 		for(String location : laneQC.keySet())
 		{
 			if(laneQC.get(location) != null)
 			{
-			if(location.contains(flowcell+"_"+lane+"_"))
-			{
-				if(!location.contains(libraryID))
+				//If the key is of the form flowcell(Serial)_lane(laneNo) then check if it has the geneusID_sample 
+				if(location.contains(flowcell+"_"+lane+"_"))
 				{
-					analysisToRemove.add(location);
+					//remove the keys not having the geneusId_sample
+					if(!location.contains(libraryID))
+					{
+						analysisToRemove.add(location);
+					}
 				}
-			}
 			}
 		}	
 		
-			for(String rem : analysisToRemove)
-				laneQC.remove(rem);
+		for(String rem : analysisToRemove)
+			laneQC.remove(rem);
 			
 		analysisToRemove.clear();
 	}
