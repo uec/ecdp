@@ -10,6 +10,7 @@ import java.util.*;
 		public HashMap<String, FlowcellData> sampleFlowcells;
 		
 		
+		//public HashMap<String, String> projectProperties;
 		//public HashMap<String, HashMap<String, String>> flowcellInfo;
 		//public HashMap<Integer, HashMap<String, String>> flowcellLane;
 		//public LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, String>>> flowcellLaneQC;
@@ -19,6 +20,8 @@ import java.util.*;
 		public SampleData()
 		{
 			//sampleInfo = new HashMap<String, ArrayList<FlowcellData>>();
+			//projectProperties = new HashMap<String, String>();
+			
 			sampleProperties = new HashMap<String, String>();
 			sampleFlowcells = new HashMap<String, FlowcellData>();
 			
@@ -41,83 +44,6 @@ import java.util.*;
 				return "unknown";
 			}
 		}
-		
-/*		public void filterQC(int lane)
-		{
-			ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
-			ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
-			
-			lanesToKeep.add(lane);
-			
-			for(String locaiton : flowcellLaneQC.keySet())
-				for(Integer i : flowcellLaneQC.get(locaiton).keySet())
-					if(!lanesToKeep.contains(i))
-						lanesToRemove.add(i);
-			
-			for(String location : flowcellLaneQC.keySet())
-				for(Integer i : lanesToRemove)
-				flowcellLaneQC.get(location).remove(i);
-			lanesToRemove.clear();
-			
-		}
-		
-		public void filterAnalysis(String flowcell, int lane)
-		{
-			ArrayList<String> analysisToRemove = new ArrayList<String>();
-			
-			for(String location : flowcellLaneQC.keySet())
-			{
-				if(location.contains(flowcell+"_"+lane+"_"))
-				{
-					if(!location.contains(sampleProperties.get("geneusID_sample")))
-					{
-						analysisToRemove.add(location);
-					}
-				}
-			}
-			
-				for(String rem : analysisToRemove)
-					flowcellLaneQC.remove(rem);
-				
-			analysisToRemove.clear();
-		}*/
-		
-	/*	public void filterFiles(int lane)
-		{
-			ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
-			ArrayList<HashMap<String, String>> filesToRemove = new ArrayList<HashMap<String,String>>();
-			//ArrayList<HashMap<String, String>> filesToKeep = new ArrayList<HashMap<String,String>>();
-			
-			lanesToKeep.add(lane);
-			
-			for(HashMap<String, String> file : flowcellFileList)
-			{
-				if(!file.get("fullpath").contains(sampleProperties.get("geneusID_sample")))
-				{
-					if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
-						filesToRemove.add(file);
-				}
-				else
-				{
-					if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
-						filesToRemove.add(file);
-				}
-			}
-			for(HashMap<String, String> file : filesToRemove)
-			{
-				flowcellFileList.remove(file);
-			}
-			/*for(HashMap<String, String> file : flowcellFileList)
-			{
-				if(!file.get("fullpath").contains(sampleProperties.get("geneusID_sample")))
-				{
-					//Check for lane no
-					if(!lanesToKeep.contains(Integer.parseInt(file.get("lane"))))
-						filesToRemove.add(file);
-				}
-				
-			}	
-		}*/
 		
 		public boolean sampleContains(String query)
 		{
