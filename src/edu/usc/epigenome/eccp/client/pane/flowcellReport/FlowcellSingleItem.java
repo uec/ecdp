@@ -20,6 +20,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.ECService;
@@ -27,8 +29,12 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
+import edu.usc.epigenome.eccp.client.pane.composites.TreeItemClick;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartBrowser;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.FilesDownload;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.QCPlots;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.QCReport;
 
 public class FlowcellSingleItem extends Composite  {
 
@@ -44,151 +50,139 @@ public class FlowcellSingleItem extends Composite  {
 	}
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
+	@UiField Tree t;
 	FlowcellData flowcell;
-	SampleData sampGeneus;
+	
 	
 	public FlowcellSingleItem() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-	@UiField FlowPanel vp;
-	@UiField FlexTable flowcellTable;
-	@UiField FlexTable flowcellTableSample;
-	@UiField DisclosurePanel qcPanel;
-	@UiField DisclosurePanel filePanel;
-	//@UiField DisclosurePanel plotPanel;
-	@UiField FlowPanel qcvp;
-	@UiField FlowPanel filesvp;
-	//@UiField FlowPanel plotvp;
 	
 	public FlowcellSingleItem(final FlowcellData flowcellIn)
 	{
-		flowcell=flowcellIn;
-		initWidget(uiBinder.createAndBindUi(this));
-		flowcellTable.setText(0,0, "Flowcell ID: " + flowcell.getFlowcellProperty("serial"));
-		flowcellTable.setText(0,1, "Lims ID: " + flowcell.getFlowcellProperty("limsID"));
-		flowcellTable.setText(0,2, flowcell.getFlowcellProperty("technician") +" " + flowcell.getFlowcellProperty("date"));
-		flowcellTable.setText(1,0, "Protocol: " + flowcell.getFlowcellProperty("protocol"));
-		flowcellTable.setText(1,1, "Status: " + flowcell.getFlowcellProperty("status"));
-		flowcellTable.setText(1,2, "Control Lane: " + flowcell.getFlowcellProperty("control"));
-		
-		//FlexTable flowcellTableSample = new FlexTable();
-			
-		//HEADERS
-		flowcellTableSample.setText(0,0, "Processing");
-		flowcellTableSample.setText(0,1, "Library");
-		flowcellTableSample.setText(0,2, "Geneusid");
-		flowcellTableSample.setText(0,2, "Organism");
-		flowcellTableSample.setText(0,3, "Project");
-		for(int i = 1; i<=8;i++)
+	  flowcell=flowcellIn;
+	  initWidget(uiBinder.createAndBindUi(this));
+
+	  TreeItemClick fcellItem = new TreeItemClick("Fcell", flowcell.getFlowcellProperty("serial"), "technician", flowcell.getFlowcellProperty("technician"));
+	  final TreeItem fcellRoot = new TreeItem(fcellItem);
+	  t.addItem(fcellRoot);
+	  fcellRoot.addItem("");
+					
+	  for(final Integer laneNo : flowcell.lane.keySet())
+	  {
+		String samp_name = flowcell.getLaneProperty(laneNo, "name");
+		final String sampNames[] = samp_name.split("\\!");
+		TreeItemClick laneClick = new TreeItemClick("Lane", laneNo.toString(), "(count", Integer.toString(sampNames.length) + " items)");
+		if(sampNames.length == 1)
+			laneClick = new TreeItemClick("Lane", laneNo.toString(),"(sample ", sampNames[0] +")");
+
+		final TreeItem laneItem = new TreeItem(laneClick);
+		laneItem.addItem("");
+
+		String sampleID = flowcell.getLaneProperty(laneNo, "sampleID");
+		String sampId[] = sampleID.split("\\!");
+		for(int i=0;i<sampId.length;i++)
 		{
-			flowcellTableSample.setText(i,0, flowcell.getLaneProperty(i,"processing"));
-			String library = flowcell.getLaneProperty(i, "name").replace("+", "<br/>");
-			flowcellTableSample.setWidget(i,1, new HTML(library));
-			String sampleID = flowcell.getLaneProperty(i, "sampleID").replace("+", "<br/>");
-			flowcellTableSample.setWidget(i, 2, new HTML(sampleID));
-			String organism = flowcell.getLaneProperty(i,"organism").replace("+", "<br/>");
-			flowcellTableSample.setWidget(i,2, new HTML(organism));
-			flowcellTableSample.setText(i,3, flowcell.getLaneProperty(i,"project"));						
-		}
-		
-		qcPanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
-		{
-			public void onOpen(OpenEvent<DisclosurePanel> arg0) 
-			{
-				qcvp.add(new Image("images/progress.gif"));
-				remoteService.getQCforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>()
+		   final String sName = sampNames[i];
+		   final String sId = sampId[i];
+		   TreeItemClick sampleClick = new TreeItemClick("Library", sName, "Project", flowcell.getLaneProperty(laneNo,"project"));
+		   final TreeItem sampleItem = new TreeItem(sampleClick);
+		   laneItem.addItem(sampleItem);
+		   sampleItem.addItem("");
+		   t.addOpenHandler(new OpenHandler<TreeItem>()
+		   {
+			 @Override
+			  public void onOpen(OpenEvent<TreeItem> event1) 
+			  {
+				TreeItem item = event1.getTarget();
+				if(sampleItem.getChildCount() > 0 && sampleItem.getChildCount() <=1 && item.getText().contains(sName))
 				{
-					public void onFailure(Throwable caught)
+				  remoteService.getQCSampleFlowcell(flowcell.getFlowcellProperty("serial"), sName, laneNo,new AsyncCallback<FlowcellData>()
+				  {
+					public void onFailure(Throwable arg0) {
+					  arg0.getMessage();
+					}
+					public void onSuccess(FlowcellData QCGot) 
 					{
-						qcPanel.clear();
-						qcPanel.add(new Label(caught.getMessage()));	
-					}	
-					public void onSuccess(FlowcellData result)
+					  flowcell.laneQC = QCGot.laneQC;
+					  flowcell.filterAnalysis(flowcell.getFlowcellProperty("serial"), laneNo, sId);
+					  flowcell.filterQC(laneNo);
+					  
+					  for(String runId : flowcell.laneQC.keySet())
+					  {
+						TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
+						TreeItem runItem = new TreeItem(runClick);	
+						sampleItem.addItem(runItem);
+						runItem.addItem(new QCReport(flowcell, flowcell.getFlowcellProperty("serial"), laneNo, runId, sName, sId));
+						runItem.addItem(new FilesDownload(flowcell, flowcell.getFlowcellProperty("serial"), laneNo, runId, sName, sId));
+						runItem.addItem(new QCPlots(flowcell, flowcell.getFlowcellProperty("serial"), laneNo, runId, sName, sId));
+					  }
+					}
+				  });
+				}
+			  }});
+		  }			
+		  fcellRoot.addItem(laneItem);	
+	   }
+	 }
+  }
+/*t.addOpenHandler(new OpenHandler<TreeItem>()
+{	
+	@Override
+	public void onOpen(OpenEvent<TreeItem> arg0) 
+	{
+		if(laneItem.getChildCount() > 0 && laneItem.getChildCount() <= 1)
+		{
+			String sampleID = flowcell.getLaneProperty(laneNo, "sampleID");
+			String samp_name = flowcell.getLaneProperty(laneNo, "name");
+			final String sampNames[] = samp_name.split("\\+");
+			String sampId[] = sampleID.split("\\+");
+			for(int i=0;i<sampId.length;i++)
+			{
+				final String sName = sampNames[i];
+				final String sId = sampId[i];
+				TreeItemClick sampleClick = new TreeItemClick("Library", sName);
+				final TreeItem sampleItem = new TreeItem(sampleClick);
+				sampleItem.addItem("");
+				t.addOpenHandler(new OpenHandler<TreeItem>()
+				{
+					@Override
+					public void onOpen(OpenEvent<TreeItem> arg0) 
 					{
-						qcvp.clear();
-						flowcell.laneQC = result.laneQC;
-						flowcell.filterLanesThatContain();
-						for(String location : flowcell.laneQC.keySet())
+						if(sampleItem.getChildCount() > 0 && sampleItem.getChildCount() <=1)
 						{
-							qcvp.add(new Label("QC Metrics from " + location));
-							FlexTable qcFlexTable = new FlexTable();
-							int j=0;
-							Boolean firstLine = true;
-							for(int i=1;i<=8;i++)
+							remoteService.getQCSampleFlowcell(flowcell.getFlowcellProperty("serial"), sName, laneNo,new AsyncCallback<FlowcellData>()
 							{
-								if(flowcell.laneQC.get(location).containsKey(i))
-								{	
-									j=0;
-									if(firstLine)
-									{						
-										flowcell.laneQC.get(location).get(i).remove("FlowCelln");
-										for(String s : flowcell.laneQC.get(location).get(i).keySet())
-										{								
-											qcFlexTable.setText(0, j, s);
-											j++;
-										}
-										firstLine = false;
-										j=0;
-									}									
+								public void onFailure(Throwable arg0) {
+									arg0.getMessage();
+								}
+								public void onSuccess(FlowcellData QCGot) 
+								{
+									flowcell.laneQC = QCGot.laneQC;
+									flowcell.filterAnalysis(flowcell.getFlowcellProperty("serial"), laneNo, sId);
+									flowcell.filterQC(laneNo);
 									
-									flowcell.laneQC.get(location).get(i).remove("FlowCelln");
-									for(String s : flowcell.laneQC.get(location).get(i).keySet())
+									if(flowcell.laneQC.isEmpty())
+										sampleItem.addItem(new TreeItem(""));
+									else
 									{
-										qcFlexTable.setText(i, j, flowcell.laneQC.get(location).get(i).get(s));
-										j++;
+										for(String runId : flowcell.laneQC.keySet())
+										{
+											TreeItemClick runClick = new TreeItemClick("Run", runId , "", "");
+											TreeItem runItem = new TreeItem(runClick);	
+											sampleItem.addItem(runItem);
+											runItem.addItem(new QCReport(flowcell, flowcell.getFlowcellProperty("serial"), laneNo, runId, sName, sId));
+										    runItem.addItem(new FilesDownload(flowcell, flowcell.getFlowcellProperty("serial"), laneNo, runId, sName, sId));
+											//runItem.addItem(new QCPlots(sampGeneus, flowcellSerial, laneNo, runId));
+										}
 									}
 								}
-							}
-							qcFlexTable.addStyleName(UserPanelResources.INSTANCE.userPanel().qctable());
-							qcvp.add(qcFlexTable);
+							});
 						}
 					}});
-			}
-		});
-		filePanel.addOpenHandler(new OpenHandler<DisclosurePanel>()
-		{
-			public void onOpen(OpenEvent<DisclosurePanel> event)
-			{
-				filesvp.add(new Image("images/progress.gif"));
-				remoteService.getFilesforFlowcell(flowcell.getFlowcellProperty("serial"), new AsyncCallback<FlowcellData>()
-				{
-					public void onFailure(Throwable caught)
-					{
-						filesvp.clear();
-						filesvp.add(new Label(caught.getMessage()));
-					}
-					public void onSuccess(FlowcellData result)
-					{
-						filesvp.clear();
-						flowcell.fileList = result.fileList;
-						flowcell.filterLanesThatContain();
-						FileBrowser f = new FileBrowser(flowcell.fileList);
-						filesvp.add(f);
-					}});				
-			}			
-		});
-	/*  plotPanel.addOpenHandler(new OpenHandler<DisclosurePanel>() 
-	  {
-
-		@Override
-		public void onOpen(OpenEvent<DisclosurePanel> arg0)
-		{
-			remoteService.getCSVFiles("", flowcell.getFlowcellProperty("serial"), "", new AsyncCallback<FlowcellData>()
-			{
-				public void onFailure(Throwable arg0) 
-				{
-					plotvp.clear();
-					plotvp.add(new Label(arg0.getMessage()));
-				}
-				public void onSuccess(FlowcellData result) 
-				{
-					plotvp.clear();
-					flowcell.fileList = result.fileList;
-					flowcell.filterLanesThatContain();
-					ChartBrowser chBrowse = new ChartBrowser(flowcell.fileList);
-					plotvp.add(chBrowse);
-			   }});
-		}  
-	});*/	
-	  }
+				laneItem.addItem(sampleItem);
+			}		
+		}		
 	}
+});*/
+     		
