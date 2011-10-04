@@ -7,8 +7,8 @@
 	<g:FlowPanel ui:field="mainPanel">
 		<g:FlowPanel ui:field="searchPanel" styleName='{res.userPanel.flowcellsearch}'>
 			<g:HorizontalPanel ui:field="searchOptionsPanel">
-				<g:Label text="Flowcell Properties: "/>
-				<g:TextBox ui:field="globalSearchBox"/>
+				<!--  <g:Label text="Flowcell Properties: "/>
+				<g:TextBox ui:field="globalSearchBox"/>-->
 				<g:Label text="Lane Properties: "/>
 				<g:TextBox ui:field="laneSearchBox"/>
 				<g:Button ui:field="searchButton" text="Search"/>
