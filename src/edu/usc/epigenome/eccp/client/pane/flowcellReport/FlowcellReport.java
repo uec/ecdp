@@ -22,18 +22,14 @@ import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 
-
 public class FlowcellReport extends ECPane{
 
-	private static FlowcellReportUiBinder uiBinder = GWT
-			.create(FlowcellReportUiBinder.class);
+	private static FlowcellReportUiBinder uiBinder = GWT.create(FlowcellReportUiBinder.class);
 
-	interface FlowcellReportUiBinder extends UiBinder<Widget, FlowcellReport> {
-	}
+	interface FlowcellReportUiBinder extends UiBinder<Widget, FlowcellReport> {}
 
-	static {
-	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
-	}
+	static 
+	{UserPanelResources.INSTANCE.userPanel().ensureInjected();}
 	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	public enum ReportType 	{ShowSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
@@ -41,13 +37,14 @@ public class FlowcellReport extends ECPane{
 	
 	@UiField FlowPanel searchPanel;
 	@UiField TextBox laneSearchBox;
-	@UiField TextBox globalSearchBox;
+	//@UiField TextBox globalSearchBox;
 	@UiField FlowPanel vp;
 	@UiField Button searchButton;
 	
-	public FlowcellReport(){
-		initWidget(uiBinder.createAndBindUi(this));
-		//showTool();
+	public FlowcellReport()
+	{
+	   initWidget(uiBinder.createAndBindUi(this));
+	   //showTool();
 	}
 
 	public FlowcellReport(ReportType reprotTypein)
@@ -55,78 +52,50 @@ public class FlowcellReport extends ECPane{
 		reportType = reprotTypein;
 		initWidget(uiBinder.createAndBindUi(this));
 		vp.add(new Image("images/progress.gif"));
-		
 		searchButton.addClickHandler(new ClickHandler() 
 		{	
-			public void onClick(ClickEvent event) 
-			{
-				if(searchPanel.getWidgetCount() > 1)
-				{	
-					searchPanel.clear();
-				}
-				
-				vp.clear();
-				vp.add(new Image("images/progress.gif"));
-				showTool();
-			}});
+		   public void onClick(ClickEvent event) 
+		   {
+			 if(searchPanel.getWidgetCount() > 1)
+			 {searchPanel.clear();}
+			 
+			 vp.clear();
+			 vp.add(new Image("images/progress.gif"));
+			 showTool();
+		}});
 	}
 
 	@Override
 	public void showTool() 
 	{
-		/*String name = reportType.name();
-		if(name.equals("ShowSamples"))
+	  AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
+	  {
+		public void onFailure(Throwable caught)
 		{
-			AsyncCallback<ArrayList<SampleData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<SampleData>>()
-		    {
-				public void onFailure(Throwable caught)
-				{
-					vp.clear();	
-					caught.printStackTrace();				
-				}
-				public void onSuccess(ArrayList<SampleData> result)
-				{
-					vp.clear();
-					for(SampleData sampl : result)
-					{
-						SampleSingleItem flowcellItem = new SampleSingleItem(sampl);
-						vp.add(flowcellItem);
-					}
-				}
-		    };remoteService.getSampleDataFromGeneus(DisplayFlowcellCallback);
+		  vp.clear();	
+		  caught.printStackTrace();				
 		}
-		else
-		{*/
-			AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
-		    {
-				public void onFailure(Throwable caught)
-				{
-					vp.clear();	
-					caught.printStackTrace();				
-				}
-				public void onSuccess(ArrayList<FlowcellData> result)
-				{
-					vp.clear();
-					for(FlowcellData flowcell : result)
-						if(flowcell.flowcellContains(globalSearchBox.getText()))
-							if(flowcell.filterLanesThatContain(laneSearchBox.getText()))
-							{
-								FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
-								vp.add(flowcellItem);
-							}
-				}
-		  };
-		  
-		  switch(reportType)
-			{
-				case ShowGeneus: remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);break;
-				case ShowFS: remoteService.getFlowcellsFromFS(DisplayFlowcellCallback);break;
-				case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
-				case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
-				default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
-			}
-		//}
+		public void onSuccess(ArrayList<FlowcellData> result)
+		{
+		  vp.clear();
+		  for(FlowcellData flowcell : result)
+		  //if(flowcell.flowcellContains(globalSearchBox.getText()))
+		  if(flowcell.filterLanesThatContain(laneSearchBox.getText()))
+		  {
+			 FlowcellSingleItem flowcellItem = new FlowcellSingleItem(flowcell);
+			 vp.add(flowcellItem);
+		  }
+		}
+	};
+	 switch(reportType)
+	{
+	  case ShowGeneus: remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);break;
+	  case ShowFS: remoteService.getFlowcellsFromFS(DisplayFlowcellCallback);break;
+	  case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
+	  case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
+	  default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
 	}
+  }
 
 	@Override
 	public Image getToolLogo() {
