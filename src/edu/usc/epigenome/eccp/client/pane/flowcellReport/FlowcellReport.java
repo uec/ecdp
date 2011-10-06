@@ -31,6 +31,7 @@ public class FlowcellReport extends ECPane{
 	static 
 	{UserPanelResources.INSTANCE.userPanel().ensureInjected();}
 	
+	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	public enum ReportType 	{ShowSamples, ShowAll, ShowGeneus, ShowFS, ShowComplete,ShowIncomplete}
 	private ReportType reportType;
@@ -65,6 +66,12 @@ public class FlowcellReport extends ECPane{
 		}});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.pane.ECPane#showTool()
+	 * Remote Service call to the backend to get list of all the flowcells.
+	 *Also perform search for the search entered and get a filtered list
+	 */
 	@Override
 	public void showTool() 
 	{
