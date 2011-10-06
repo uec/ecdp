@@ -45,8 +45,6 @@ public class FileTable extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
-	@UiField FlowPanel main;
-	@UiField HorizontalPanel header;
 	@UiField Label headerText;
 	@UiField Image headerIcon;
 	@UiField Label contentCountText;
@@ -55,14 +53,12 @@ public class FileTable extends Composite {
 	FileTable(String headerIn, ArrayList<LinkedHashMap<String, String>> filesIn)
 	{
 		files = filesIn;
-		
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		//headerIcon = new Image("images/rightArrow.png");
 		headerText.setText(headerIn);
 		contentCountText.setText(" (" + files.size() + " items)");
-		
 		contentTable.setVisible(false);
+		
 		if(headerIn.contains("Search Res"))
 		{
 			headerIcon.setUrl("images/downArrow.png");
@@ -93,6 +89,7 @@ public class FileTable extends Composite {
 	public void drawTable()
 	{
 		contentTable.clear();
+		//Sort files(alphabetically) depending on the label clicked(FileName, FileType, FileLocation)
 		Label fileNameLabel = new Label("File Name");
 		fileNameLabel.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent event)
@@ -111,12 +108,12 @@ public class FileTable extends Composite {
 			{
 				sortBy("label");
 			}});
-		
+		//add the labels(sort by) to the contentTable(FlexTable)
 		contentTable.setWidget(0, 0, fileNameLabel);
 		contentTable.setWidget(0, 1, fileTypeLabel);
 		contentTable.setWidget(0, 2, fileLocationLabel);
 
-		//Iterate over the arraylist for the particular nodevalue
+		//Iterate over the arraylist for the particular nodevalue and add fileName, fileType and fileLocation into the FlexTable
 		for(int n=0; n<files.size(); n++)
 		{
 			LinkedHashMap<String, String> f = files.get(n);
@@ -124,18 +121,21 @@ public class FileTable extends Composite {
 			String fileURI = f.containsKey("encfullpath") ? "http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.get("encfullpath") :  "http://www.epigenome.usc.edu/webmounts/" + f.get("dir") + "/" + f.get("base");
 			
 			chartLaunchPanel.add(new HTML("<a target=\"new\" href=\"" + fileURI + "\">" + f.get("base") + "</a>"));
-			if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
+		/*	if(f.get("base").contains("ResultCount") && f.get("base").contains(".csv"))
 				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.ResultCount));
 			else if(f.get("base").contains("ReadCount") && f.get("base").contains(".csv"))
 				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.Area));
 			else if(f.get("base").contains("nmerCount") && f.get("base").contains(".csv"))
-				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.Column));
+				chartLaunchPanel.add(new ChartViewer(f.get("fullpath"), ChartType.Column));*/
 			contentTable.setWidget(n+1, 0, chartLaunchPanel);
 			contentTable.setText(n+1, 1, f.get("type"));
 			contentTable.setText(n+1, 2, f.get("label"));			
 		}	
 	}
 	
+	/*
+	 * Function to sort files(alphabetically) depending on the given key (name, type or location)
+	 */
 	public void sortBy(final String key)
 	{
 		Collections.sort(files, new Comparator<LinkedHashMap<String, String>>()
