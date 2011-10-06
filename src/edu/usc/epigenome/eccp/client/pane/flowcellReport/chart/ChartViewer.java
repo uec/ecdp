@@ -26,17 +26,17 @@ public class ChartViewer extends Composite
 
 	interface ChartViewerUiBinder extends UiBinder<Widget, ChartViewer> {
 	}
+	
 	static {
 	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
 	}
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	
 	@UiField Label view;
-	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel chartPanel;
-	@UiField FlowPanel popup;
 	@UiField Button closeButton;
 
+	//Enum for different chartTypes (AreaChart, MotionChart and ColumnChart)
 	public static enum ChartType
 	{
 		Area,
@@ -48,13 +48,14 @@ public class ChartViewer extends Composite
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
-	
+	/*
+	 * ChartViewer consturctor taking the path of the file and the ChartType(Enum) 
+	 */
 	public ChartViewer(final String csvPath, final ChartType t)
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		closeButton.setVisible(false);
-		
 		closeButton.addClickHandler(new ClickHandler()
 		{
 			public void onClick(ClickEvent arg0) 
@@ -66,13 +67,12 @@ public class ChartViewer extends Composite
 	
 		//showChart(t, csvPath);
 		
+		//on click of the viewChart label, remoteService call to the backend to get the data
+		//and depending on the chartType give call to the appropriate ChartViewer
 		view.addClickHandler(new ClickHandler()
 		{
 			public void onClick(ClickEvent arg0) 
-			{
-				//chartPanel.clear();
-				//chartPanel.add(new Label ("Loading data"));
-				
+			{	
 				remoteService.getCSVFromDisk(csvPath, new AsyncCallback<String>() 
 				{	
 					public void onSuccess(String result) 
@@ -96,30 +96,4 @@ public class ChartViewer extends Composite
 			}});
 		
 	}
-	
-	public void showChart(final ChartType t, final String csvPath)
-	{
-		AsyncCallback<String> CSVCallback = new AsyncCallback<String>()
-		{	
-			@Override
-			public void onSuccess(String result) 
-			{
-				//chartPanel.clear();
-				if(t == ChartType.ResultCount)
-					chartPanel.add(new MotionChartViewer(result));
-				else if(t == ChartType.Area)
-					chartPanel.add(new AreaChartViewer(result));
-				else if(t == ChartType.Column)
-					chartPanel.add(new ColumnChartViewer(result));
-			}
-			
-			@Override
-			public void onFailure(Throwable arg0) 
-			{
-				//chartPanel.clear();
-				chartPanel.add(new Label ("Error loading data!"));	
-			}
-		};remoteService.getCSVFromDisk(csvPath, CSVCallback);
-	}
-
 }
