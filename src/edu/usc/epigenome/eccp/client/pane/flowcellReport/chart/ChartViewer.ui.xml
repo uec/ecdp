@@ -7,8 +7,8 @@
 		<g:HorizontalPanel>
 			<g:Label ui:field="view" text="viewChart" styleName='{res.userPanel.viewdisplaylabel}'></g:Label>
 		</g:HorizontalPanel>
-		<g:FlowPanel ui:field="popup" styleName='{res.userPanel.popupdisplaypanel}'>
-			<g:FlowPanel ui:field='mainPanel' styleName='{res.userPanel.popupdisplaypanel}'>
+		<g:FlowPanel ui:field="popup" >
+			<g:FlowPanel ui:field='mainPanel'>
 				<g:FlowPanel ui:field='chartPanel'></g:FlowPanel>
 				<g:Button ui:field="closeButton" text="Close"></g:Button>
 			</g:FlowPanel>
