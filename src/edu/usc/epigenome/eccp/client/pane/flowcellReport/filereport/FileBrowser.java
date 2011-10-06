@@ -41,9 +41,6 @@ public class FileBrowser extends Composite {
 	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
 	}
 
-	@UiField FlowPanel vp;
-	@UiField HorizontalPanel menu_items;
-	@UiField MenuBar mainbar;
 	@UiField MenuItem locationSort;
 	@UiField MenuItem laneSort;
 	@UiField MenuItem typeSort;
@@ -58,6 +55,9 @@ public class FileBrowser extends Composite {
 
 	ArrayList<LinkedHashMap<String,String>> flowcellFileList;
 	
+	/*
+	 * Constructor that takes an ArrayList of LinkedHashMap for files
+	 */
 	public FileBrowser(ArrayList<LinkedHashMap<String,String>> fileListIn)
 	{
 		flowcellFileList = fileListIn;
@@ -66,6 +66,8 @@ public class FileBrowser extends Composite {
 		//for(LinkedHashMap<String,String> set_type : flowcellFileList)
 			//set_type.put("type", FileTable.getNiceType(set_type.get("base")));
 		
+		//Different ways(in the menubar) to arrange files
+		//arrange by location
 		locationSort.setCommand(new Command()
 		{	
 			public void execute() 
@@ -75,6 +77,7 @@ public class FileBrowser extends Composite {
 			}
 		});
 		
+		//arrange files by lane
 		laneSort.setCommand(new Command()
 		{	
 			public void execute() 
@@ -83,6 +86,7 @@ public class FileBrowser extends Composite {
 			}
 		});
 		
+		//arrange files by type
 		typeSort.setCommand(new Command()
 		{
 			public void execute() 
@@ -91,15 +95,14 @@ public class FileBrowser extends Composite {
 			}
 		});
 		
-		
 		searchbox.addClickHandler(new ClickHandler() {
 			
 			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
 				searchbox.setValue("");
 			}
 		});
 		
+		//by default organize files by type
 		organizeBy("type");
 		
 		/*
@@ -143,7 +146,6 @@ public class FileBrowser extends Composite {
 		sortedFiles.addAll(noDups);
 		//get the Arraylist sorted by the selection made
 		sortedFiles= sortBy(orgby);
-		//ArrayList<LinkedHashMap<String,String>> sortedFiles = sortBy(orgby);
 		filePanel.clear();
 		//Set the TreeNode image
 		fileGroups.clear();
@@ -164,6 +166,7 @@ public class FileBrowser extends Composite {
 				organizedFiles.put(f.get(orgby), putval);
 			}
 		}
+		//Iterate over the files in each group and add
 			for(String organizedByThis : organizedFiles.keySet())
 			{
 				fileGroups.add(new FileTable(organizedByThis, organizedFiles.get(organizedByThis)));
@@ -186,6 +189,9 @@ public class FileBrowser extends Composite {
 		return sortedFiles;
 	}
 	
+	/*
+	 * Keyboard listener for the Enter key pressed(after entering search items in the searchBox)
+	 */
 	@SuppressWarnings("deprecation")
 	private class SubmitListener extends KeyboardListenerAdapter {
 	    public void onKeyPress(Widget sender, char key, int mods) {
