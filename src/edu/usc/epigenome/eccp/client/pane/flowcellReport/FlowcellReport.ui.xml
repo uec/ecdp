@@ -9,7 +9,7 @@
 			<g:HorizontalPanel ui:field="searchOptionsPanel">
 				<!--  <g:Label text="Flowcell Properties: "/>
 				<g:TextBox ui:field="globalSearchBox"/>-->
-				<g:Label text="Lane Properties: "/>
+				<g:Label text="Search Properties: "/>
 				<g:TextBox ui:field="laneSearchBox"/>
 				<g:Button ui:field="searchButton" text="Search"/>
 			</g:HorizontalPanel>
