@@ -15,7 +15,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, analysis_id, sample_name, ControlLane, processing, technician from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
+		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing, technician from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
 		ResultSet results = stat.executeQuery(selectQuery);
 		ServletOutputStream myOut = null;
 		try
@@ -31,7 +31,7 @@ try{
 			{
 				for(int i=1;i<=cols;i++)
 				{
-					if(i == 5 || i == 8)
+					if(i == 8)
 						myOut.print("Unknown");
 					else
 					myOut.print(results.getString(i));
@@ -56,7 +56,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select geneusID_sample, lane, sample_name, project, processing, protocol from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
+		String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from sequencing.view_run_metric where flowcell_serial ='"+fcell_serial + "'";
 		ResultSet results = stat.executeQuery(selectQuery);
 	
 		ServletOutputStream myOut = null;
@@ -67,7 +67,7 @@ try{
 			response.addHeader("Content-Disposition", "inline; filename=" + fcell_serial + "_pipeline.txt");
 			int i=0;
 		
-			myOut.print("ClusterSize = 8" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
+			myOut.print("ClusterSize = 2" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + fcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000");
 			myOut.println();
 			while(results.next())
 			{
@@ -76,11 +76,23 @@ try{
 				myOut.println("#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + ")");
 				myOut.println("Sample."+ i + ".SampleID = " + results.getString("geneusID_sample"));
 				String lane = results.getString("lane");
+				String barcode = results.getString("barcode");
 				myOut.println("Sample."+ i + ".Lane = " + lane);
+				
 				if(results.getString("protocol").contains("Paired"))
-					myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt,s_" + lane + "_2_sequence.txt");
+				{
+					if(results.getString("barcode").contains("NO BARCODE"))
+						myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt,s_" + lane + "_2_sequence.txt");
+					else
+						myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_" + barcode +"_sequence.txt,s_" + lane + "_2_" + barcode + "_sequence.txt");
+				}
 				else if(results.getString("protocol").contains("Single"))
-					myOut.println("Sample."+ i + ".Input = s_" + lane + "_sequence.txt");
+				{
+					if(results.getString("barcode").contains("NO BARCODE"))
+						myOut.println("Sample."+ i + ".Input = s_" + lane + "_sequence.txt");
+					else
+						myOut.println("Sample."+ i + ".Input = s_" + lane + "_" + barcode + "_sequence.txt");
+				}
 				
 				if(results.getString("processing").contains("ChIP-seq"))
 					myOut.println("Sample."+ i + ".Workflow = chipseq");
@@ -91,7 +103,18 @@ try{
 				else
 					myOut.println("Sample."+ i + ".Workflow = regular");
 				
-				myOut.println("Sample."+ i + ".Reference = hg18");
+				
+				if(results.getString("organism").contains("Mus"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa");
+				else if(results.getString("organism").contains("Phi"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa");
+				else if(results.getString("processing").contains("RNA-seq"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/bowtie/hg19");
+				else if(results.getString("processing").contains("BS-seq"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg18_unmasked/hg18_unmasked.plusContam.fa");
+				else
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa");
+	
 			}
 			myOut.println();
 		}
@@ -109,4 +132,3 @@ try{
   }
 }catch(Exception exp){out.println("No project exists by this name");}
 	%>
-	
