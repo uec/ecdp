@@ -22,7 +22,6 @@
 	font-weight: normal;
 	color: #568;
 	padding: 5px;
-	
 }
 
 .samplesearch {
@@ -37,14 +36,21 @@
 	border-style: dotted;
 	border-width: 1px;
 	border-color: #BBCCEE;
+	
 }
 
 .samplereportitem tr:first-child td:first-child{
-	font-weight: bold;	
+	font-weight: bold;
+	padding:1px;
+}
+
+.samplereportitem td:first-child{
+	padding: 1px;
 }
 
 .samplereportitem td {
 	font-weight:normal;
+	padding: 1px;
 	word-spacing: 1px;	
 }
 
@@ -166,19 +172,13 @@ h1 {
 	color: #0000BB;
 	padding-bottom: 3px;
 	
-	
-}
+	}
 
 .viewSwitchlabel {
 	font-size: 11px;
 	color: #0000BB;
 	text-decoration: underline;
 	text-align: right;
-}
-
-.popupdisplaypanel{
-	
-	
 }
 
 .viewchartlabel {
@@ -272,17 +272,14 @@ h1 {
 	border-width: 0px;	
 }
 
-
 .gwt-StackLayoutPanel * *{
 	height: 30px; 
 	border: 0px;
 }
 
-
 .gwt-StackLayoutPanel  {
 	border: 3px;
 }
-
 
 .gwt-DisclosurePanel#controlpanel .content .gwt-Label{
 	width: 150px;
@@ -314,3 +311,20 @@ h1 {
 .gwt-DecoratedTabBar .gwt-Label{
 	white-space:nowrap;
 }
+
+.popupdisplaypanel{
+	/*position: absolute;*/
+	visibility: visible;
+	
+	}
+
+.closeTabs {
+
+/*	position: absolute;
+	top:10;
+	right:10;
+	width:500px;
+	height: 700px;
+	visibility: visible;*/
+}
+
