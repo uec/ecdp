@@ -37,6 +37,7 @@ public interface UserPanelResources extends ClientBundle
 		String Error();
 		String Normal();
 		String Jobid();
+		String closeTabs();
 	}
 
 	@NotStrict
