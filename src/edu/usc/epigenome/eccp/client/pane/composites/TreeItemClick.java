@@ -16,7 +16,7 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 
-public class TreeItemClick extends Composite implements ClickHandler, HasClickHandlers {
+public class TreeItemClick extends Composite {
 
 	private static TreeItemClickUiBinder uiBinder = GWT
 			.create(TreeItemClickUiBinder.class);
@@ -44,7 +44,7 @@ public class TreeItemClick extends Composite implements ClickHandler, HasClickHa
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		addData.setText(0, 0, name);
-		this.addClickHandler(this);
+	//	this.addClickHandler(this);
 	}
 	public TreeItemClick(String Libname, final String library)
 	{
@@ -52,7 +52,7 @@ public class TreeItemClick extends Composite implements ClickHandler, HasClickHa
 		initWidget(uiBinder.createAndBindUi(this));
 		addData.setText(0,0,  Libname + ": " + lib);
 		//addText.setText("Flowcell: " + serial);
-		this.addClickHandler(this);
+	//	this.addClickHandler(this);
 	}
 
 	public TreeItemClick(String Libname, final String library, String Serialname, final String fcellSerial)
@@ -63,17 +63,17 @@ public class TreeItemClick extends Composite implements ClickHandler, HasClickHa
 		addData.setText(0,0,  Libname + ": " + lib);
 		addData.setText(0, 1, Serialname + ": " + serial);
 		//addText.setText("Flowcell: " + serial);
-		this.addClickHandler(this);
+		//this.addClickHandler(this);
 	}
 
-	public void onClick(ClickEvent event) 
-	{}
+	//public void onClick(ClickEvent event) 
+	//{}
 
-	@Override
-	public HandlerRegistration addClickHandler(ClickHandler handler) 
-	{
-		return addDomHandler(handler, ClickEvent.getType());
-	}
+	//@Override
+	//public HandlerRegistration addClickHandler(ClickHandler handler) 
+	//{
+		//return addDomHandler(handler, ClickEvent.getType());
+	//}
 
 }
 
