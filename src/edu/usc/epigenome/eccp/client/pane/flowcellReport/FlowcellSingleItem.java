@@ -112,7 +112,7 @@ public class FlowcellSingleItem extends Composite  {
 				TreeItem item = event1.getTarget();
 				if(sampleItem.getChildCount() > 0 && sampleItem.getChildCount() <=1 && item.getText().contains(sName))
 				{
-				  remoteService.getQCSampleFlowcell(flowcell.getFlowcellProperty("serial"), sName, laneNo,new AsyncCallback<FlowcellData>()
+				  remoteService.getQCSampleFlowcell(flowcell.getFlowcellProperty("serial"), sName, laneNo, "super", new AsyncCallback<FlowcellData>()
 				  {
 					public void onFailure(Throwable arg0) {
 					  arg0.getMessage();
