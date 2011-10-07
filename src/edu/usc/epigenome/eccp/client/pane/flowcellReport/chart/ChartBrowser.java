@@ -18,6 +18,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.chart.ChartViewer.ChartType;
 
+/**
+ * NOT USED
+ *
+ */
 public class ChartBrowser extends Composite {
 
 	private static ChartBrowserUiBinder uiBinder = GWT
@@ -29,7 +33,7 @@ public class ChartBrowser extends Composite {
 	ArrayList<LinkedHashMap<String, String>> fileList;
 	@UiField FlowPanel addCharts;
 	
-	public ChartBrowser() {
+/*	public ChartBrowser() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
@@ -78,5 +82,5 @@ public class ChartBrowser extends Composite {
 			}
 		});
 		return sortedFiles;
-	}
+	}*/
 }
