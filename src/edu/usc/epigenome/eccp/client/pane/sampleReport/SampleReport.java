@@ -1,6 +1,7 @@
 package edu.usc.epigenome.eccp.client.pane.sampleReport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,7 +24,6 @@ import edu.usc.epigenome.eccp.client.ECControlCenter;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.GenUserBinderWidget;
-import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
 
 
@@ -37,7 +37,6 @@ public class SampleReport extends ECPane{
 	
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	
-	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel searchPanel;
 	@UiField HorizontalPanel searchOptionsPanel;
 	@UiField FlowPanel vp;
@@ -45,12 +44,23 @@ public class SampleReport extends ECPane{
 	@UiField Button searchButton;
 	String searchText ="";
 	String fText ="";
+	//variable yesSearch to determine if searchItem is entered
+	boolean yesSearch = false;
 	
-	public SampleReport() {
+	/*
+	 * Constructor 
+	 */
+	public SampleReport() 
+	{	
 		initWidget(uiBinder.createAndBindUi(this));
-		
 		vp.add(new Image("images/progress.gif"));
 		
+		if(ECControlCenter.getUserType().equals("super"))
+			ECCPBinderWidget.clearaddTabPanel();
+		else if(ECControlCenter.getUserType().equals("guest"))
+			GenUserBinderWidget.clearaddTabPanel();
+		
+		//Check if parameter t is not null and get the search contents
 		if(Window.Location.getParameter("t") != null)
 		{
 			searchText = Window.Location.getParameter("t");
@@ -58,6 +68,7 @@ public class SampleReport extends ECPane{
 			searchPanel.setVisible(false);
 		}
 		
+		//Click handler to handle clickEvent for searchButton
 		searchButton.addClickHandler(new ClickHandler() 
 		{	
 			public void onClick(ClickEvent event) 
@@ -66,16 +77,12 @@ public class SampleReport extends ECPane{
 					searchPanel.clear();
 					searchPanel.add(searchOptionsPanel);
 				}
-				if(ECControlCenter.getUserType().equals("super"))
-					ECCPBinderWidget.clearaddTabPanel();
-				else if(ECControlCenter.getUserType().equals("guest"))
-					GenUserBinderWidget.clearaddTabPanel();
-				
+				//Encrypt the text searched for and create a URL for the User
 				AsyncCallback<ArrayList<String>> encrypstring = new AsyncCallback<ArrayList<String>>()
 				{
 					public void onSuccess(ArrayList<String> result) 
 					{
-						String url = "http://webapp.epigenome.usc.edu/ECCPBinder/ECControlCenter.html?"+"au=sol" + "&t=" + result.get(0) + "&q=" + result.get(1);
+						String url = "http://127.0.0.1:8888/ECControlCenter.html?gwt.codesvr=127.0.0.1:9997&"+"au=sol" + "&t=" + result.get(0) + "&q=" + result.get(1);
 						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url  + "</a>"));
 					}
 					public void onFailure(Throwable caught) 
@@ -87,60 +94,69 @@ public class SampleReport extends ECPane{
 				
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
+				//set yesSearch to true 
+				yesSearch = true;
 				showTool();
 			}});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see edu.usc.epigenome.eccp.client.pane.ECPane#showTool()
+	 * Function to get Projects.
+	 * If yesSearch is false, then normal query to get list of all projects from the database
+	 * If yesSearch is true, then mysql fullText query to get list of projects that match the searchItem 
+	 * in sampleSearchBox
+	 */
 	@Override
-	public void showTool() 
+	public void showTool()
 	{
-		AsyncCallback<ArrayList<SampleData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<SampleData>>()
+		AsyncCallback<ArrayList<String>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<String>>()
 	    {
 			public void onFailure(Throwable caught)
 			{
 				vp.clear();	
 				caught.printStackTrace();				
 			}
-			public void onSuccess(ArrayList<SampleData> result)
+			public void onSuccess(ArrayList<String> result)
 			{
 				vp.clear();
-				for(SampleData sampl : result)
+				for(String sampl : result)
 				{
-					if(sampl.sampleContains(sampleSearchBox.getText()))
-					{
-						SampleTreeView flowcellItem = new SampleTreeView(sampl);
-						//SampleSingleReport flowcellItem = new SampleSingleReport(sampl);
+						SampleTreeView flowcellItem = new SampleTreeView(sampl, sampleSearchBox.getText(), yesSearch);
 						vp.add(flowcellItem);
-					}
 				}
 			}
-	    };remoteService.getSampleFromGeneus(DisplayFlowcellCallback);
-		
+	    };remoteService.getProjectsFromGeneus(sampleSearchBox.getText(), yesSearch,DisplayFlowcellCallback);
 	}
 	
+	/*
+	 * Function specific to the Guest user.
+	 * Function to decrypt the keys (from the URL) and perform search and get Projects meeting the specified searchItem
+	 */
 	public void decryptKeys()
 	{
-		AsyncCallback<ArrayList<String>> GotPlainText = new AsyncCallback<ArrayList<String>>() {
-
-			public void onFailure(Throwable caught) 
+		remoteService.decryptSearchProject(searchText, fText, new AsyncCallback<HashMap<String,ArrayList<String>>>() 
+		{
+			@Override
+			public void onFailure(Throwable caught)
 			{
+				vp.clear();
 				caught.printStackTrace();
 			}
-
-			public void onSuccess(ArrayList<String> result) 
-			{	
-				//Window.alert("result is blank for " + result.get(0));
-				if(result.get(0).equals("") || result.get(0).contentEquals(""))
+			@Override
+			public void onSuccess(HashMap<String, ArrayList<String>> list) 
+			{
+				vp.clear();
+				ArrayList<String> decryptContents = list.get("decrypted");
+				ArrayList<String> projects = list.get("project");
+				for(String proj : projects)
 				{
-					//Window.alert("result is the blank section " + result.get(0));
-				}
-				else{
-					//Window.alert("result is " + result.get(0));
-					sampleSearchBox.setText(result.get(0));
+				  SampleTreeView flowcellItem = new SampleTreeView(proj, decryptContents.get(0), true);
+				  vp.add(flowcellItem);
 				}
 			}
-		};
-		remoteService.decryptKeyword(searchText, fText, GotPlainText);
+		});
 	}
 
 	@Override
