@@ -10,7 +10,6 @@
      	<g:west size="250">
      	<g:ScrollPanel>
      	<g:HTMLPanel ui:field="layoutReport">
-     		 <!--  <c:ControlPanelWidget typeGeneus="Samples From Geneus" typeGroup="ShowSamples"/>-->
      		 <g:Label ui:field="label" text="Switch to Sample View" styleName='{res.userPanel.viewSwitchlabel}'></g:Label>
      	    <g:HTMLPanel ui:field="FcellReport">
      		 	<c:ControlPanelWidget typeGeneus="Flowcells From Geneus" typeGroup="ShowGeneus"/>
