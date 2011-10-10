@@ -1,6 +1,7 @@
 package edu.usc.epigenome.eccp.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -34,9 +35,12 @@ public interface ECService extends RemoteService
 	 */
 	ArrayList<SampleData> getSampleFromGeneus() throws IllegalArgumentException;
 	//Get projects from geneus
-	ArrayList<String> getProjectsFromGeneus(String searchString, boolean yes) throws IllegalArgumentException;
+	ArrayList<String> getProjectsFromGeneus(String toSearch, boolean yesSearch) throws IllegalArgumentException;
+	HashMap<String, ArrayList<String>> decryptSearchProject(String toSearch) throws IllegalArgumentException;
+	
+	
 	//Get QC for the given sample, flowcell and laneNo (for tree view flowcell and sample)
-	FlowcellData getQCSampleFlowcell(String serial, String sampleID, int laneNo) throws IllegalArgumentException;
+	FlowcellData getQCSampleFlowcell(String serial, String sampleID, int laneNo, String userType) throws IllegalArgumentException;
 	//Get the files for given run_id, flowcell serial and sample
 	FlowcellData getFilesforRunSample(String run_id, String serial, String sampleID) throws IllegalArgumentException;
 	//Get the csv files for generating file list for plots
@@ -45,8 +49,8 @@ public interface ECService extends RemoteService
 	FlowcellData getLaneFlowcellSample(String sample_name, String flowcellSerial) throws IllegalArgumentException;
 	//Get the flowcells for a given sample_name
 	SampleData getFlowcellsforSample(String sampleProperty) throws IllegalArgumentException;
-	
-	ArrayList<SampleData>getSamplesForProject(String projectName) throws IllegalArgumentException;
+	//Get Samples for the given project (use the searchString to perform search if boolean variable is yes)
+	ArrayList<SampleData>getSamplesForProject(String projectName, String searchString, boolean yes) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	
 	
@@ -68,7 +72,7 @@ public interface ECService extends RemoteService
 	//Encrypt the given string 
 	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
 	//Encrypt the contents passed for Guest User
-	ArrayList<String> getEncryptedData(String globalText, String laneText) throws IllegalArgumentException;
+	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;
 	//Decrypt the contents passed for Guest User
 	ArrayList<String> decryptKeyword(String fcellText, String laneText)throws IllegalArgumentException;
 	
