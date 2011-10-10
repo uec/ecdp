@@ -42,66 +42,58 @@ public class FilesDownload extends Composite {
 	String flowcellSerial;
 	int laneNo;
 	String run;
-	SampleData sample;
+	FlowcellData flowcell;
 	
-	@UiField FlowPanel LabPanel;
 	@UiField Label downloadF;
 	@UiField VerticalPanel popup;
-	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel summaryChart;
-	//@UiField Button closeButton;
-	
 	
 	public FilesDownload() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-
-	public FilesDownload(final SampleData sampleIn, final String flowcellSerialIn, final int lane, final String runId)
+	/*
+	 * Constructor for the download files section
+	 */
+	public FilesDownload(final FlowcellData flowcellIn, final String flowcellSerialIn, final int lane, final String runId, final String library, final String sampleID)
 	{
 		flowcellSerial = flowcellSerialIn;
-		sample = sampleIn;
+		flowcell = flowcellIn;
 		laneNo = lane;
 		run = runId;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		popup.removeFromParent();
+		//popup.removeFromParent();
 		
-	/*	closeButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent arg0) 
-			{
-				//popup.hide();
-			}
-		});*/
-		
+		//On click of the downloadFiles button, remoteService call to the backend to get the files
 		downloadF.addClickHandler(new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
 			{
+				//Check for the user type and accordingly add tab to the respective TabPanel
 				if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
-					ECCPBinderWidget.addtoTab(popup, "Files" +sample.getSampleProperty("library") + "_" + flowcellSerial);
+					ECCPBinderWidget.addtoTab(popup, "Files" +library + "_" + flowcellSerial);
 				else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
-					GenUserBinderWidget.addtoTab(popup, "Files" + sample.getSampleProperty("library") + "_" + flowcellSerial);
-				//popup.showRelativeTo(downloadF);
-				//Window.open(arg0, arg1, arg2)
+					GenUserBinderWidget.addtoTab(popup, "Files" + library + "_" + flowcellSerial);
+				
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
 				
-				remoteService.getFilesforRunSample(run, flowcellSerial, sample.getSampleProperty("geneusID_sample"), new AsyncCallback<FlowcellData>()
+				//Remote service call to the backend to get the files for the specified sample, flowcell and run
+				remoteService.getFilesforRunSample(run, flowcellSerial, sampleID, new AsyncCallback<FlowcellData>()
 				{
 					public void onFailure(Throwable caught)
 					{
 						summaryChart.clear();
 						summaryChart.add(new Label(caught.getMessage()));				
 					}
-					public void onSuccess(FlowcellData result) {
+					public void onSuccess(FlowcellData result) 
+					{
 						summaryChart.clear();
-						//Window.alert("the size of result set is " + result.fileList.size());
-						summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
-						sample.sampleFlowcells.get(flowcellSerial).fileList = result.fileList;
-						sample.sampleFlowcells.get(flowcellSerial).filterFiles(lane, sample.getSampleProperty("geneusID_sample"), run);
-						FileBrowser f = new FileBrowser(sample.sampleFlowcells.get(flowcellSerial).fileList);
+						summaryChart.add(new Label("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
+						flowcell.fileList = result.fileList;
+						//Filter the files and them to the summaryChart
+						flowcell.filterFiles(lane, sampleID, run);
+						FileBrowser f = new FileBrowser(flowcell.fileList);
 						summaryChart.add(f);
 					}	
 				});
@@ -109,3 +101,47 @@ public class FilesDownload extends Composite {
 		});
 	}
 }
+
+/*public FilesDownload(final SampleData sampleIn, final String flowcellSerialIn, final int lane, final String runId)
+{
+	flowcellSerial = flowcellSerialIn;
+	sample = sampleIn;
+	laneNo = lane;
+	run = runId;
+	initWidget(uiBinder.createAndBindUi(this));
+	
+	popup.removeFromParent();
+	
+	downloadF.addClickHandler(new ClickHandler() 
+	{	
+		public void onClick(ClickEvent arg0) 
+		{
+			if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
+				ECCPBinderWidget.addtoTab(popup, "Files" +sample.getSampleProperty("library") + "_" + flowcellSerial);
+			else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
+				GenUserBinderWidget.addtoTab(popup, "Files" + sample.getSampleProperty("library") + "_" + flowcellSerial);
+			//popup.showRelativeTo(downloadF);
+			//Window.open(arg0, arg1, arg2)
+			summaryChart.clear();
+			summaryChart.add(new Label("Loading Data"));
+			
+			remoteService.getFilesforRunSample(run, flowcellSerial, sample.getSampleProperty("geneusID_sample"), new AsyncCallback<FlowcellData>()
+			{
+				public void onFailure(Throwable caught)
+				{
+					summaryChart.clear();
+					summaryChart.add(new Label(caught.getMessage()));				
+				}
+				public void onSuccess(FlowcellData result) {
+					summaryChart.clear();
+					//Window.alert("the size of result set is " + result.fileList.size());
+					summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
+					sample.sampleFlowcells.get(flowcellSerial).fileList = result.fileList;
+					sample.sampleFlowcells.get(flowcellSerial).filterFiles(lane, sample.getSampleProperty("geneusID_sample"), run);
+					FileBrowser f = new FileBrowser(sample.sampleFlowcells.get(flowcellSerial).fileList);
+					summaryChart.add(f);
+				}	
+			});
+		}
+	});
+}*/
