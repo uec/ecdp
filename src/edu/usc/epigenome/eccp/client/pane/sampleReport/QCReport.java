@@ -42,54 +42,49 @@ public class QCReport extends Composite {
 
 	ECServiceAsync remoteService = (ECServiceAsync) GWT.create(ECService.class);
 	String flowcellSerial;
-	SampleData sample;
+	FlowcellData flowcell;
 	int laneNo;
 	String run;
 	
-	@UiField FlowPanel LabPanel;
 	@UiField Label Statistics;
 	@UiField VerticalPanel popup;
-	@UiField FlowPanel mainPanel;
 	@UiField FlowPanel summaryChart;
-	//@UiField Button closeButton;
 	
 	
 	public QCReport() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	public QCReport(final SampleData sampleIn, final String flowcellSerialIn, final int lane, final String runId)
+	/*
+	 * Constructor to get QC metrics information from the database
+	 */
+	public QCReport(final FlowcellData flowcellIn, final String flowcellSerialIn, final int lane, final String runId, final String library, final String sampleID)
 	{
 		flowcellSerial = flowcellSerialIn;
-		sample = sampleIn;
+		flowcell = flowcellIn;
 		laneNo = lane;
 		run = runId;
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		popup.removeFromParent();
+		//popup.removeFromParent();
 		
-	/*	closeButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent arg0) 
-			{
-				popup.hide();
-			}
-		});*/
-		
+		//OnClick of the statistics label, remoteService call to the backend to get the QCmetrics information
 		Statistics.addClickHandler(new ClickHandler() 
 		{	
 			public void onClick(ClickEvent arg0) 
 			{
+				//Depending on the userMode add the QC metrics for the respective user
 				if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
-					ECCPBinderWidget.addtoTab(popup, "QC" + sample.getSampleProperty("library") + "_" + flowcellSerial);
+					ECCPBinderWidget.addtoTab(popup, "QC" + library + "_" + flowcellSerial);
 				else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
-					GenUserBinderWidget.addtoTab(popup, "QC" + sample.getSampleProperty("library") + "_" + flowcellSerial);
+					GenUserBinderWidget.addtoTab(popup, "QC" +library + "_" + flowcellSerial);
 				
 				summaryChart.clear();
 				summaryChart.add(new Label("Loading Data"));
 				
-				remoteService.getQCSampleFlowcell(flowcellSerial, sample.sampleProperties.get("library"),laneNo,  new AsyncCallback<FlowcellData>()
+				//RemoteService call to the backend to get the QC for the given flowcell, library and laneNo
+				//Window.alert("the user type is " + ECControlCenter.getUserType());
+				remoteService.getQCSampleFlowcell(flowcellSerial, library,laneNo,  ECControlCenter.getUserType(), new AsyncCallback<FlowcellData>()
 				{	
 					public void onFailure(Throwable arg0) 
 					{
@@ -99,27 +94,27 @@ public class QCReport extends Composite {
 					public void onSuccess(FlowcellData result)
 					{
 						summaryChart.clear();
-						sample.sampleFlowcells.get(flowcellSerial).laneQC = result.laneQC;
-						summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
-						sample.sampleFlowcells.get(flowcellSerial).filterQC(lane);
-						sample.sampleFlowcells.get(flowcellSerial).filterAnalysis(flowcellSerial, laneNo, sample.getSampleProperty("geneusID_sample"));
-						sample.sampleFlowcells.get(flowcellSerial).filterRuns(run);
-						
-						for(String location : sample.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
+						flowcell.laneQC = result.laneQC;
+						summaryChart.add(new Label("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
+						//Filter information retrieved from the backend
+						flowcell.filterQC(lane);
+						flowcell.filterAnalysis(flowcellSerial, laneNo, sampleID);
+						flowcell.filterRuns(run);
+
+						for(String location : flowcell.laneQC.keySet())
 						{
-							//summaryChart.add(new Label("QC Metric from " + location));
 							FlexTable qcFlexTable = new FlexTable();
 							int j=0;
 							Boolean firstLine = true;
 							for(int i=1;i<=8;i++)
 							{
-								if(sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).containsKey(i))
+								if(flowcell.laneQC.get(location).containsKey(i))
 								{	
 									j=0;
 									if(firstLine)
 									{						
-										sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).remove("FlowCelln");
-										for(String s : sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).keySet())
+										flowcell.laneQC.get(location).get(i).remove("FlowCelln");
+										for(String s : flowcell.laneQC.get(location).get(i).keySet())
 										{								
 											qcFlexTable.setText(j, 0, s);
 											j++;
@@ -128,15 +123,14 @@ public class QCReport extends Composite {
 										j=0;
 									}									
 											
-									sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).remove("FlowCelln");
-									for(String s : sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).keySet())
+									flowcell.laneQC.get(location).get(i).remove("FlowCelln");
+									for(String s : flowcell.laneQC.get(location).get(i).keySet())
 									{
-										qcFlexTable.setText(j, i, sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).get(s));
+										qcFlexTable.setText(j, i, flowcell.laneQC.get(location).get(i).get(s));
 										j++;
 									}
 								}
 							}
-							//qcFlexTable.addStyleName("qctable");
 							summaryChart.add(qcFlexTable);
 						}
 					}});
@@ -144,3 +138,82 @@ public class QCReport extends Composite {
 	}
 
 }
+
+
+/*public QCReport(final SampleData sampleIn, final String flowcellSerialIn, final int lane, final String runId)
+{
+	flowcellSerial = flowcellSerialIn;
+	sample = sampleIn;
+	laneNo = lane;
+	run = runId;
+	initWidget(uiBinder.createAndBindUi(this));
+	
+	popup.removeFromParent();
+	
+	Statistics.addClickHandler(new ClickHandler() 
+	{	
+		public void onClick(ClickEvent arg0) 
+		{
+			if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
+				ECCPBinderWidget.addtoTab(popup, "QC" + sample.getSampleProperty("library") + "_" + flowcellSerial);
+			else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
+				GenUserBinderWidget.addtoTab(popup, "QC" + sample.getSampleProperty("library") + "_" + flowcellSerial);
+			
+			summaryChart.clear();
+			summaryChart.add(new Label("Loading Data"));
+			
+			
+			remoteService.getQCSampleFlowcell(flowcellSerial, sample.sampleProperties.get("library"),laneNo,  new AsyncCallback<FlowcellData>()
+			{	
+				public void onFailure(Throwable arg0) 
+				{
+					summaryChart.clear();
+					summaryChart.add(new Label("Error Loading, Try again Later...."));
+				}
+				public void onSuccess(FlowcellData result)
+				{
+					summaryChart.clear();
+					sample.sampleFlowcells.get(flowcellSerial).laneQC = result.laneQC;
+					//Window.alert(" serial passed " + flowcellSerial + " lane " + laneNo + " runId " + run);
+					summaryChart.add(new Label("Sample:" + sample.getSampleProperty("library") + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
+					sample.sampleFlowcells.get(flowcellSerial).filterQC(lane);
+					sample.sampleFlowcells.get(flowcellSerial).filterAnalysis(flowcellSerial, laneNo, sample.getSampleProperty("geneusID_sample"));
+					sample.sampleFlowcells.get(flowcellSerial).filterRuns(run);
+					
+					for(String location : sample.sampleFlowcells.get(flowcellSerial).laneQC.keySet())
+					{
+						//summaryChart.add(new Label("QC Metric from " + location));
+						FlexTable qcFlexTable = new FlexTable();
+						int j=0;
+						Boolean firstLine = true;
+						for(int i=1;i<=8;i++)
+						{
+							if(sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).containsKey(i))
+							{	
+								j=0;
+								if(firstLine)
+								{						
+									sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).remove("FlowCelln");
+									for(String s : sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).keySet())
+									{								
+										qcFlexTable.setText(j, 0, s);
+										j++;
+									}
+									firstLine = false;
+									j=0;
+								}									
+										
+								sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).remove("FlowCelln");
+								for(String s : sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).keySet())
+								{
+									qcFlexTable.setText(j, i, sample.sampleFlowcells.get(flowcellSerial).laneQC.get(location).get(i).get(s));
+									j++;
+								}
+							}
+						}
+						//qcFlexTable.addStyleName("qctable");
+						summaryChart.add(qcFlexTable);
+					}
+				}});
+		}});
+}*/
