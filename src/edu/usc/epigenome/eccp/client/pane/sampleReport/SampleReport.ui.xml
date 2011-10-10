@@ -6,7 +6,7 @@
 	<g:FlowPanel ui:field="mainPanel">
 		 <g:FlowPanel ui:field="searchPanel" styleName='{res.userPanel.samplesearch}'>
 			<g:HorizontalPanel ui:field="searchOptionsPanel">
-				<g:Label text="Sample Properties: "/>
+				<g:Label text="Search Properties: "/>
 				<g:TextBox ui:field="sampleSearchBox"/>
 				<g:Button ui:field="searchButton" text="Search"/>
 			</g:HorizontalPanel>
