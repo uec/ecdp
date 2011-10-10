@@ -1,6 +1,7 @@
 package edu.usc.epigenome.eccp.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
@@ -18,15 +19,16 @@ public interface ECServiceAsync
 	void getFlowcellsIncomplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	void getFlowcellsComplete(AsyncCallback<ArrayList<FlowcellData>> callback) throws IllegalArgumentException;
 	//Get projects from sample view
-	void getProjectsFromGeneus(String searchString, boolean yes, AsyncCallback<ArrayList<String>> callback) throws IllegalArgumentException;
+	void getProjectsFromGeneus(String toSearch, boolean yesSearch, AsyncCallback<ArrayList<String>> callback) throws IllegalArgumentException;
+	void decryptSearchProject(String toSearch, AsyncCallback<HashMap<String, ArrayList<String>>>callback) throws IllegalArgumentException;
 	
-	void getSamplesForProject(String projectName, AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
+	void getSamplesForProject(String projectName, String searchString, boolean yes, AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	
 	void getSampleFromGeneus(AsyncCallback<ArrayList<SampleData>> callback) throws IllegalArgumentException;
 	//Get QC for given flowcell (flowcell view)
 	void getQCforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	//Get QC for the given flowcell, sample and lane (sample view)
-	void getQCSampleFlowcell(String serial, String sampleID,int laneNo, AsyncCallback<FlowcellData> callback);
+	void getQCSampleFlowcell(String serial, String sampleID,int laneNo, String userType, AsyncCallback<FlowcellData> callback);
 	
 	//Get files for a given flowcell (flowcell view)
 	void getFilesforFlowcell(String serial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
@@ -44,7 +46,7 @@ public interface ECServiceAsync
 	void clearCache(String cachefile, AsyncCallback<String> callback) throws IllegalArgumentException;
 	void qstat(String queue, AsyncCallback<String[]> result) throws IllegalArgumentException;
 	void encryptURLEncoded(String srcText, AsyncCallback<String> callback);
-	void getEncryptedData(String globalText, String laneText, AsyncCallback<ArrayList<String>> callback);
+	void getEncryptedData(String globalText, AsyncCallback<ArrayList<String>> callback);
 	void decryptKeyword(String fcellText, String laneText, AsyncCallback<ArrayList<String>> callback);
 	
 	void getLaneFlowcellSample(String string, String flowcellSerial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
