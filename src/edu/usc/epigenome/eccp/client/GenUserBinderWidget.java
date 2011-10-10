@@ -39,12 +39,13 @@ public class GenUserBinderWidget extends Composite {
 	public GenUserBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		//Window.alert("the user " + ECControlCenter.getUserType());
-		
 		SampleReport sp = new SampleReport();
-		layoutReport.add(sp);
-		sp.decryptKeys();
-		sp.showTool();
+		if(!sp.isAttached())
+		{
+			Window.alert("the user " + ECControlCenter.getUserType());
+			layoutReport.add(sp);
+			sp.decryptKeys();
+		}
 	}
 
 	public static void clearaddTabPanel()
@@ -82,25 +83,21 @@ public class GenUserBinderWidget extends Composite {
 				
 				if(curIndex == 0 && tabsCount > 0)
 				{
-					//Window.alert("In case curIndex == 0 and tabsCount > 0");
 					tabQCDownload.selectTab(curIndex +1);
 					tabQCDownload.remove(curIndex);
 				}
 				else if(curIndex == tabsCount-1)
 				{
-				//	Window.alert("In case tabsCount -1");
 					tabQCDownload.selectTab(curIndex-1);
 					tabQCDownload.remove(curIndex);
 				}
 				else if(curIndex > 0 && curIndex < tabsCount)
 				{
-					//Window.alert("In case curIndex > 0 and tabsCount < curIndex");
 					tabQCDownload.selectTab(curIndex + 1);
 					tabQCDownload.remove(curIndex);
 				}
 				else 
 				{
-					//Window.alert("In case curIndex == 0");
 					tabQCDownload.remove(curIndex);
 				}		
 			}
