@@ -15,7 +15,6 @@ public class FlowcellData implements IsSerializable
 	public HashMap<Integer,ArrayList<String>>QClist;
 	public ArrayList<LinkedHashMap<String, String>> fileList;
 	public LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
-	//public HashMap<String, HashMap<String,HashMap<Integer, HashMap<String, String>>>> sample;
 	public String flowcellFilter = "";
 	public String laneFilter = "";
 	
@@ -26,8 +25,8 @@ public class FlowcellData implements IsSerializable
 		QClist = new HashMap<Integer, ArrayList<String>>();
 		laneQC = new LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
 		fileList = new ArrayList<LinkedHashMap<String,String>>();
-		//sample = new HashMap<String,HashMap<String,HashMap<Integer, HashMap<String, String>>>>();
 	}	
+	
 	/*
 	 * Get the value of the given flowcell property
 	 */
@@ -135,7 +134,6 @@ public class FlowcellData implements IsSerializable
 			if(!lanesToKeep.contains(i))
 				lanesToRemove.add(i);		
 		}
-		
 		for(Integer i : lanesToRemove)
 		{
 			lane.remove(i);			
@@ -151,8 +149,6 @@ public class FlowcellData implements IsSerializable
 			for(Integer i : lanesToRemove)
 				laneQC.get(location).remove(i);
 		lanesToRemove.clear();
-		
-		
 		
 		for(HashMap<String,String> file : fileList)
 		{
@@ -172,8 +168,6 @@ public class FlowcellData implements IsSerializable
 
 	public void filterSamplesLanes(String sampleID) 
 	{
-		//Window.alert("sampleID is " + sampleID);
-		//Window.alert("flowcell serial is " + flowcellProperties.get("serial"));
 			Object a[] = lane.keySet().toArray();
 			ArrayList<Integer> lanesToKeep = new ArrayList<Integer>();
 			ArrayList<Integer> lanesToRemove = new ArrayList<Integer>();
@@ -254,7 +248,6 @@ public class FlowcellData implements IsSerializable
 	public void filterAnalysis(String flowcell, int lane, String libraryID)
 	{
 		ArrayList<String> analysisToRemove = new ArrayList<String>();
-		
 		//Iterate over each key in laneQC
 		for(String location : laneQC.keySet())
 		{
@@ -265,9 +258,7 @@ public class FlowcellData implements IsSerializable
 				{
 					//remove the keys not having the geneusId_sample
 					if(!location.contains(libraryID))
-					{
 						analysisToRemove.add(location);
-					}
 				}
 			}
 		}	
@@ -290,8 +281,7 @@ public class FlowcellData implements IsSerializable
 			{
 				analysisToRemove.add(location);
 			}
-		}
-		
+		}	
 		for(String remove : analysisToRemove)
 			laneQC.remove(remove);
 		
