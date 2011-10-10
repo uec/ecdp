@@ -76,7 +76,6 @@ public class FileBrowser extends Composite {
 				searchbox.setValue("");
 			}
 		});
-		
 		//arrange files by lane
 		laneSort.setCommand(new Command()
 		{	
@@ -85,7 +84,6 @@ public class FileBrowser extends Composite {
 				organizeBy("lane");
 			}
 		});
-		
 		//arrange files by type
 		typeSort.setCommand(new Command()
 		{
@@ -95,8 +93,8 @@ public class FileBrowser extends Composite {
 			}
 		});
 		
-		searchbox.addClickHandler(new ClickHandler() {
-			
+		searchbox.addClickHandler(new ClickHandler() 
+		{	
 			public void onClick(ClickEvent event) {
 				searchbox.setValue("");
 			}
@@ -199,5 +197,4 @@ public class FileBrowser extends Composite {
 	       searchbutton.click();
 	    }
 	  }
-	
 }
