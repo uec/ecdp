@@ -8,17 +8,21 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratedTabPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.LazyPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -50,45 +54,38 @@ public class ECCPBinderWidget extends Composite {
 	@UiField static Label label;
 	static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
-	//static TabLayoutPanel tabQCDownload = new TabLayoutPanel(2, Unit.EM);
 
-	
 	public ECCPBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		//tabQCDownload.addStyleName("tabStyle");
-		
-		//DOM.setElementProperty(tabQCDownload.getElement(),"hideMode", "nosize");
-		//DOM.setElementProperty(tabQCDownload.getElement(),"position", "absolute");
 		label.setText("Switch to Sample View");
-		
-		label.addClickHandler( new ClickHandler() 
-		{	
-			public void onClick(ClickEvent arg0) 
-			{
-				if(label.getText().contains("Flowcell"))
-				{
-					addTabPanel.clear();
-					layoutReport.clear();
-					layoutReport.add(label);
-					layoutReport.add(FcellReport);
-					label.setText("Switch to Sample View");
-				}
-				else if(label.getText().contains("Sample"))
-				{
-					addTabPanel.clear();
-					layoutReport.clear();
-					SampleReport sp = new SampleReport();
-					layoutReport.add(label);
-					if(!sp.isAttached())
-					{	
-						layoutReport.add(sp);
-						sp.showTool();
-					}
-					label.setText("Switch to Flowcell View");
-				}	
+		label.addClickHandler(new ClickHandler() 
+		{
+		  public void onClick(ClickEvent arg0) 
+		  {
+			 if(label.getText().contains("Flowcell"))
+			 {
+			   addTabPanel.clear();
+			   layoutReport.clear();
+			   layoutReport.add(label);
+			   layoutReport.add(FcellReport);
+			   label.setText("Switch to Sample View");
 			}
-			});
+			else if(label.getText().contains("Sample"))
+			{
+			   addTabPanel.clear();
+			   layoutReport.clear();
+			   SampleReport sp = new SampleReport();
+			   layoutReport.add(label);
+			   if(!sp.isAttached())
+			   {	
+				 layoutReport.add(sp);
+				 sp.showTool();
+			   }
+			   label.setText("Switch to Flowcell View");
+			}	
+		}
+	  });
 	}
 	
 	public static void clearaddTabPanel()
@@ -103,55 +100,32 @@ public class ECCPBinderWidget extends Composite {
 	 */
 	public static void addReport(final ECPane toolWidget, FocusPanel fpanel, final String typeGe)
 	{
-		fpanel.addClickHandler(new ClickHandler() {
-		
+		fpanel.addClickHandler(new ClickHandler() 
+		{
 			public void onClick(ClickEvent event) 
 			{
 				layoutReport.add(toolWidget);
 				toolWidget.showTool();
-				/*if(typeGe.contains("Samples From Geneus"))
-				{
-					addTabPanel.clear();
-					mainStack.clear();
-					label.setText("Switch to Flowcell View");
-					if(!toolWidget.isAttached())
-					{	
-						layoutReport.add(toolWidget);
-						toolWidget.showTool();
-					}
-				}	
-				else
-				{
-					if(toolTabPanel.getWidgetIndex(toolWidget) < 0)
-					{
-						toolTabPanel.add(toolWidget, typeGe);
-						toolWidget.showTool();
-					}	
-					toolTabPanel.selectTab(toolTabPanel.getWidgetIndex(toolWidget));
-					addTabPanel.add(toolTabPanel);*/
-				}
-			//}
-		});
+			}});
 	}
+	
 	/*
 	 * Function to add tabs based on the selection made on the left hand side of the panel 
 	 *Input: Takes the flowpanel to be added and the displayName for the tab
 	 */
 	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
-		//fp.addStyleName(UserPanelResources.INSTANCE.userPanel().closeTabs());
 		HorizontalPanel hp = new HorizontalPanel();
 		Image image = new Image();
 		Label label = new Label(displayName);
 		hp.add(label);
 		hp.add(image);
-	
 		image.setUrl("images/close_icon.gif");
+		
 		if(tabQCDownload.getWidgetIndex(fp) < 0)
 		{
 			tabQCDownload.add(fp, hp);
 		}
-		tabQCDownload.setTitle(displayName);
 		tabQCDownload.selectTab(tabQCDownload.getWidgetIndex(fp));
 		addTabPanel.add(tabQCDownload);
 		
@@ -169,50 +143,24 @@ public class ECCPBinderWidget extends Composite {
 				
 				if(curIndex == 0 && tabsCount > 0)
 				{
-					//Window.alert("In case curIndex == 0 and tabsCount > 0");
 					tabQCDownload.selectTab(curIndex +1);
 					tabQCDownload.remove(curIndex);
 				}
 				else if(curIndex == tabsCount-1)
 				{
-				//	Window.alert("In case tabsCount -1");
 					tabQCDownload.selectTab(curIndex-1);
 					tabQCDownload.remove(curIndex);
 				}
 				else if(curIndex > 0 && curIndex < tabsCount)
 				{
-					//Window.alert("In case curIndex > 0 and tabsCount < curIndex");
 					tabQCDownload.selectTab(curIndex + 1);
 					tabQCDownload.remove(curIndex);
 				}
 				else 
 				{
-					//Window.alert("In case curIndex == 0");
 					tabQCDownload.remove(curIndex);
 				}		
 			}
 		});
 	}
-	
-	//@UiField
-	//public static TabLayoutPanel toolTabPanel;
-	/*@UiField
-	public  static HTMLPanel controlAdd;
-	
-	
-	public static  TabLayoutPanel getToolTabPanel() {
-		return toolTabPanel;
-	}
-
-	public void setToolTabPanel(TabLayoutPanel toolTabPanel) {
-		this.toolTabPanel = toolTabPanel;
-	}
-
-	public void setControlAdd(HTMLPanel controlAdd) {
-		this.controlAdd = controlAdd;
-	}
-
-	public static  HTMLPanel getControlAdd() {
-		return controlAdd;
-	}*/
 }
