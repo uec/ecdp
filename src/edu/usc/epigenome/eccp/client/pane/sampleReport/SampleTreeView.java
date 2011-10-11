@@ -56,7 +56,6 @@ public class SampleTreeView extends Composite
 	   projRoot.addItem("");
 	   t.addOpenHandler(new OpenHandler<TreeItem>()
 			   {	
-		   @Override
 		   public void onOpen(OpenEvent<TreeItem> event) 
 		   {
 			 if(projRoot.getChildCount() > 0 && projRoot.getChildCount() <= 1)
@@ -87,7 +86,6 @@ public class SampleTreeView extends Composite
 						//On opening the flowcell TreeItem give a remoteService call to the backend and get all lanes pertaining to the given sample and flowcell 
 						t.addOpenHandler(new OpenHandler<TreeItem>()
 						{
-						  @Override
 						  public void onOpen(OpenEvent<TreeItem> event1) 
 						  {
 							  TreeItem item = event1.getTarget();

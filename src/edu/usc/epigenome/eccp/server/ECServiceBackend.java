@@ -182,7 +182,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * Input project name 
 	 * Output arraylist of SampleData containing sample information for the given projectName
 	 */
-	@Override
 	public ArrayList<SampleData> getSamplesForProject(String projectName, String searchString, boolean yes)throws IllegalArgumentException 
 	{
 		ArrayList<SampleData> samples = new ArrayList<SampleData>();
@@ -355,7 +354,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 *  Function to get a list of runId's(analysis_id) for each of the lanes 
 	 *  Input: given library and flowcell 
 	 */
-	@Override
 	public FlowcellData getLaneFlowcellSample(String Library, String flowcellSerial) throws IllegalArgumentException 
 	{
 		FlowcellData flowcell = new FlowcellData();
@@ -1679,8 +1677,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return "cache cleared";
 	}
 	
-	
-	@Override
 	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException 
 	{	
 		return null;
