@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,10 +45,10 @@ import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.data.MethylationData;
-import edu.usc.epigenome.eccp.client.data.ProjectData;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.sun.mirror.apt.RoundCompleteEvent;
 
 
 /**
@@ -90,8 +91,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//If search flag set, then perform full text match on project, sample_name, organism, flowcell_serial, geneusID_sample fields
 			if(yes)
 			{
-				//replace all the spaces by " +"  ('+' stands for and in mysql fulltext search)
+				//replace all the spaces by " +"  ('+' stands for 'and operation' in mysql fulltext search)
 				String search = searchString.replaceAll("\\s+", " \\+");
+				//Query to select distinct projects 
 				selectQuery = "select distinct(project) from view_run_metric where MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+search+"' IN BOOLEAN MODE) order by Date_Sequenced";
 			}
 			
@@ -121,11 +123,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return projects;	
 	}
 	
-	public HashMap<String, ArrayList<String>> decryptSearchProject(String toSearch, String fText) throws IllegalArgumentException
+	public HashMap<String, ArrayList<String>> decryptSearchProject(String toSearch) throws IllegalArgumentException
 	{
 		ArrayList<String> projects = new ArrayList<String>();
 		HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
-		ArrayList<String> decryptContents = decryptKeyword(toSearch, fText);
+		ArrayList<String> decryptContents = decryptKeyword(toSearch, toSearch);
 		map.put("decrypted", decryptContents);
 		java.sql.Connection myConnection = null;
 		try
@@ -143,7 +145,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			 myConnection = DriverManager.getConnection(dbURL);
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
-			//Get all the distinct projects
+			//Get all the distinct projects using a fulltext search match
 			String contents = decryptContents.get(0).replaceAll("\\s+", " \\+");
 			String selectQuery = "select distinct(project) from view_run_metric where MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+contents+"' IN BOOLEAN MODE) order by Date_Sequenced";
 			
@@ -573,9 +575,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * @see edu.usc.epigenome.eccp.client.ECService#getQCSampleFlowcell(java.lang.String, java.lang.String)
 	 * Get the QC for a given flowcell and sample
 	 */
-	public FlowcellData getQCSampleFlowcell(String serial, String sampleName, int laneNo) throws IllegalArgumentException
+	public FlowcellData getQCSampleFlowcell(String serial, String sampleName, int laneNo, String userType) throws IllegalArgumentException
 	{
-		//System.out.println("The parameters received are " + serial + " sample " + sampleName + " laneNumber is " + laneNo);
 		FlowcellData flowcell = new FlowcellData();
 		java.sql.Connection myConnection = null;
 		try
@@ -593,10 +594,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			//create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
-			//get the distinct analysis_id's for the given flowcell
+			//get the distinct analysis_id's for the given flowcell, sample_name and lane number
 			String selectQuery ="select distinct(analysis_id) from view_run_metric where flowcell_serial = '"+serial + "' and sample_name = '"+sampleName+ "' and lane = '"+laneNo +"' and Date_Sequenced !='NULL' order by analysis_id";
 			ResultSet results = stat.executeQuery(selectQuery);
-			
+			System.out.println("the user type passed is  " + userType);
 			//Iterate over the result set
 			if(results.next())
 			{
@@ -607,6 +608,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				Statement st1 = myConnection.createStatement();
 				//for each analysis_id get the QC information from the database
 				String innSelect = "select  * from view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleName+ "' and Date_Sequenced !='NULL'";
+				
+				if(userType.equalsIgnoreCase("guest"))
+				{
+					String toSelect = "flowcell_serial, sample_name, lane, geneusID_sample, organism, protocol, ControlLane,  barcode, Date_Sequenced, RunParam_RTAVersion, contamSeqs, genome";
+					//String toSelect = getUserMeticNames();
+					innSelect = "select " + toSelect + " from view_run_metric where analysis_id ='" +  analysis_id + "' and flowcell_serial = '"+serial + "' and sample_name = '"+sampleName+ "' and Date_Sequenced !='NULL'";
+				}
+				System.out.println("The query executed is " + innSelect);
 				ResultSet rs = st1.executeQuery(innSelect);
 				ResultSetMetaData rsMetaData = rs.getMetaData();
 				
@@ -615,7 +624,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
 					qcProperties.put("lane", rs.getString("lane"));
-					qcProperties.put("geneusID_sample", rs.getString("geneusID_sample"));
+					//qcProperties.put("geneusID_sample", rs.getString("'geneusID_sample'"));
 					for(int i = 5; i<=rsMetaData.getColumnCount();i++)
 					{
 						if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
@@ -1265,17 +1274,17 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * remote method to md5 and then encrypt and url encode the input.
 	 * returns an ArrayList of the encrypted data. 
 	 */
-	public ArrayList<String> getEncryptedData(String globalText, String laneText) throws IllegalArgumentException 
+	public ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException 
 	{
 		try
 		{
 			ArrayList<String> retCipher = new ArrayList<String>();
 			String mdGlobal = md5(globalText);
-			String mdLane = md5(laneText);
+			//String mdLane = md5(laneText);
 			String tempGlobal = globalText.concat(mdGlobal);
-			String tempLane = laneText.concat(mdLane);
+			//String tempLane = laneText.concat(mdLane);
 			retCipher.add(encryptURLEncoded(tempGlobal));
-			retCipher.add(encryptURLEncoded(tempLane));
+			//retCipher.add(encryptURLEncoded(tempLane));
 			return retCipher;
 		}		
 		catch (Exception e)
@@ -1297,7 +1306,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	        md.update(text.getBytes());
 	        byte byteData[] = md.digest();
 	 
-	        //convert the byte to hex format method 1
+	        //convert the byte to hex format method
 	        StringBuffer sb = new StringBuffer();
 	        for (int i = 0; i < byteData.length; i++) 
 	        	sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
@@ -1325,17 +1334,20 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			desCipher.init(Cipher.DECRYPT_MODE,keySpec,desCipher.getParameters());
 			
-			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
+			//Get the byte array using the BASE64Decoder
 			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(fcellData);
-			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
+			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
 			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
-			laneAfterDecrypt = new String(laneBytes);
+			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
+			//Get string of the decoded byte arrays
 			fcellAfterDecrypt = new String(fcellBytes);
+			laneAfterDecrypt = new String(laneBytes);
 			System.out.println("laneAfterDecrypt is " + laneAfterDecrypt + "   fcellAfterDecrypt is " + fcellAfterDecrypt);
-			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
 			String tempFcell = fcellAfterDecrypt.substring(0,fcellAfterDecrypt.length()-32);
+			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
 			System.out.println("tempLane is " + tempLane + "   tempFcell is " + tempFcell);
 			
+			//Check the decrypted value with the md5 value 
 			if(md5(tempLane).equals(laneAfterDecrypt.substring(laneAfterDecrypt.length()-32, laneAfterDecrypt.length())) && 
 					md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length()-32, fcellAfterDecrypt.length())))
 			{
@@ -1351,6 +1363,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			e.printStackTrace();
 		}
+		//Else add the original string into the decryptedContents array
 		decryptedContents.add(fcellData);
 		decryptedContents.add(laneData);
 		return decryptedContents;
@@ -1380,9 +1393,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	/*
 	 * Method to format the given input string.
 	 */
-	NumberFormat formatter = NumberFormat.getInstance();
+	
 	public String NoFormat(String temp)
 	{
+		NumberFormat formatter = NumberFormat.getInstance();
 		String result = null;
 		double no = Double.valueOf(temp);
 		if(no == 0)
@@ -1423,6 +1437,57 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	        	catch (IOException ignored) { }
 	    }
 	    return new String(buffer);
+	}
+	
+	
+	/*
+	 * Function to get a String of Metrics to display to the user
+	 */
+	public String getUserMeticNames()
+	{
+		 StringBuilder userMetric = new StringBuilder();
+		java.sql.Connection myConnection = null;
+		try
+		{
+		  Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+		  //database connection code 
+		  String username = "zack";
+		  String password = "LQSadm80";
+		  //URL to connect to the database
+		  String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
+			  + username + "&password=" + password;
+		  //create the connection
+		  myConnection = DriverManager.getConnection(dbURL);
+		  //create statement handle for executing queries
+		  Statement stat = myConnection.createStatement();
+		  //get the metrics for the user(guest user)
+		  String selectQuery ="select metric from metric order by id where usage_enum = 'user'";
+		  
+		  //String selectItems = "flowcell_serial, sample_name, lane, geneusID_sample, organism, protocol, ControlLane,  barcode, Date_Sequenced, RunParam_RTAVersion, contamSeqs, genome";
+		  //String selectQuery = "select " + selectItems + " from metric";  
+		  ResultSet results = stat.executeQuery(selectQuery);
+		  //Iterate over the result set
+		  String prefix = "";
+		  while(results.next())
+		  {
+			  userMetric.append(prefix);
+			  prefix=",";
+			  userMetric.append(results.getString("metric"));
+			System.out.println("the appended string is " + userMetric.toString());
+		  }
+		}
+		catch(Exception e)
+		{e.printStackTrace();}
+		finally
+		{
+			try {
+				myConnection.close();
+			 } catch (SQLException e) {
+				e.printStackTrace();
+			 }
+		}
+		System.out.println("the user Metrics string is " + userMetric.toString());
+		return userMetric.toString();
 	}
 	
 	/*********************************************************************
