@@ -43,7 +43,7 @@ public class SampleReport extends ECPane{
 	@UiField TextBox sampleSearchBox;
 	@UiField Button searchButton;
 	String searchText ="";
-	String fText ="";
+	//String fText ="";
 	//variable yesSearch to determine if searchItem is entered
 	boolean yesSearch = false;
 	
@@ -61,10 +61,9 @@ public class SampleReport extends ECPane{
 			GenUserBinderWidget.clearaddTabPanel();
 		
 		//Check if parameter t is not null and get the search contents
-		if(Window.Location.getParameter("t") != null)
+		if(Window.Location.getParameter("s") != null)
 		{
-			searchText = Window.Location.getParameter("t");
-			fText = Window.Location.getParameter("q");
+			searchText = Window.Location.getParameter("s");
 			searchPanel.setVisible(false);
 		}
 		
@@ -82,7 +81,7 @@ public class SampleReport extends ECPane{
 				{
 					public void onSuccess(ArrayList<String> result) 
 					{
-						String url = "http://127.0.0.1:8888/ECControlCenter.html?gwt.codesvr=127.0.0.1:9997&"+"au=sol" + "&t=" + result.get(0) + "&q=" + result.get(1);
+						String url = "http://127.0.0.1:8888/ECControlCenter.html?gwt.codesvr=127.0.0.1:9997&"+"au=smp" + "&s=" + result.get(0);
 						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url  + "</a>"));
 					}
 					public void onFailure(Throwable caught) 
@@ -90,7 +89,7 @@ public class SampleReport extends ECPane{
 						caught.printStackTrace();
 					}
 				};
-				remoteService.getEncryptedData(sampleSearchBox.getText(), "", encrypstring);
+				remoteService.getEncryptedData(sampleSearchBox.getText(), encrypstring);
 				
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
@@ -136,7 +135,7 @@ public class SampleReport extends ECPane{
 	 */
 	public void decryptKeys()
 	{
-		remoteService.decryptSearchProject(searchText, fText, new AsyncCallback<HashMap<String,ArrayList<String>>>() 
+		remoteService.decryptSearchProject(searchText, new AsyncCallback<HashMap<String,ArrayList<String>>>() 
 		{
 			@Override
 			public void onFailure(Throwable caught)
