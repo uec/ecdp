@@ -3,36 +3,26 @@ package edu.usc.epigenome.eccp.client.data;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.*;
 
+/*
+ * Data Structure to hold sample specific data which is  
+ * serialized to be used with ECServiceBackend.java(Backend code)
+ */
 	public class SampleData implements IsSerializable
 	{
-		//public HashMap<String, ArrayList<FlowcellData>> sampleInfo;
+		//Data Structure to hold sample specific properties
 		public HashMap<String, String> sampleProperties;
 		public HashMap<String, FlowcellData> sampleFlowcells;
-		
-		
-		//public HashMap<String, String> projectProperties;
-		//public HashMap<String, HashMap<String, String>> flowcellInfo;
-		//public HashMap<Integer, HashMap<String, String>> flowcellLane;
-		//public LinkedHashMap<String, LinkedHashMap<Integer, LinkedHashMap<String, String>>> flowcellLaneQC;
-		//public ArrayList<LinkedHashMap<String, String>> flowcellFileList;
-		//public LinkedHashMap<String, LinkedHashMap<String,String>> laneQC;
 		String sampleFilter = "";
+		
 		public SampleData()
 		{
-			//sampleInfo = new HashMap<String, ArrayList<FlowcellData>>();
-			//projectProperties = new HashMap<String, String>();
-			
 			sampleProperties = new HashMap<String, String>();
 			sampleFlowcells = new HashMap<String, FlowcellData>();
-			
-			//flowcellInfo = new HashMap<String, HashMap<String,String>>();
-			//flowcellLane = new HashMap<Integer, HashMap<String, String>>();
-			//flowcellLaneQC = new LinkedHashMap<String, LinkedHashMap<Integer,LinkedHashMap<String,String>>>();
-			//flowcellFileList = new ArrayList<LinkedHashMap<String,String>>();
-			//laneQC = new LinkedHashMap<String, LinkedHashMap<String,String>>();
 		}
 		
-		
+		/*
+		 * Function to get Sample properties from sampleProperties HashMap
+		 */
 		public String getSampleProperty(String key)
 		{
 			try
