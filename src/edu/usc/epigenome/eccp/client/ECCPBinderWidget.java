@@ -48,11 +48,10 @@ public class ECCPBinderWidget extends Composite {
 	}
 	
 	@UiField public static VerticalPanel addTabPanel;
-	//@UiField static StackLayoutPanel mainStack;
 	@UiField static HTMLPanel FcellReport;
 	@UiField static HTMLPanel layoutReport;
 	@UiField static Label label;
-	static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
+	//static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
 
 	public ECCPBinderWidget() 
@@ -88,6 +87,9 @@ public class ECCPBinderWidget extends Composite {
 	  });
 	}
 	
+	/*
+	 * static method to clear the tabPanel (to add tabs)
+	 */
 	public static void clearaddTabPanel()
 	{
 		addTabPanel.clear();
@@ -111,7 +113,7 @@ public class ECCPBinderWidget extends Composite {
 	
 	/*
 	 * Function to add tabs based on the selection made on the left hand side of the panel 
-	 *Input: Takes the flowpanel to be added and the displayName for the tab
+	 *Input: Takes the panel to be added and the displayName for the tab
 	 */
 	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
@@ -132,7 +134,7 @@ public class ECCPBinderWidget extends Composite {
 		/*
 		 * Tabbed Browsing 
 		 * Logic to navigate tabs while closing them 
-		 * Click handler on the click of the x mark on the Tab
+		 * Click handler on the click of the 'x' mark (image) on the Tab
 		 */
 		image.addClickHandler(new ClickHandler()
 		{
