@@ -33,26 +33,36 @@ public class GenUserBinderWidget extends Composite {
 
 	@UiField public static VerticalPanel addTabPanel;
 	@UiField static HTMLPanel layoutReport;
+	//Declared DecoratedTabPanel in the code as it doesn't work with the ScrollPanel
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
 	
-	
+	/*
+	 * Constructor  
+	 * The guest user initialization and binding
+	 */
 	public GenUserBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		SampleReport sp = new SampleReport();
 		if(!sp.isAttached())
 		{
-			Window.alert("the user " + ECControlCenter.getUserType());
+			//Window.alert("the user " + ECControlCenter.getUserType());
 			layoutReport.add(sp);
 			sp.decryptKeys();
 		}
 	}
 
+	/*
+	 * static method to clear the tabPanel (to add tabs)
+	 */
 	public static void clearaddTabPanel()
 	{
 		addTabPanel.clear();
 	}
 	
+	/*
+	 * static method to add tabs to the tab panel
+	 */
 	public static void addtoTab(final VerticalPanel fp, String displayName)
 	{
 		HorizontalPanel hp = new HorizontalPanel();
