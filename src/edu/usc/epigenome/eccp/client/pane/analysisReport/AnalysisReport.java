@@ -93,12 +93,12 @@ public class AnalysisReport extends ECPane
 
 					public void onSuccess(ArrayList<String> result) 
 					{
-						String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?"+"au=solan" + "&t=" + result.get(1) + "&q=" + result.get(0);
+						String url = "http://webapp.epigenome.usc.edu/gareports/Gareports.html?"+"au=solan" + "&t=" + result.get(1);
 						searchPanel.add(new HTML("share these search results: <a href='" + url + "'>" + url + "</a>"));
 						searchPanel.setWidth("720px");
 					}
 				};
- 	 			remoteService.getEncryptedData(globalSearchBox.getText(), laneSearchBox.getText(), encrypstring);
+ 	 			remoteService.getEncryptedData(globalSearchBox.getText(), encrypstring);
 				
 				vp.clear();
 				vp.add(new Image("images/progress.gif"));
@@ -175,10 +175,7 @@ public class AnalysisReport extends ECPane
 		
 		switch(reportType)
 		{
-			//case ShowGeneus: remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);break;
 			case ShowFS: remoteService.getAnalysisFromFS(DisplayFlowcellCallback);break;
-			//case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
-			//case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
 			default: remoteService.getAnalysisFromFS(DisplayFlowcellCallback);break;			
 		}		
 	}
