@@ -42,31 +42,55 @@ public class ECControlCenter implements EntryPoint
 	 */
 	public void onModuleLoad() 
 	{
-		
-		//if(Window.Location.getQueryString().equals("") && Window.Location.getPath().endsWith("/ECCPBinder/"))
-		//{
-		if(Window.Location.getQueryString().contains("gwt"))
+		if(Window.Location.getQueryString().equals("") && Window.Location.getPath().endsWith("/ECCPBinder/"))
 		{
 			userType = "super";
 			ECCPBinderWidget sbw = new ECCPBinderWidget();
 			RootLayoutPanel.get().add(sbw);
 		}
-		/*else
+		else
 		{
-			userType = "guest";
-			//Map<String, java.util.List<String>> m = Window.Location.getParameterMap();
-			if(Window.Location.getParameter("au").contentEquals("sol"))
+			Map<String, java.util.List<String>> m = Window.Location.getParameterMap();
+			if(m.containsKey("au"))
 			{
-				if((Window.Location.getParameter("t").length() > 0) &&(Window.Location.getParameter("q").length() > 0))
+				if(Window.Location.getParameter("au").contentEquals("smp"))
 				{
-					GenUserBinderWidget gubw = new GenUserBinderWidget();
-					RootLayoutPanel.get().add(gubw);
+					if((Window.Location.getParameter("s").length() > 0))
+					{
+						userType = "guest";
+						GenUserBinderWidget gubw = new GenUserBinderWidget();
+						RootLayoutPanel.get().add(gubw);
+					}
 				}
-			}
 			else
 			{
 				RootLayoutPanel.get().add(new Label("Your access code is expired or does not exist. Please contact Zack Ramjan (ramjan @ usc edu) at the USC Epigenome Center for a new code"));
 			}
-		}*/
+		}
+		else
+		{
+			RootLayoutPanel.get().add(new Label("Your access code is expired or does not exist. Please contact Zack Ramjan (ramjan @ usc edu) at the USC Epigenome Center for a new code"));
+		}
 	}
+		
+		
+/*	if(Window.Location.getQueryString().contains("gwt"))
+	{
+		if(Window.Location.getQueryString().contains("au"))
+		{
+			if((Window.Location.getParameter("s").length() > 0))
+			{
+				userType = "guest";
+				GenUserBinderWidget gubw = new GenUserBinderWidget();
+				RootLayoutPanel.get().add(gubw);
+			}
+		}
+		else
+		{
+			userType = "super";
+			ECCPBinderWidget sbw = new ECCPBinderWidget();
+			RootLayoutPanel.get().add(sbw);
+		}
+	}*/
+  }
 }
