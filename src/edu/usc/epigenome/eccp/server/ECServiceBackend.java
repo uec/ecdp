@@ -1247,7 +1247,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	}
 	
 	/*
-	 * Get files for the flowcell and add to the sampleData object
+	 * Function to get the name of file from the given full file path
 	 */
 	public String getFileName(String fullPath)
 	{
@@ -1362,8 +1362,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			e.printStackTrace();
 		}
 		//Else add the original string into the decryptedContents array
-		decryptedContents.add(fcellData);
-		decryptedContents.add(laneData);
+		decryptedContents.add("");
+		decryptedContents.add("");
 		return decryptedContents;
 	}
 
@@ -1676,6 +1676,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 		return "cache cleared";
 	}
+	
+	
 	
 	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException 
 	{	
