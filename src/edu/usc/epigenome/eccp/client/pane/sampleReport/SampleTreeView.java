@@ -55,7 +55,7 @@ public class SampleTreeView extends Composite
 	   t.addItem(projRoot);
 	   projRoot.addItem("");
 	   t.addOpenHandler(new OpenHandler<TreeItem>()
-			   {	
+	   {	
 		   public void onOpen(OpenEvent<TreeItem> event) 
 		   {
 			 if(projRoot.getChildCount() > 0 && projRoot.getChildCount() <= 1)
