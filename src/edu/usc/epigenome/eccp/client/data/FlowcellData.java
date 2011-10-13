@@ -10,10 +10,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class FlowcellData implements IsSerializable
 {
+	//DS to hold the flowcell properties as <propertyName, value>
 	public HashMap<String,String> flowcellProperties;
+	//DS to hold the laneNo and properties associated with the lane as <laneNo, <propertyName, value>
 	public HashMap<Integer,HashMap<String,String>> lane;
+	//DS to hold the laneNo and the runID's associated with it as <laneNo, ArrayList<runId's>
 	public HashMap<Integer,ArrayList<String>>QClist;
+	//DS to hold a list of files with properties as ArrayList<<Propertyname, value>>
 	public ArrayList<LinkedHashMap<String, String>> fileList;
+	//DS to hold runID (analysis_id) which in turn holds the laneNo and the QC metrics for that lane as 
+	//<runID, <laneNo, <QCmetricName, metricValue>>>
 	public LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
 	public String flowcellFilter = "";
 	public String laneFilter = "";
