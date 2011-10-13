@@ -42,7 +42,11 @@ public class ECControlCenter implements EntryPoint
 	 */
 	public void onModuleLoad() 
 	{
-		if(Window.Location.getQueryString().equals("") && Window.Location.getPath().endsWith("/ECCPBinder/"))
+		/********************************************************
+		 * FOR DEPLOYMENT uncomment the following block of code
+		 ********************************************************
+		 */
+	/*	if(Window.Location.getQueryString().equals("") && Window.Location.getPath().endsWith("/ECCPBinder/"))
 		{
 			userType = "super";
 			ECCPBinderWidget sbw = new ECCPBinderWidget();
@@ -71,10 +75,12 @@ public class ECControlCenter implements EntryPoint
 		{
 			RootLayoutPanel.get().add(new Label("Your access code is expired or does not exist. Please contact Zack Ramjan (ramjan @ usc edu) at the USC Epigenome Center for a new code"));
 		}
-	}
+	}*/
 		
-		
-/*	if(Window.Location.getQueryString().contains("gwt"))
+	/*******************************************************************
+	 * 	FOR TESTING HOSTED MODE comment out the following section
+	 *******************************************************************/
+	if(Window.Location.getQueryString().contains("gwt"))
 	{
 		if(Window.Location.getQueryString().contains("au"))
 		{
@@ -91,6 +97,6 @@ public class ECControlCenter implements EntryPoint
 			ECCPBinderWidget sbw = new ECCPBinderWidget();
 			RootLayoutPanel.get().add(sbw);
 		}
-	}*/
+	}
   }
 }
