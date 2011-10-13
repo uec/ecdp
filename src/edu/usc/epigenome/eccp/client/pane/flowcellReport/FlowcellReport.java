@@ -72,7 +72,6 @@ public class FlowcellReport extends ECPane{
 	 * Remote Service call to the backend to get list of all the flowcells.
 	 *Also perform search for the searchItem entered in the text box and get a filtered list
 	 */
-	@Override
 	public void showTool() 
 	{
 	  AsyncCallback<ArrayList<FlowcellData>> DisplayFlowcellCallback = new AsyncCallback<ArrayList<FlowcellData>>()
@@ -104,12 +103,10 @@ public class FlowcellReport extends ECPane{
 	}
   }
 
-	@Override
 	public Image getToolLogo() {
 		return null;
 	}
 
-	@Override
 	public com.google.gwt.user.client.ui.Label getToolTitle() {
 		return null;
 	}
