@@ -91,7 +91,6 @@ public class FlowcellSingleItem extends Composite  {
 		   //On opening the sampleItem, a remote service call to the backend to get the runs for the given flowcell, lane and sample
 		   t.addOpenHandler(new OpenHandler<TreeItem>()
 		   {
-			 
 			  public void onOpen(OpenEvent<TreeItem> event1) 
 			  {
 				TreeItem item = event1.getTarget();
