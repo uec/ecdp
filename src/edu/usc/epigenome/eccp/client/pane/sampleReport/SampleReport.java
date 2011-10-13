@@ -137,7 +137,6 @@ public class SampleReport extends ECPane{
 	{
 		remoteService.decryptSearchProject(searchText, new AsyncCallback<HashMap<String,ArrayList<String>>>() 
 		{
-			
 			public void onFailure(Throwable caught)
 			{
 				vp.clear();
