@@ -1,0 +1,2 @@
+serviceClass: edu.usc.epigenome.eccp.client.ECService
+path: 204CB74BC1356B6DFCFD3B25927C3FC1.gwt.rpc

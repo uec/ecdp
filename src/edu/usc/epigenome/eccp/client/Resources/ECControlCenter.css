@@ -162,9 +162,10 @@ h1 {
 }
 
 .displayfilehorizontal {
-	background-color:#D3D3D3
+	background-color:#D3D3D3;
 	margin-left: 5px;
 }
+
 .viewdisplaylabel {
 	font-size: 12px;
 	color: #0000BB;
@@ -265,7 +266,7 @@ h1 {
 }
 
 .gwt-DisclosurePanel td {
-	padding: 0px
+	padding: 0px;
 	border-style: none;
 	border-width: 0px;	
 }
