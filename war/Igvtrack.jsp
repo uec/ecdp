@@ -35,11 +35,11 @@ if(request.getParameter("xml") != null && (!request.getParameter("xml").isEmpty(
 	        
 	        for(HashMap<String,String> file :e.getFilesforFlowcell(x.getFlowcellProperty("serial")).fileList)
 	        {
-	            if(file.get("base").contains("tdf"))
-	            {
-	       		  out.print("<Resource name=\"" + file.get("base") + "\"" + " path=\"" + "http://www.epigenome.usc.edu/webmounts/" + file.get("dir") + "/" + file.get("base"));
-				  out.print("\"/>");
-	            }
+	        	  if(file.get("base").endsWith("tdf") || file.get("base").endsWith("bam") || file.get("base").endsWith("bed") || file.get("base").endsWith("gtf"))
+                  {
+                        out.print("<Resource name=\"" + file.get("base") + "\"" + " path=\"http://www.epigenome.usc.edu/webmounts/" + file.get("fullpath").replaceAll("^.+/flowcells/", ""));
+                        out.print("\"/>");
+                  }
 
 	        }
 	out.println("</Category>");
