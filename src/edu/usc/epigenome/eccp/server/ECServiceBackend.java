@@ -423,6 +423,147 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * Get an ArrayList of all the flowcells from the database(data structure FlowcellData)
 	 */ 
 	
+	public ArrayList<FlowcellData> getFlowcellsFromGeneusFast() throws IllegalArgumentException
+	{
+		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+
+			//URL
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
+				+ username + "&password=" + password;
+
+			//create the connection
+			 myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//Get all the distinct geneusId_run   
+			String selectQuery ="select geneusID_run,flowcell_serial, protocol, technician, Date_Sequenced, ControlLane,group_concat(sample_name SEPARATOR '!') as name, group_concat(geneusID_sample SEPARATOR '!') as sampleID, organism, project, processing,lane from view_run_metric group by flowcell_serial,geneusID_run,lane order by flowcell_serial DESC,lane";
+			ResultSet results = stat.executeQuery(selectQuery);
+			
+			//Iterate over the resultset consisting of GeneusID
+		   if(results.next())
+		   {
+		     do
+			 {
+		    	 FlowcellData flowcell = new FlowcellData();
+		    	 String lims_id = results.getString("geneusId_run");
+		    	 Statement st1 = myConnection.createStatement();
+		    	 //for each geneusid get the flowcell serial no, protocol, technician, the date and the control lane 
+		    	 String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from view_run_metric where geneusID_run ='"+lims_id + "' group by geneusId_run";            
+		    	 ResultSet rs = st1.executeQuery(innSelect);
+		    	 //Iterate over the resultset and add the flowcellproperties for each of the flowcells
+		    	 while(rs.next())
+		    	 {
+		    		 flowcell.flowcellProperties.put("serial", rs.getString("flowcell_serial"));
+		    		 flowcell.flowcellProperties.put("limsID", lims_id);
+		    		 flowcell.flowcellProperties.put("technician", rs.getString("technician").replace("å", ""));
+		    		 //@SuppressWarnings("deprecation")  
+		    		 if(rs.getString("Date_Sequenced") == null || rs.getString("Date_Sequenced").equals(""))
+		    			 flowcell.flowcellProperties.put("date", "Unknown");
+		    		 else
+		    		 {
+		    			 Date d = new Date(rs.getString("Date_Sequenced"));
+		    			 flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
+		    		 }
+		    		 //flowcell.flowcellProperties.put("date", rs.getString("Date_Sequenced"));
+		    		 flowcell.flowcellProperties.put("protocol", rs.getString("protocol"));
+		    		 flowcell.flowcellProperties.put("status","in geneus");
+		    		 flowcell.flowcellProperties.put("control", rs.getString("ControlLane"));
+		    	 }
+				 rs.close();
+				 st1.close();
+					
+				//Select distinct lanes for each of the flowcells
+				Statement statLane = myConnection.createStatement();
+				String LaneProp ="select distinct(lane) from view_run_metric where geneusID_run ='"+lims_id+"'";
+				ResultSet RsProp = statLane.executeQuery(LaneProp);	
+				//Iterate over the lane numbers 
+				while(RsProp.next())
+				{
+					int lane_no =  RsProp.getInt("lane");
+					HashMap<String,String> sampleData = new HashMap<String,String>();
+					Statement cellprop = myConnection.createStatement();
+					//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
+					String st2 ="select processing, sample_name, geneusID_sample, organism, project from view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
+					ResultSet Prop = cellprop.executeQuery(st2);
+						
+					//Iterate over the information and populate the lane information for each of the flowcell
+					while(Prop.next())
+					{
+						sampleData.put("processing", Prop.getString("processing"));
+						String sample_name = Prop.getString("sample_name");
+						String sampleID = Prop.getString("geneusID_sample");
+						String organism = Prop.getString("organism");
+						//For multiple samples in a Lane, concatenate the sample_name, organism, sampleID using '+' 
+						if(sampleData.containsKey("name"))
+						{
+							String tempName = sampleData.get("name");
+							if(!(tempName.contains(sample_name)))
+								sampleData.put("name", sampleData.get("name").concat("!").concat(sample_name));
+						}
+						else
+							sampleData.put("name", sample_name);
+							
+						if(sampleData.containsKey("organism"))
+						{
+							String tempOrg = sampleData.get("organism");
+							if(!(tempOrg.contains(organism)))
+								sampleData.put("organism", sampleData.get("organism").concat("!").concat(organism));
+						}
+						else
+							sampleData.put("organism", Prop.getString("organism"));
+						
+						if(sampleData.containsKey("sampleID"))
+						{
+							String tempSampleID = sampleData.get("sampleID");
+							if(!(tempSampleID.contains(sampleID)))
+								sampleData.put("sampleID", sampleData.get("sampleID").concat("!").concat(sampleID));
+						}
+						else
+							sampleData.put("sampleID", sampleID);
+						
+						    sampleData.put("project", Prop.getString("project"));
+					}
+					Prop.close();
+					cellprop.close();
+					flowcell.lane.put(lane_no, sampleData);	
+				}
+				RsProp.close();
+				statLane.close();
+			    //add each of the flowcell to the arraylist
+				flowcells.add(flowcell);
+				
+		     }while(results.next());
+		    
+		     results.close();
+		     stat.close();
+		   }
+		   else
+		   	{
+			   System.out.println("In the else clause for FLOWCELLS");
+			   //flowcells = getFlowcellsFromGeneusFiles();
+		   	}
+		}
+		catch (Exception e)
+		{e.printStackTrace();}
+		finally
+		{
+		  try {myConnection.close();} 
+		  catch (SQLException e) {
+			e.printStackTrace(); }
+		}
+		return flowcells;	
+	}
+	
+	
 	public ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException
 	{
 		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
@@ -506,7 +647,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						if(sampleData.containsKey("name"))
 						{
 							String tempName = sampleData.get("name");
-							if(!(tempName.contains(sample_name)))
+							String[] namesList = tempName.split("!");
+							boolean found = false;
+							for (String s : namesList)
+								if(sample_name.equals(s))
+									found = true;
+							
+							if(!found)
 								sampleData.put("name", sampleData.get("name").concat("!").concat(sample_name));
 						}
 						else
