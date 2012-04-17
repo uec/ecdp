@@ -94,6 +94,9 @@ public class QCReport extends Composite {
 					public void onSuccess(FlowcellData result)
 					{
 						summaryChart.clear();
+						MetricGridWidget grid = new MetricGridWidget();
+						summaryChart.add(grid);
+						/*summaryChart.clear();
 						flowcell.laneQC = result.laneQC;
 						summaryChart.add(new Label("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
 						//Filter information retrieved from the backend
@@ -132,8 +135,9 @@ public class QCReport extends Composite {
 								}
 							}
 							summaryChart.add(qcFlexTable);
-						}
-					}});
+						}*/
+					} 
+					}); //end remoteService call
 			}});
 	}
 
