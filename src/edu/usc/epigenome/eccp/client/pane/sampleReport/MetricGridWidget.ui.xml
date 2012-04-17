@@ -1,0 +1,28 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    		 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	         xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	         xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
+	<ui:style>
+		.important {
+			font-weight: bold;
+		}
+	</ui:style>
+	
+	
+	<g:HTMLPanel>
+	<gxt:ContentPanel ui:field="gridPanel" headingText="Metric Grid">
+					<container:VerticalLayoutContainer>
+						<container:child >
+							<gxt:toolbar.ToolBar>
+								<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
+								<gxt:button.TextButton ui:field="userButton" text="User View" />
+							</gxt:toolbar.ToolBar>
+						</container:child>
+						<container:child >
+							<gxt:container.VerticalLayoutContainer ui:field="content" height="500" />
+						</container:child>
+					</container:VerticalLayoutContainer>
+				</gxt:ContentPanel>			
+	</g:HTMLPanel>
+</ui:UiBinder> 
