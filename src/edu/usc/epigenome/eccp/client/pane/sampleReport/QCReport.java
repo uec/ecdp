@@ -1,5 +1,7 @@
 package edu.usc.epigenome.eccp.client.pane.sampleReport;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import com.google.gwt.core.client.GWT;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,6 +28,7 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.GenUserBinderWidget;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
+import edu.usc.epigenome.eccp.client.data.NameValue;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 
 public class QCReport extends Composite {
@@ -94,8 +97,43 @@ public class QCReport extends Composite {
 					public void onSuccess(FlowcellData result)
 					{
 						summaryChart.clear();
-						MetricGridWidget grid = new MetricGridWidget();
+						final MetricGridWidget grid = new MetricGridWidget();
 						summaryChart.add(grid);
+						flowcell.filterQC(lane);
+						flowcell.filterAnalysis(flowcellSerial, laneNo, sampleID);
+						flowcell.filterRuns(run);
+						flowcell.laneQC = result.laneQC;
+						final ArrayList<NameValue> data = new ArrayList<NameValue>();
+						
+						
+						for(String location : flowcell.laneQC.keySet())
+							for(int i=1;i<=8;i++)
+								if(flowcell.laneQC.get(location).containsKey(i))
+									for(String s : flowcell.laneQC.get(location).get(i).keySet())
+									{								
+										NameValue metric = new NameValue();
+										metric.setall(s, flowcell.laneQC.get(location).get(i).get(s), "all");
+										data.add(metric);
+									}									
+						remoteService.getQCTypes(new AsyncCallback<HashMap<String,String>>(){
+
+							@Override
+							public void onFailure(Throwable caught)
+							{
+								grid.populateGrid(data);
+							}
+
+							@Override
+							public void onSuccess(HashMap<String, String> result)
+							{
+								for(NameValue n : data)
+									n.setType(result.get(n.getName()));
+								grid.populateGrid(data);
+							}});
+						
+						
+						
+						
 						/*summaryChart.clear();
 						flowcell.laneQC = result.laneQC;
 						summaryChart.add(new Label("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));

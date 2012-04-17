@@ -61,12 +61,12 @@ public class NameValue implements Serializable
 
 	
 	
-	public void setall(String name, String chrm, String pos)
+	public void setall(String name, String value, String type)
 	{
 		this.setKey(new Random().nextLong());
 		this.name=name;
-		this.type=chrm;
-		this.value=pos;
+		this.value=value;
+		this.type=type;
 				
 	}
 }

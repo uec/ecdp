@@ -53,6 +53,7 @@ public interface ECService extends RemoteService
 	ArrayList<SampleData>getSamplesForProject(String projectName, String searchString, boolean yes) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	
+	HashMap<String,String> getQCTypes();
 	
 	/*
 	 * Methylation Reporting

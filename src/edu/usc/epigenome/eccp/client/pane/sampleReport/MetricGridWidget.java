@@ -70,6 +70,13 @@ public class MetricGridWidget extends Composite {
 		  content.add(grid);	
 		//  populateGrid();
 	}
+	
+	public void populateGrid(ArrayList<NameValue> data)
+	{
+		store.replaceAll(data);
+		Info.display("Notice", "data loaded");
+	}
+	
 	/*void populateGrid()
 	{
 		myServer.getGenes(mode, new AsyncCallback<ArrayList<NameValue>>(){

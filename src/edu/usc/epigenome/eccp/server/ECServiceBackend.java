@@ -710,6 +710,49 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return flowcells;	
 	}
 	
+	
+	
+	public HashMap<String,String> getQCTypes()
+	{
+		java.sql.Connection myConnection = null;
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+			//database connection code 
+			String username = "zack";
+			String password = "LQSadm80";
+			
+			//URL to connect to the database
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user="
+				+ username + "&password=" + password;
+			//create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			//create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			//get the distinct analysis_id's for the given flowcell, sample_name and lane number
+			String selectQuery ="Select m.metric as metric, IF(ISNULL(c.name),\"Unknown\",c.name) as name from metric m left join category c on m.id_category = c.id order by metric";
+			ResultSet results = stat.executeQuery(selectQuery);
+			HashMap<String,String> metricTypes = new HashMap<String,String>();
+			while(results.next())
+			{
+				metricTypes.put(results.getString("metric"),results.getString("name"));
+			}
+			return metricTypes;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+		  try{myConnection.close();}
+		  catch (SQLException e) 
+		  {e.printStackTrace();}
+		}
+		return null;
+	}
+	
 	/*************************************************************************
 	 * Functions common to both Flowcell specific Tree View and Project Specific Tree View  
 	 *************************************************************************

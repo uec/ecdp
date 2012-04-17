@@ -51,4 +51,5 @@ public interface ECServiceAsync
 	
 	void getLaneFlowcellSample(String string, String flowcellSerial,AsyncCallback<FlowcellData> callback) throws IllegalArgumentException;
 	void getFlowcellsforSample(String sampleProperty,AsyncCallback<SampleData> asyncCallback)throws IllegalArgumentException;
+	void getQCTypes(AsyncCallback<HashMap<String, String>> callback);
 }

@@ -20,7 +20,7 @@
 							</gxt:toolbar.ToolBar>
 						</container:child>
 						<container:child >
-							<gxt:container.VerticalLayoutContainer ui:field="content" height="500" />
+							<gxt:container.VerticalLayoutContainer ui:field="content" />
 						</container:child>
 					</container:VerticalLayoutContainer>
 				</gxt:ContentPanel>			
