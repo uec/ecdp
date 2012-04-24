@@ -9,8 +9,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
@@ -30,6 +28,7 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
+import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
@@ -50,15 +49,10 @@ public class DownloadGridWidget extends Composite
 	@UiField ToolBar buttons;
 	@UiField ContentPanel gridPanel;
 	
+
 	
-	StoreFilterField<FileData> filter = new StoreFilterField<FileData>() {
-		@Override
-		protected boolean doSelect(Store<FileData> store, FileData parent,
-				FileData item, String filter) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-	};
+		
+
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
 	ColumnConfig<FileData, String> cc1,cc2,cc3;
@@ -71,7 +65,6 @@ public class DownloadGridWidget extends Composite
 	public DownloadGridWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
 		createFileDownloadGrid();
-		buttons.add(filter);
 	}
 
 	public void createFileDownloadGrid() {
@@ -91,8 +84,23 @@ public class DownloadGridWidget extends Composite
 		 columnDefs.add(cc3);
          fileDataColumnModel = new ColumnModel<FileData>(columnDefs);
 		 store = new ListStore<FileData>(properties.key());
-		 view = new GroupingView<FileData>();
+		
+		 StoreFilterField<FileData> filter = new StoreFilterField<FileData>() {
+				@Override
+				protected boolean doSelect(Store<FileData> store, FileData parent, 	FileData item, String filter) 
+				{
+					if(item.getFullPath().contains(filter))
+						return true;
+					else
+						return false;
+				}
+			};
+			filter.bind(store);
+			filter.setEmptyText("Search...");
+			buttons.add(filter);
 		 
+		 
+		 view = new GroupingView<FileData>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
@@ -143,8 +151,6 @@ public class DownloadGridWidget extends Composite
 		 
 		 TextArea text = new TextArea();
 		 text.setText(fileList);
-		 
-		 
 		 final Dialog simple = new Dialog();
 		 simple.setHeadingText("Paste these links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
 		 simple.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.NO);

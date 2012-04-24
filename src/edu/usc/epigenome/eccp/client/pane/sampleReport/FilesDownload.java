@@ -104,7 +104,7 @@ public class FilesDownload extends Composite {
 						for (LinkedHashMap<String, String> record: flowcell.fileList) {
 							FileData item = new FileData();
 							//public void setAll(String name,	String location, String type,String source,	String category, String downloadLocation)
-							item.setAll(record.get("base"), record.get("label"),record.get("type"),"","",record.get("encfullpath"));					
+							item.setAll(record.get("base"), record.get("fullpath"), record.get("label"),record.get("type"),"","",record.get("encfullpath"));					
 							data.add(item);
 						}
 						grid.populateGrid(data);

@@ -9,20 +9,32 @@ public class FileData implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	String name;
+	String fullPath;
 	String location;
 	String type;
 	String source;
 	String category;
 	String downloadLocation;
 	
-	public void setAll(String name,	String location, String type,String source,	String category, String downloadLocation)
+	public void setAll(String name, String fullPath, String location, String type,String source,	String category, String downloadLocation)
 	{
 		this.name=name;
+		this.fullPath = fullPath;
 		this.location=location;
 		this.type=type;
 		this.source=source;
 		this.category=category;
 		this.downloadLocation=downloadLocation;
+	}
+	
+	public String getFullPath()
+	{
+		return fullPath;
+	}
+
+	public void setFullPath(String fullPath)
+	{
+		this.fullPath = fullPath;
 	}
 	
 	public String getDownloadLocation()

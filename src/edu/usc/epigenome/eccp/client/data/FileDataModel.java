@@ -9,6 +9,7 @@ public interface FileDataModel extends PropertyAccess<FileData>
 {
 	@Path("downloadLocation") ModelKeyProvider<FileData> key();
 	 ValueProvider<FileData, String> name();
+	 ValueProvider<FileData, String> fullPath();
 	 ValueProvider<FileData, String> type();
 	 ValueProvider<FileData, String> location();
 	 ValueProvider<FileData, String> downloadLocation();
