@@ -97,7 +97,7 @@ public class QCReport extends Composite {
 					public void onSuccess(FlowcellData result)
 					{
 						summaryChart.clear();
-						final MetricGridWidget grid = new MetricGridWidget();
+						final MetricGridWidget grid = new MetricGridWidget("statistics");
 						summaryChart.add(grid);
 						flowcell.filterQC(lane);
 						flowcell.filterAnalysis(flowcellSerial, laneNo, sampleID);

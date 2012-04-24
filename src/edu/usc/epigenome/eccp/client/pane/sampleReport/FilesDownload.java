@@ -1,5 +1,8 @@
 package edu.usc.epigenome.eccp.client.pane.sampleReport;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -23,6 +26,7 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.GenUserBinderWidget;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
+import edu.usc.epigenome.eccp.client.data.NameValue;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
 import edu.usc.epigenome.eccp.client.pane.flowcellReport.filereport.FileBrowser;
@@ -93,8 +97,17 @@ public class FilesDownload extends Composite {
 						flowcell.fileList = result.fileList;
 						//Filter the files and them to the summaryChart
 						flowcell.filterFiles(lane, sampleID, run);
-						FileBrowser f = new FileBrowser(flowcell.fileList);
-						summaryChart.add(f);
+						final MetricGridWidget grid = new MetricGridWidget("fileDownload");
+						summaryChart.add(grid);
+						final ArrayList<NameValue> data = new ArrayList<NameValue>();
+						for (LinkedHashMap<String, String> record: flowcell.fileList) {
+							NameValue item = new NameValue();
+							item.setall(record.get("base"), record.get("label"),record.get("type"));					
+							data.add(item);
+						}
+						grid.populateGrid(data);
+					//	FileBrowser f = new FileBrowser(flowcell.fileList);
+					//	summaryChart.add(f);
 					}	
 				});
 			}
