@@ -11,6 +11,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
@@ -19,6 +20,7 @@ import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
+import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
@@ -67,10 +69,13 @@ public class DownloadGridWidget extends Composite
 
 	public void createFileDownloadGrid() {
 		//SET UP COLUMNS
+	     IdentityValueProvider<FileData> identity = new IdentityValueProvider<FileData>();
+	     final CheckBoxSelectionModel<FileData> sm = new CheckBoxSelectionModel<FileData>(identity);
 		 List<ColumnConfig<FileData, ?>> columnDefs = new ArrayList<ColumnConfig<FileData, ?>>();
 		 cc1 = new ColumnConfig<FileData, String>(properties.name(), 200, "File Name");
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
 		 cc3 = new ColumnConfig<FileData, String>(properties.location(), 200, "File Location");
+		 columnDefs.add(sm.getColumn());
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc2);		
 		 columnDefs.add(cc3);
