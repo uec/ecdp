@@ -67,7 +67,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	 * if the search flag (boolean yes) is set then perform a mysql full text search for the searchString in the database
 	 * and return the list of projects matching the search criteria
 	 */
-	public ArrayList<String> getProjectsFromGeneus(String searchString, boolean yes) throws IllegalArgumentException
+	public ArrayList<String> getProjectsFromGeneus(String searchString, boolean doFullTextSearch) throws IllegalArgumentException
 	{
 		ArrayList<String> projects = new ArrayList<String>();
 		java.sql.Connection myConnection = null;
@@ -89,7 +89,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//Get all the distinct projects
 			String selectQuery ="select distinct(project) from view_run_metric order by Date_Sequenced";
 			//If search flag set, then perform full text match on project, sample_name, organism, flowcell_serial, geneusID_sample fields
-			if(yes)
+			if(doFullTextSearch)
 			{
 				//replace all the spaces by " +"  ('+' stands for 'and operation' in mysql fulltext search)
 				String search = searchString.replaceAll("\\s+", " \\+");

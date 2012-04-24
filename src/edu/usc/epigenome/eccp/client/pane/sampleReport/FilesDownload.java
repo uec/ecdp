@@ -26,6 +26,7 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.GenUserBinderWidget;
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
+import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.NameValue;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
@@ -93,16 +94,17 @@ public class FilesDownload extends Composite {
 					public void onSuccess(FlowcellData result) 
 					{
 						summaryChart.clear();
-						summaryChart.add(new Label("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run:" + run));
 						flowcell.fileList = result.fileList;
 						//Filter the files and them to the summaryChart
 						flowcell.filterFiles(lane, sampleID, run);
-						final MetricGridWidget grid = new MetricGridWidget("fileDownload");
+						final DownloadGridWidget grid = new DownloadGridWidget();
+						grid.setHeadingText("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run: " + (run.length() > 40 ? "..." + run.subSequence(run.length() - 40, run.length()) : run));
 						summaryChart.add(grid);
-						final ArrayList<NameValue> data = new ArrayList<NameValue>();
+						final ArrayList<FileData> data = new ArrayList<FileData>();
 						for (LinkedHashMap<String, String> record: flowcell.fileList) {
-							NameValue item = new NameValue();
-							item.setall(record.get("base"), record.get("label"),record.get("type"));					
+							FileData item = new FileData();
+							//public void setAll(String name,	String location, String type,String source,	String category, String downloadLocation)
+							item.setAll(record.get("base"), record.get("label"),record.get("type"),"","",record.get("encfullpath"));					
 							data.add(item);
 						}
 						grid.populateGrid(data);

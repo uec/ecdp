@@ -97,7 +97,8 @@ public class QCReport extends Composite {
 					public void onSuccess(FlowcellData result)
 					{
 						summaryChart.clear();
-						final MetricGridWidget grid = new MetricGridWidget("statistics");
+						final MetricGridWidget grid = new MetricGridWidget();
+						grid.setHeadingText("Sample:" + library + " > Flowcell:" + flowcellSerial + " > Lane:"+ laneNo + " > Run: " + (run.length() > 40 ? "..." + run.subSequence(run.length() - 40, run.length()) : run));
 						summaryChart.add(grid);
 						flowcell.filterQC(lane);
 						flowcell.filterAnalysis(flowcellSerial, laneNo, sampleID);
@@ -114,9 +115,10 @@ public class QCReport extends Composite {
 										NameValue metric = new NameValue();
 										metric.setall(s, flowcell.laneQC.get(location).get(i).get(s), "all");
 										data.add(metric);
-									}									
-						remoteService.getQCTypes(new AsyncCallback<HashMap<String,String>>(){
-
+									}						
+						
+						remoteService.getQCTypes(new AsyncCallback<HashMap<String,String>>()
+						{
 							@Override
 							public void onFailure(Throwable caught)
 							{
@@ -129,7 +131,8 @@ public class QCReport extends Composite {
 								for(NameValue n : data)
 									n.setType(result.get(n.getName()));
 								grid.populateGrid(data);
-							}});
+							}
+						});
 						
 						
 						

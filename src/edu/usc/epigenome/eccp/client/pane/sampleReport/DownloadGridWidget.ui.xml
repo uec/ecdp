@@ -11,12 +11,12 @@
 	
 	
 	<g:HTMLPanel>
-	<gxt:ContentPanel ui:field="gridPanel" headingText="Metric Grid">
+	<gxt:ContentPanel ui:field="gridPanel" headingText="Download Grid">
 					<container:VerticalLayoutContainer>
 						<container:child >
 							<gxt:toolbar.ToolBar ui:field="buttons">
-								<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
-								<gxt:button.TextButton ui:field="userButton" text="User View" /> 
+								<gxt:button.TextButton ui:field="organizeType" text="Organize by Type" />
+								<gxt:button.TextButton ui:field="organizeLocation" text="Organize by Location" /> 
 							</gxt:toolbar.ToolBar>
 						</container:child>
 						<container:child >
