@@ -93,7 +93,7 @@ public class DownloadGridWidget extends Composite
 				//TODO add multi download
 				int i = event.getRowIndex();
 				FileData f = store.get(i);
-				Window.open("http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.getDownloadLocation(), "downloading " + f.getName(), "enabled");						
+				Window.open("http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.getDownloadLocation(), "downloading " + f.getName(), "enabled");
 			}});
 	}
 	

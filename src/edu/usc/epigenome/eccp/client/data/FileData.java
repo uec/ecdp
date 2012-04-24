@@ -8,7 +8,6 @@ public class FileData implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public long key;
 	String name;
 	String location;
 	String type;
@@ -33,14 +32,6 @@ public class FileData implements Serializable
 	public void setDownloadLocation(String downloadLocation)
 	{
 		this.downloadLocation = downloadLocation;
-	}
-	public long getKey()
-	{
-		return key;
-	}
-	public void setKey(long key)
-	{
-		this.key = key;
 	}
 	public String getName()
 	{
