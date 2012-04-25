@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.data.shared.ListStore;
@@ -30,6 +34,8 @@ import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
+import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import edu.usc.epigenome.eccp.client.ECService;
@@ -55,33 +61,44 @@ public class DownloadGridWidget extends Composite
 
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
-	ColumnConfig<FileData, String> cc1,cc2,cc3;
+	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4;
 	ListStore<FileData> store;
 	Grid<FileData> grid;
-	CheckBoxSelectionModel<FileData> sm;
+	IdentityValueProvider<FileData> identity = new IdentityValueProvider<FileData>();
+	CheckBoxSelectionModel<FileData> sm  = new CheckBoxSelectionModel<FileData>(identity);
+	
 	
 	private static final FileDataModel properties = GWT.create(FileDataModel.class);
 
 	public DownloadGridWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
 		createFileDownloadGrid();
+		sm.setSelectionMode(SelectionMode.MULTI);
 	}
 
 	public void createFileDownloadGrid() {
 		//SET UP COLUMNS
-	     IdentityValueProvider<FileData> identity = new IdentityValueProvider<FileData>();
-	     sm = new CheckBoxSelectionModel<FileData>(identity);
-	     sm.setSelectionMode(SelectionMode.SIMPLE);
+	    
+	    
 	     
 	     
 		 List<ColumnConfig<FileData, ?>> columnDefs = new ArrayList<ColumnConfig<FileData, ?>>();
-		 cc1 = new ColumnConfig<FileData, String>(properties.name(), 200, "File Name");
+		 cc1 = new ColumnConfig<FileData, String>(properties.name(), 300, "File Name");
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
 		 cc3 = new ColumnConfig<FileData, String>(properties.location(), 200, "File Location");
-		 columnDefs.add(sm.getColumn());
+		 cc4 = new ColumnConfig<FileData, String>(properties.downloadLocation(), 100, "Download");
+		 cc4.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+		{
+		      public SafeHtml render(String object) 
+		      {  
+		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + object + " \">download</a>");		        
+		      }
+		}));
+		 //columnDefs.add(sm.getColumn());
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc2);		
 		 columnDefs.add(cc3);
+		 columnDefs.add(cc4);
          fileDataColumnModel = new ColumnModel<FileData>(columnDefs);
 		 store = new ListStore<FileData>(properties.key());
 		
@@ -95,9 +112,9 @@ public class DownloadGridWidget extends Composite
 						return false;
 				}
 			};
-			filter.bind(store);
-			filter.setEmptyText("Search...");
-			buttons.add(filter);
+		filter.bind(store);
+		filter.setEmptyText("Search...");
+		buttons.add(filter);
 		 
 		 
 		 view = new GroupingView<FileData>();
@@ -105,22 +122,15 @@ public class DownloadGridWidget extends Composite
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 grid = new Grid<FileData>(store, fileDataColumnModel);
+		
+		 sm.setSelectionMode(SelectionMode.SIMPLE);
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);
-		 grid.addRowClickHandler(new RowClickHandler(){
-
-			@Override
-			public void onRowClick(RowClickEvent event)
-			{
-				//TODO add multi download
-				int i = event.getRowIndex();
-				FileData f = store.get(i);
-				if(event.getColumnIndex() == 1)
-					Window.open("http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.getDownloadLocation(), "downloading " + f.getName(), "enabled");
-			}});
 		 sm.bindGrid(grid);
 	}
+
+			
 	
 	public void populateGrid(ArrayList<FileData> data)
 	{
