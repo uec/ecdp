@@ -13,6 +13,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
+import com.sencha.gxt.widget.core.client.TabPanel;
 
 import edu.usc.epigenome.eccp.client.pane.sampleReport.SampleReport;
 
@@ -53,6 +55,7 @@ public class GenUserBinderWidget extends Composite {
 	{
 		addTabPanel.clear();
 	}
+	
 	
 	/*
 	 * static method to add tabs to the tab panel

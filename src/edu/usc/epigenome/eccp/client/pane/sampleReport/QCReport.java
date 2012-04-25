@@ -77,8 +77,10 @@ public class QCReport extends Composite {
 			public void onClick(ClickEvent arg0) 
 			{
 				//Depending on the userMode add the QC metrics for the respective user
-				if(ECControlCenter.getUserType().equalsIgnoreCase("super"))
-					ECCPBinderWidget.addtoTab(popup, "QC" + library + "_" + flowcellSerial);
+				if(ECControlCenter.getUserType().equalsIgnoreCase("super")) {
+				//	ECCPBinderWidget.addtoTab(popup, "QC" + library + "_" + flowcellSerial);
+					ECCPBinderWidget.addTab(popup,"QC" + library + "_" + flowcellSerial);
+				}
 				else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
 					GenUserBinderWidget.addtoTab(popup, "QC" +library + "_" + flowcellSerial);
 				

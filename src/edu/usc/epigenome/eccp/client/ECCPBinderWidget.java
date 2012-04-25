@@ -14,6 +14,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
+import com.sencha.gxt.widget.core.client.TabPanel;
 
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
@@ -39,6 +41,7 @@ public class ECCPBinderWidget extends Composite {
 	@UiField static Label label;
 	//static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
+	static TabPanel tabPanel = new TabPanel();
 
 	public ECCPBinderWidget() 
 	{
@@ -96,6 +99,20 @@ public class ECCPBinderWidget extends Composite {
 				toolWidget.showTool();
 			}});
 	}
+	
+	public static void addTab(VerticalPanel vp, String displayName) {
+		TabItemConfig item = new TabItemConfig();
+		item.setClosable(true);
+		item.setText(displayName);
+		tabPanel.add(vp,item);
+		tabPanel.setActiveWidget(tabPanel.getWidget(tabPanel.getWidgetCount() - 1));
+		addTabPanel.add(tabPanel);
+	}
+	
+	
+	
+	
+	
 	
 	/*
 	 * Function to add tabs based on the selection made on the left hand side of the panel 
