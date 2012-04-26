@@ -76,8 +76,8 @@ public class FilesDownload extends Composite {
 			{
 				//Check for the user type and accordingly add tab to the respective TabPanel
 				if(ECControlCenter.getUserType().equalsIgnoreCase("super")) {				
-			//		ECCPBinderWidget.addtoTab(popup, "Files" +library + "_" + flowcellSerial);
-					ECCPBinderWidget.addTab(popup, "Files" +library + "_" + flowcellSerial);
+					ECCPBinderWidget.addtoTab(popup, "Files" +library + "_" + flowcellSerial);
+			//		ECCPBinderWidget.addTab(popup, "Files" +library + "_" + flowcellSerial);
 				}
 				else if(ECControlCenter.getUserType().equalsIgnoreCase("guest"))
 					GenUserBinderWidget.addtoTab(popup, "Files" + library + "_" + flowcellSerial);

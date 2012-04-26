@@ -14,12 +14,9 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.widget.core.client.TabItemConfig;
-import com.sencha.gxt.widget.core.client.TabPanel;
-
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.pane.ECPane;
-import edu.usc.epigenome.eccp.client.pane.sampleReport.SampleReport;
+
 
 
 public class ECCPBinderWidget extends Composite {
@@ -36,44 +33,15 @@ public class ECCPBinderWidget extends Composite {
 	}
 	
 	@UiField public static VerticalPanel addTabPanel;
-	@UiField static HTMLPanel FcellReport;
+	
 	@UiField static HTMLPanel layoutReport;
-	@UiField static Label label;
+	
 	//static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
 	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
-	static TabPanel tabPanel = new TabPanel();
 
 	public ECCPBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		label.setText("Switch to Sample View");
-		label.addClickHandler(new ClickHandler() 
-		{
-		  public void onClick(ClickEvent arg0) 
-		  {
-			 if(label.getText().contains("Flowcell"))
-			 {
-			   addTabPanel.clear();
-			   layoutReport.clear();
-			   layoutReport.add(label);
-			   layoutReport.add(FcellReport);
-			   label.setText("Switch to Sample View");
-			}
-			else if(label.getText().contains("Sample"))
-			{
-			   addTabPanel.clear();
-			   layoutReport.clear();
-			   SampleReport sp = new SampleReport();
-			   layoutReport.add(label);
-			   if(!sp.isAttached())
-			   {	
-				 layoutReport.add(sp);
-				 sp.showTool();
-			   }
-			   label.setText("Switch to Flowcell View");
-			}	
-		}
-	  });
 	}
 	
 	/*
@@ -99,20 +67,6 @@ public class ECCPBinderWidget extends Composite {
 				toolWidget.showTool();
 			}});
 	}
-	
-	public static void addTab(VerticalPanel vp, String displayName) {
-		TabItemConfig item = new TabItemConfig();
-		item.setClosable(true);
-		item.setText(displayName);
-		tabPanel.add(vp,item);
-		tabPanel.setActiveWidget(tabPanel.getWidget(tabPanel.getWidgetCount() - 1));
-		addTabPanel.add(tabPanel);
-	}
-	
-	
-	
-	
-	
 	
 	/*
 	 * Function to add tabs based on the selection made on the left hand side of the panel 

@@ -6,7 +6,8 @@ import java.util.HashMap;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import edu.usc.epigenome.eccp.client.data.FlowcellData;
-import edu.usc.epigenome.eccp.client.data.MethylationData;
+import edu.usc.epigenome.eccp.client.data.LibraryData;
+import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.SampleData;
 
 /**
@@ -15,14 +16,42 @@ import edu.usc.epigenome.eccp.client.data.SampleData;
 @RemoteServiceRelativePath("ecservice")
 public interface ECService extends RemoteService
 {
+	ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams);
+
+	
+	
+	
+	//get QC type info
+	HashMap<String,String> getQCTypes();
+	
+	
+	/*
+	 * Utility Functions
+	 */
+	//Encrypt the given string 
+	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
+	//Encrypt the contents passed for Guest User
+	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;
+	//Decrypt the contents passed for Guest User
+	ArrayList<String> decryptKeyword(String fcellText, String laneText)throws IllegalArgumentException;
+	
+	
+	
+	
+	
+	
+	//////////////////////////////////I plan to deprecate everything below!
+	
 	/*
 	 * Flowcell reporting
 	 */
 	ArrayList<FlowcellData> getFlowcellsAll() throws IllegalArgumentException;
 	ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException;
-	ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException;
-	ArrayList<FlowcellData> getFlowcellsIncomplete() throws IllegalArgumentException;
-	ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException;
+
+	
+	
+	
+	
 	//Get QC for the given flowcell serial
 	FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException;
 	//Get files for flowcell
@@ -53,28 +82,6 @@ public interface ECService extends RemoteService
 	ArrayList<SampleData>getSamplesForProject(String projectName, String searchString, boolean yes) throws IllegalArgumentException;
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	
-	HashMap<String,String> getQCTypes();
-	
-	/*
-	 * Methylation Reporting
-	 */
-	ArrayList<MethylationData> getMethFromGeneus() throws IllegalArgumentException;	
-	MethylationData getFilesForMeth(String serial) throws IllegalArgumentException;
-	MethylationData getQCforMeth(String serial) throws IllegalArgumentException;
 
-	//PBS reporting
-	public String[] qstat(String queue);
-	//Cache management
-	String clearCache(String cachefile) throws IllegalArgumentException;
-	
-	/*
-	 * Utility Functions
-	 */
-	//Encrypt the given string 
-	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
-	//Encrypt the contents passed for Guest User
-	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;
-	//Decrypt the contents passed for Guest User
-	ArrayList<String> decryptKeyword(String fcellText, String laneText)throws IllegalArgumentException;
 	
 }

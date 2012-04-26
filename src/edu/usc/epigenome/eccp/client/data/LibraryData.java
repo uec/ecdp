@@ -7,6 +7,5 @@ public class LibraryData extends HashMap<String,LibraryProperty>
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-		
+	FileData files;
 }

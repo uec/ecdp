@@ -3,12 +3,15 @@
              xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container" 
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
-	<gxt:ContentPanel ui:field="gridPanel" headingText="Metric Grid">
+	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center">
 		<container:VerticalLayoutContainer>
 			<container:child>
-				<gxt:toolbar.ToolBar ui:field="buttons">
-					<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
-					<gxt:button.TextButton ui:field="userButton" text="User View" />
+				<gxt:toolbar.ToolBar>
+					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
+					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
+					<gxt:button.TextButton ui:field="byProject" text="By Project" />
+					<gxt:button.TextButton ui:field="expand" text="Expand All" />
+					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 				</gxt:toolbar.ToolBar>
 			</container:child>
 			<container:child>
@@ -16,5 +19,4 @@
 			</container:child>
 		</container:VerticalLayoutContainer>
 	</gxt:ContentPanel>
-
 </ui:UiBinder> 

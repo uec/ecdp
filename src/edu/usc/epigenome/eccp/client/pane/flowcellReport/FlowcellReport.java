@@ -96,9 +96,6 @@ public class FlowcellReport extends ECPane{
 	 switch(reportType)
 	{
 	  case ShowGeneus: remoteService.getFlowcellsFromGeneus(DisplayFlowcellCallback);break;
-	  case ShowFS: remoteService.getFlowcellsFromFS(DisplayFlowcellCallback);break;
-	  case ShowIncomplete: remoteService.getFlowcellsIncomplete(DisplayFlowcellCallback);break;
-	  case ShowComplete: remoteService.getFlowcellsComplete(DisplayFlowcellCallback);break;
 	  default: remoteService.getFlowcellsAll(DisplayFlowcellCallback);break;			
 	}
   }
