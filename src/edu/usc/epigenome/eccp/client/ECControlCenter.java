@@ -82,8 +82,8 @@ public class ECControlCenter implements EntryPoint
 			if((Window.Location.getParameter("s").length() > 0))
 			{
 				userType = "guest";
-				GenUserBinderWidget gubw = new GenUserBinderWidget();
-				RootLayoutPanel.get().add(gubw);
+				//GenUserBinderWidget gubw = new GenUserBinderWidget();
+				//RootLayoutPanel.get().add(gubw);
 			}
 		}
 		else

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
+
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -12,17 +12,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.RowClickEvent;
+import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -30,13 +29,13 @@ import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 import com.sencha.gxt.widget.core.client.info.Info;
-import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
+import edu.usc.epigenome.eccp.client.events.LibrarySelectedEvent;
 
 public class sampleList extends Composite 
 {
@@ -85,12 +84,12 @@ public class sampleList extends Composite
 		 cc2 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
 		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
 		 cc3.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
-					{
-					      public SafeHtml render(String object) 
-					      {  
-					        return SafeHtmlUtils.fromString(object.length() > 40 ? "..." + object.subSequence(object.length() - 40, object.length()) : object);		        
-					      }
-					}));
+		{
+		      public SafeHtml render(String object) 
+		      {  
+		        return SafeHtmlUtils.fromString(object.length() > 40 ? "..." + object.subSequence(object.length() - 40, object.length()) : object);		        
+		      }
+		}));
 		 
 		 cc4 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
 		 cc5 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
@@ -109,6 +108,37 @@ public class sampleList extends Composite
 		 view.groupBy(cc5);
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
+		 
+		 grid.addRowClickHandler(new RowClickHandler()
+		 {
+			@Override
+			public void onRowClick(RowClickEvent event)
+			{
+				LibraryData summarizedLibrary = store.get(event.getRowIndex());
+				 LibraryDataQuery query = new LibraryDataQuery();
+				 query.setIsSummaryOnly(false);
+				 query.setGetFiles(true);
+				 query.setDBid(summarizedLibrary.get("id_run_sample").getValue());
+				 myServer.getLibraries(query, new AsyncCallback<ArrayList<LibraryData>>(){
+						@Override
+						public void onFailure(Throwable caught)
+						{
+							Info.display("Error","Failed to get Library");
+						}
+
+						@Override
+						public void onSuccess(ArrayList<LibraryData> result)
+						{
+							if(result.size() > 0)
+								ECCPEventBus.EVENT_BUS.fireEvent(new LibrarySelectedEvent(result.get(0)));
+							else
+								Info.display("Error","Failed to get Library");
+						}});
+				
+				
+				
+			}
+		});
 		 
 		 content.add(grid);
 		 filter.bind(store);

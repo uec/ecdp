@@ -3,14 +3,9 @@
     		 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
 	         xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	         xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
-	<ui:style>
-		.important {
-			font-weight: bold;
-		}
-	</ui:style>
+
 	
-	
-	<g:HTMLPanel>
+	<g:ScrollPanel>
 	<gxt:ContentPanel ui:field="gridPanel" headingText="Download Grid">
 					<container:VerticalLayoutContainer>
 						<container:child >
@@ -25,5 +20,5 @@
 						</container:child>
 					</container:VerticalLayoutContainer>
 				</gxt:ContentPanel>			
-	</g:HTMLPanel>
+	</g:ScrollPanel>
 </ui:UiBinder> 

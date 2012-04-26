@@ -21,105 +21,19 @@ import edu.usc.epigenome.eccp.client.pane.ECPane;
 
 public class ECCPBinderWidget extends Composite {
 
-	private static ECCPBinderWidgetUiBinder uiBinder = GWT
-			.create(ECCPBinderWidgetUiBinder.class);
+	private static ECCPBinderWidgetUiBinder uiBinder = GWT.create(ECCPBinderWidgetUiBinder.class);
 
-	interface ECCPBinderWidgetUiBinder extends
-			UiBinder<Widget, ECCPBinderWidget> {
-	}
+	interface ECCPBinderWidgetUiBinder extends	UiBinder<Widget, ECCPBinderWidget> {}
 	
-	static {
-	    UserPanelResources.INSTANCE.userPanel().ensureInjected();  
-	}
+	static {   UserPanelResources.INSTANCE.userPanel().ensureInjected();}
 	
-	@UiField public static VerticalPanel addTabPanel;
 	
 	@UiField static HTMLPanel layoutReport;
 	
-	//static DecoratedTabPanel toolTabPanel = new DecoratedTabPanel();
-	static DecoratedTabPanel tabQCDownload = new DecoratedTabPanel();
+	
 
 	public ECCPBinderWidget() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-	}
-	
-	/*
-	 * static method to clear the tabPanel (to add tabs)
-	 */
-	public static void clearaddTabPanel()
-	{
-		addTabPanel.clear();
-	}
-	
-	/*
-	 * For the Flowcell View
-	 * Function to add different reports to the tab
-	 * Input: the Widget to be added, focus panel and the String to be represented on the Tab
-	 */
-	public static void addReport(final ECPane toolWidget, FocusPanel fpanel, final String typeGe)
-	{
-		fpanel.addClickHandler(new ClickHandler() 
-		{
-			public void onClick(ClickEvent event) 
-			{
-				layoutReport.add(toolWidget);
-				toolWidget.showTool();
-			}});
-	}
-	
-	/*
-	 * Function to add tabs based on the selection made on the left hand side of the panel 
-	 *Input: Takes the panel to be added and the displayName for the tab
-	 */
-	public static void addtoTab(final VerticalPanel fp, String displayName)
-	{
-		HorizontalPanel hp = new HorizontalPanel();
-		Image image = new Image();
-		Label label = new Label(displayName);
-		hp.add(label);
-		hp.add(image);
-		image.setUrl("images/close_icon.gif");
-		
-		if(tabQCDownload.getWidgetIndex(fp) < 0)
-		{
-			tabQCDownload.add(fp, hp);
-		}
-		tabQCDownload.selectTab(tabQCDownload.getWidgetIndex(fp));
-		addTabPanel.add(tabQCDownload);
-		
-		/*
-		 * Tabbed Browsing 
-		 * Logic to navigate tabs while closing them 
-		 * Click handler on the click of the 'x' mark (image) on the Tab
-		 */
-		image.addClickHandler(new ClickHandler()
-		{
-			public void onClick(ClickEvent arg0) 
-			{
-				int tabsCount = tabQCDownload.getWidgetCount();
-				int curIndex = tabQCDownload.getWidgetIndex(fp);
-				
-				if(curIndex == 0 && tabsCount > 0)
-				{
-					tabQCDownload.selectTab(curIndex +1);
-					tabQCDownload.remove(curIndex);
-				}
-				else if(curIndex == tabsCount-1)
-				{
-					tabQCDownload.selectTab(curIndex-1);
-					tabQCDownload.remove(curIndex);
-				}
-				else if(curIndex > 0 && curIndex < tabsCount)
-				{
-					tabQCDownload.selectTab(curIndex + 1);
-					tabQCDownload.remove(curIndex);
-				}
-				else 
-				{
-					tabQCDownload.remove(curIndex);
-				}		
-			}
-		});
 	}
 }

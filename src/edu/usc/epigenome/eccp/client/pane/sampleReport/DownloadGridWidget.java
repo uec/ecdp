@@ -10,7 +10,6 @@ import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
@@ -22,8 +21,6 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.RowClickEvent;
-import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.form.TextArea;
@@ -32,12 +29,8 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
-import com.sencha.gxt.widget.core.client.grid.filters.StringFilter;
 import com.sencha.gxt.widget.core.client.info.Info;
-import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
-import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent.SelectionChangedHandler;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
@@ -55,10 +48,6 @@ public class DownloadGridWidget extends Composite
 	@UiField ToolBar buttons;
 	@UiField ContentPanel gridPanel;
 	
-
-	
-		
-
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
 	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4;
@@ -70,10 +59,19 @@ public class DownloadGridWidget extends Composite
 	
 	private static final FileDataModel properties = GWT.create(FileDataModel.class);
 
-	public DownloadGridWidget() {
+	public DownloadGridWidget() 
+	{
 		initWidget(uiBinder.createAndBindUi(this));
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
+	}
+	
+	public DownloadGridWidget(List<FileData> data) 
+	{
+		initWidget(uiBinder.createAndBindUi(this));
+		createFileDownloadGrid();
+		sm.setSelectionMode(SelectionMode.MULTI);
+		populateGrid(data);
 	}
 
 	public void createFileDownloadGrid() {
@@ -132,7 +130,7 @@ public class DownloadGridWidget extends Composite
 
 			
 	
-	public void populateGrid(ArrayList<FileData> data)
+	public void populateGrid(List<FileData> data)
 	{
 		store.replaceAll(data);
 		Info.display("Notice", "data loaded");

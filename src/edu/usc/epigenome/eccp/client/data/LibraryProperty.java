@@ -12,6 +12,9 @@ public class LibraryProperty implements Serializable
 	String value;
 	String type;
 	String category;
+	String description;
+	String prettyName;
+	String sortOrder;
 	String source;
 	String usage;
 	
@@ -70,6 +73,30 @@ public class LibraryProperty implements Serializable
 	public void setUsage(String usage)
 	{
 		this.usage = usage;
+	}
+	public String getDescription()
+	{
+		return description;
+	}
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	public String getPrettyName()
+	{
+		return prettyName;
+	}
+	public void setPrettyName(String prettyName)
+	{
+		this.prettyName = prettyName;
+	}
+	public String getSortOrder()
+	{
+		return sortOrder;
+	}
+	public void setSortOrder(String sortOrder)
+	{
+		this.sortOrder = sortOrder;
 	}
 
 	

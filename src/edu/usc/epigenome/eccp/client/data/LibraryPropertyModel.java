@@ -13,4 +13,7 @@ public interface LibraryPropertyModel  extends PropertyAccess<LibraryProperty>
 	 ValueProvider<LibraryProperty, String> category();
 	 ValueProvider<LibraryProperty, String> source();
 	 ValueProvider<LibraryProperty, String> usage();
+	 ValueProvider<LibraryProperty, String> prettyName();
+	 ValueProvider<LibraryProperty, String> sortOrder();
+	 ValueProvider<LibraryProperty, String> description();
 }

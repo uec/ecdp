@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
              xmlns:g="urn:import:com.google.gwt.user.client.ui" 
              xmlns:c="urn:import:edu.usc.epigenome.eccp.client.sampleList" 
-             xmlns:f="urn:import:edu.usc.epigenome.eccp.client.pane.flowcellReport">
+             xmlns:f="urn:import:edu.usc.epigenome.eccp.client.tab">
 
 	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
 
@@ -15,9 +15,7 @@
 			</g:ScrollPanel>
 		</g:west>
 		<g:center>
-			<g:ScrollPanel>
-				<g:VerticalPanel ui:field="addTabPanel"></g:VerticalPanel>
-			</g:ScrollPanel>
+			<f:TabbedReport/>
 		</g:center>
 	</g:SplitLayoutPanel>
 </ui:UiBinder>

@@ -29,8 +29,7 @@ import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 
 public class MetricGridWidget extends Composite {
 
-	private static MetricGridUiBinder uiBinder = GWT
-			.create(MetricGridUiBinder.class);
+	private static MetricGridUiBinder uiBinder = GWT.create(MetricGridUiBinder.class);
 
 	interface MetricGridUiBinder extends UiBinder<Widget, MetricGridWidget> {
 	}
@@ -52,7 +51,7 @@ public class MetricGridWidget extends Composite {
 		
 	};
 	String mode = "user";
-	ColumnModel<LibraryProperty> geneColumnModel;
+	ColumnModel<LibraryProperty> colModel;
 	ColumnConfig<LibraryProperty, String> cc1,cc2,cc3;
 	ListStore<LibraryProperty> store;
 	Grid<LibraryProperty> grid;
@@ -66,25 +65,31 @@ public class MetricGridWidget extends Composite {
 			    buttons.add(filter);	 
 	}
 	
+	public MetricGridWidget(List<LibraryProperty> data) {
+		initWidget(uiBinder.createAndBindUi(this));
+		createStatisticsGrid();
+		buttons.add(filter);
+		populateGrid(data);
+	}
+	
 	public void createStatisticsGrid() {
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryProperty, ?>>();
-		 cc1 = new ColumnConfig<LibraryProperty, String>(properties.name(), 200, "Name");
-		 cc2 = new ColumnConfig<LibraryProperty, String>(properties.type(), 220, "type");
-		 cc3 = new ColumnConfig<LibraryProperty, String>(properties.value(), 200, "value");
+		 cc1 = new ColumnConfig<LibraryProperty, String>(properties.name(), 200, "Metric");
+		 cc2 = new ColumnConfig<LibraryProperty, String>(properties.category(), 220, "Category");
+		 cc3 = new ColumnConfig<LibraryProperty, String>(properties.value(), 200, "Value");
 		 columnDefs.add(cc2);
 		 columnDefs.add(cc1);		
 		 columnDefs.add(cc3);
-         geneColumnModel = new ColumnModel<LibraryProperty>(columnDefs);
+         colModel = new ColumnModel<LibraryProperty>(columnDefs);
 		 store = new ListStore<LibraryProperty>(properties.key());
 		 view = new GroupingView<LibraryProperty>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 grid = new Grid<LibraryProperty>(store, geneColumnModel);
+		 grid = new Grid<LibraryProperty>(store, colModel);
 		 grid.setView(view);
 		 view.groupBy(cc2);
-		
 		 content.add(grid);				
 	}
 	
