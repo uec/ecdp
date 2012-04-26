@@ -2,8 +2,9 @@ package edu.usc.epigenome.eccp.client.data;
 
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface LibraryPropertyModel
+public interface LibraryPropertyModel  extends PropertyAccess<LibraryProperty>
 {
 	 ModelKeyProvider<LibraryProperty> key();
 	 ValueProvider<LibraryProperty, String> name();

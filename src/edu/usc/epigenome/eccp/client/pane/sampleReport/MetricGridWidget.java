@@ -24,8 +24,8 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
-import edu.usc.epigenome.eccp.client.data.NameValue;
-import edu.usc.epigenome.eccp.client.data.NameValueModel;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
+import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 
 public class MetricGridWidget extends Composite {
 
@@ -40,23 +40,23 @@ public class MetricGridWidget extends Composite {
 	@UiField VerticalLayoutContainer content;
 	@UiField ToolBar buttons;
 	
-	GroupingView<NameValue> view = new GroupingView<NameValue>();
-	StoreFilterField<NameValue> filter = new StoreFilterField<NameValue>() {
+	GroupingView<LibraryProperty> view = new GroupingView<LibraryProperty>();
+	StoreFilterField<LibraryProperty> filter = new StoreFilterField<LibraryProperty>() {
 
 		@Override
-		protected boolean doSelect(Store<NameValue> store, NameValue parent,
-				NameValue item, String filter) {
+		protected boolean doSelect(Store<LibraryProperty> store, LibraryProperty parent,
+				LibraryProperty item, String filter) {
 			// TODO Auto-generated method stub
 			return false;
 		}
 		
 	};
 	String mode = "user";
-	ColumnModel<NameValue> geneColumnModel;
-	ColumnConfig<NameValue, String> cc1,cc2,cc3;
-	ListStore<NameValue> store;
-	Grid<NameValue> grid;
-	private static final NameValueModel properties = GWT.create(NameValueModel.class);
+	ColumnModel<LibraryProperty> geneColumnModel;
+	ColumnConfig<LibraryProperty, String> cc1,cc2,cc3;
+	ListStore<LibraryProperty> store;
+	Grid<LibraryProperty> grid;
+	private static final LibraryPropertyModel properties = GWT.create(LibraryPropertyModel.class);
 
 	public MetricGridWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -68,27 +68,27 @@ public class MetricGridWidget extends Composite {
 	
 	public void createStatisticsGrid() {
 		//SET UP COLUMNS
-		 List<ColumnConfig<NameValue, ?>> columnDefs = new ArrayList<ColumnConfig<NameValue, ?>>();
-		 cc1 = new ColumnConfig<NameValue, String>(properties.name(), 200, "Name");
-		 cc2 = new ColumnConfig<NameValue, String>(properties.type(), 220, "type");
-		 cc3 = new ColumnConfig<NameValue, String>(properties.value(), 200, "value");
+		 List<ColumnConfig<LibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryProperty, ?>>();
+		 cc1 = new ColumnConfig<LibraryProperty, String>(properties.name(), 200, "Name");
+		 cc2 = new ColumnConfig<LibraryProperty, String>(properties.type(), 220, "type");
+		 cc3 = new ColumnConfig<LibraryProperty, String>(properties.value(), 200, "value");
 		 columnDefs.add(cc2);
 		 columnDefs.add(cc1);		
 		 columnDefs.add(cc3);
-         geneColumnModel = new ColumnModel<NameValue>(columnDefs);
-		 store = new ListStore<NameValue>(properties.key());
-		 view = new GroupingView<NameValue>();
+         geneColumnModel = new ColumnModel<LibraryProperty>(columnDefs);
+		 store = new ListStore<LibraryProperty>(properties.key());
+		 view = new GroupingView<LibraryProperty>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 grid = new Grid<NameValue>(store, geneColumnModel);
+		 grid = new Grid<LibraryProperty>(store, geneColumnModel);
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		
 		 content.add(grid);				
 	}
 	
-	public void populateGrid(ArrayList<NameValue> data)
+	public void populateGrid(List<LibraryProperty> data)
 	{
 		store.replaceAll(data);
 		view.collapseAllGroups();
