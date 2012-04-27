@@ -2,7 +2,12 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
 			 xmlns:tabs="urn:import:com.sencha.gxt.widget.core.client" 
-			 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container">
-			 
-	 <tabs:TabPanel ui:field="tabPanel" width="100%" />			 
+			 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+			 xmlns:e="urn:import:edu.usc.epigenome.eccp.client.pane.sampleReport">
+	 
+	<g:ScrollPanel>
+  		<g:HTMLPanel>		 
+	 		<tabs:TabPanel ui:field="tabPanel"/>
+  		</g:HTMLPanel>
+	</g:ScrollPanel>	 
 </ui:UiBinder> 

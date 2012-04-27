@@ -10,6 +10,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
@@ -38,17 +39,16 @@ public class MetricGridWidget extends Composite {
 	@UiField ContentPanel gridPanel;
 	@UiField VerticalLayoutContainer content;
 	@UiField ToolBar buttons;
+	@UiField VerticalLayoutContainer vlc;
+	@UiField VerticalLayoutContainer vlc2;
 	
 	GroupingView<LibraryProperty> view = new GroupingView<LibraryProperty>();
 	StoreFilterField<LibraryProperty> filter = new StoreFilterField<LibraryProperty>() {
-
 		@Override
-		protected boolean doSelect(Store<LibraryProperty> store, LibraryProperty parent,
-				LibraryProperty item, String filter) {
-			// TODO Auto-generated method stub
-			return false;
+		protected boolean doSelect(Store<LibraryProperty> store, LibraryProperty parent,LibraryProperty item, String filter) 
+		{
+			return item.getName().contains(filter);
 		}
-		
 	};
 	String mode = "user";
 	ColumnModel<LibraryProperty> colModel;
@@ -59,17 +59,17 @@ public class MetricGridWidget extends Composite {
 
 	public MetricGridWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
-		 
-		
-			    createStatisticsGrid();
-			    buttons.add(filter);	 
+		createStatisticsGrid();
+		buttons.add(filter);	 
 	}
 	
 	public MetricGridWidget(List<LibraryProperty> data) {
 		initWidget(uiBinder.createAndBindUi(this));
+		//vlc2.getScrollSupport().setScrollMode(ScrollMode.ALWAYS);
 		createStatisticsGrid();
 		buttons.add(filter);
 		populateGrid(data);
+		
 	}
 	
 	public void createStatisticsGrid() {
@@ -77,7 +77,7 @@ public class MetricGridWidget extends Composite {
 		 List<ColumnConfig<LibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryProperty, ?>>();
 		 cc1 = new ColumnConfig<LibraryProperty, String>(properties.name(), 200, "Metric");
 		 cc2 = new ColumnConfig<LibraryProperty, String>(properties.category(), 220, "Category");
-		 cc3 = new ColumnConfig<LibraryProperty, String>(properties.value(), 200, "Value");
+		 cc3 = new ColumnConfig<LibraryProperty, String>(properties.value(), 300, "Value");
 		 columnDefs.add(cc2);
 		 columnDefs.add(cc1);		
 		 columnDefs.add(cc3);
@@ -91,6 +91,7 @@ public class MetricGridWidget extends Composite {
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);				
+		 filter.bind(store);
 	}
 	
 	public void populateGrid(List<LibraryProperty> data)

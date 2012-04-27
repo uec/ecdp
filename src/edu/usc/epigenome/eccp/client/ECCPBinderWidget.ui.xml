@@ -10,7 +10,7 @@
 		<g:west size="600">
 			<g:ScrollPanel>
 				<g:HTMLPanel ui:field="layoutReport">
-					<c:sampleList/>
+					<c:sampleList/> 
 				</g:HTMLPanel>
 			</g:ScrollPanel>
 		</g:west>
