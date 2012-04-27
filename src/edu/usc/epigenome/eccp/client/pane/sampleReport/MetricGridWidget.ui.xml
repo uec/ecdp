@@ -5,7 +5,6 @@
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
 		<gxt:ContentPanel ui:field="gridPanel" headingText="Metric Grid">
 			<container:VerticalLayoutContainer ui:field="vlc">
-				
 					<gxt:toolbar.ToolBar ui:field="buttons">
 						<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
 						<gxt:button.TextButton ui:field="userButton" text="User View" />

@@ -3,7 +3,6 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui" 
              xmlns:c="urn:import:edu.usc.epigenome.eccp.client.sampleList" 
              xmlns:f="urn:import:edu.usc.epigenome.eccp.client.tab">
-
 	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
 
 	<g:SplitLayoutPanel>

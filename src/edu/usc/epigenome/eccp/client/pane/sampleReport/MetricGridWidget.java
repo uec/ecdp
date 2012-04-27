@@ -68,8 +68,7 @@ public class MetricGridWidget extends Composite {
 		//vlc2.getScrollSupport().setScrollMode(ScrollMode.ALWAYS);
 		createStatisticsGrid();
 		buttons.add(filter);
-		populateGrid(data);
-		
+		populateGrid(data);		
 	}
 	
 	public void createStatisticsGrid() {
