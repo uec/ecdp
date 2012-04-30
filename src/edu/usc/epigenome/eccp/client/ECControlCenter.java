@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.sencha.gxt.widget.core.client.container.Viewport;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -90,7 +91,9 @@ public class ECControlCenter implements EntryPoint
 		{
 			userType = "super";
 			ECCPBinderWidget sbw = new ECCPBinderWidget();
-			RootLayoutPanel.get().add(sbw);
+			Viewport viewport = new Viewport();
+		    viewport.setWidget(sbw);
+			RootLayoutPanel.get().add(viewport);
 		}
 	}
   }

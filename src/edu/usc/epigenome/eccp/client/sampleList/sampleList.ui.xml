@@ -3,10 +3,18 @@
              xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container" 
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
-	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center">
-		<container:VerticalLayoutContainer>
-			<container:child>
-				<gxt:toolbar.ToolBar>
+             
+              <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="toolBarRowData">
+   				 <ui:attributes width="1" height="100" />
+  			  </ui:with>
+  			  
+  			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">
+   				 <ui:attributes width="1" height="1" />
+  			  </ui:with>
+ 	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center">
+		<container:VerticalLayoutContainer ui:field="vlc">
+			<container:child layoutData='{toolBarRowData}'>
+				<gxt:toolbar.ToolBar >
 					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
 					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
 					<gxt:button.TextButton ui:field="byProject" text="By Project" />
@@ -14,8 +22,8 @@
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 				</gxt:toolbar.ToolBar>
 			</container:child>
-			<container:child>
-				<gxt:container.VerticalLayoutContainer ui:field="content" />
+			<container:child layoutData='{contentData}'>
+				<gxt:container.FlowLayoutContainer ui:field="content" />
 			</container:child>
 		</container:VerticalLayoutContainer>
 	</gxt:ContentPanel>

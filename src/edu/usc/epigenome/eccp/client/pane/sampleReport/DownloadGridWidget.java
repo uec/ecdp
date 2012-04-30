@@ -10,7 +10,11 @@ import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
@@ -21,6 +25,7 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.form.TextArea;
@@ -44,10 +49,23 @@ public class DownloadGridWidget extends Composite
 	ECServiceAsync myServer = (ECServiceAsync) GWT.create(ECService.class);
 	GroupingView<FileData> view = new GroupingView<FileData>();
 	
-	@UiField VerticalLayoutContainer content;
 	@UiField ToolBar buttons;
+	@UiField HorizontalPanel buttonsHP;
+	@UiField VerticalLayoutContainer vlc;
+	@UiField VerticalLayoutContainer content;
 	@UiField ContentPanel gridPanel;
 	
+	 StoreFilterField<FileData> filter = new StoreFilterField<FileData>() {
+			@Override
+			protected boolean doSelect(Store<FileData> store, FileData parent, 	FileData item, String filter) 
+			{
+				if(item.getFullPath().contains(filter))
+					return true;
+				else
+					return false;
+			}
+		};
+		
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
 	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4;
@@ -69,18 +87,20 @@ public class DownloadGridWidget extends Composite
 	public DownloadGridWidget(List<FileData> data) 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
+		//ZR I hate this dirty hack for making the toolbar appear.
+		buttonsHP.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
-		populateGrid(data);
+		buttonsHP.add(filter);
+		populateGrid(data);	
+		Widget w = vlc.getWidget(0);
+		vlc.remove(0);
+		vlc.insert(w, 0,new VerticalLayoutData(1400,50));
 	}
 
 	public void createFileDownloadGrid() {
 		//SET UP COLUMNS
-	    
-	    
-	     
-	     
-		 List<ColumnConfig<FileData, ?>> columnDefs = new ArrayList<ColumnConfig<FileData, ?>>();
+	     List<ColumnConfig<FileData, ?>> columnDefs = new ArrayList<ColumnConfig<FileData, ?>>();
 		 cc1 = new ColumnConfig<FileData, String>(properties.name(), 300, "File Name");
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
 		 cc3 = new ColumnConfig<FileData, String>(properties.location(), 200, "File Location");
@@ -100,16 +120,7 @@ public class DownloadGridWidget extends Composite
          fileDataColumnModel = new ColumnModel<FileData>(columnDefs);
 		 store = new ListStore<FileData>(properties.key());
 		
-		 StoreFilterField<FileData> filter = new StoreFilterField<FileData>() {
-				@Override
-				protected boolean doSelect(Store<FileData> store, FileData parent, 	FileData item, String filter) 
-				{
-					if(item.getFullPath().contains(filter))
-						return true;
-					else
-						return false;
-				}
-			};
+		
 		filter.bind(store);
 		filter.setEmptyText("Search...");
 		buttons.add(filter);
@@ -120,7 +131,7 @@ public class DownloadGridWidget extends Composite
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 grid = new Grid<FileData>(store, fileDataColumnModel);
-		
+		 grid.setHeight(Window.getClientHeight() - 100);
 		 sm.setSelectionMode(SelectionMode.SIMPLE);
 		 grid.setView(view);
 		 view.groupBy(cc2);

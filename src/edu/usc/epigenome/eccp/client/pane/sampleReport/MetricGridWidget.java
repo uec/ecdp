@@ -8,13 +8,18 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -38,16 +43,18 @@ public class MetricGridWidget extends Composite {
 
 	@UiField ContentPanel gridPanel;
 	@UiField VerticalLayoutContainer content;
+
 	@UiField ToolBar buttons;
+	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
-	@UiField VerticalLayoutContainer vlc2;
+
 	
 	GroupingView<LibraryProperty> view = new GroupingView<LibraryProperty>();
 	StoreFilterField<LibraryProperty> filter = new StoreFilterField<LibraryProperty>() {
 		@Override
 		protected boolean doSelect(Store<LibraryProperty> store, LibraryProperty parent,LibraryProperty item, String filter) 
 		{
-			return item.getName().contains(filter);
+			return item.getName().toLowerCase().contains(filter.toLowerCase());
 		}
 	};
 	String mode = "user";
@@ -60,15 +67,20 @@ public class MetricGridWidget extends Composite {
 	public MetricGridWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
 		createStatisticsGrid();
-		buttons.add(filter);	 
+		buttons.add(filter);
 	}
 	
 	public MetricGridWidget(List<LibraryProperty> data) {
 		initWidget(uiBinder.createAndBindUi(this));
-		//vlc2.getScrollSupport().setScrollMode(ScrollMode.ALWAYS);
 		createStatisticsGrid();
-		buttons.add(filter);
-		populateGrid(data);		
+		//ZR I hate this dirty hack for making the toolbar appear.
+		buttonsHP.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
+		filter.setEmptyText("Search...");
+		buttonsHP.add(filter);
+		populateGrid(data);	
+		Widget w = vlc.getWidget(0);
+		vlc.remove(0);
+		vlc.insert(w, 0,new VerticalLayoutData(1400,50));
 	}
 	
 	public void createStatisticsGrid() {
@@ -87,10 +99,12 @@ public class MetricGridWidget extends Composite {
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 grid = new Grid<LibraryProperty>(store, colModel);
+		 grid.setHeight(Window.getClientHeight() - 100);
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);				
 		 filter.bind(store);
+		
 	}
 	
 	public void populateGrid(List<LibraryProperty> data)

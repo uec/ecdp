@@ -3,15 +3,26 @@
              xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container" 
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
+		
+		
+		
 		<gxt:ContentPanel ui:field="gridPanel" headingText="Metric Grid">
 			<container:VerticalLayoutContainer ui:field="vlc">
+				<container:child>
 					<gxt:toolbar.ToolBar ui:field="buttons">
-						<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
-						<gxt:button.TextButton ui:field="userButton" text="User View" />
+						<g:HorizontalPanel ui:field="buttonsHP">
+							<gxt:button.TextButton ui:field="adminButton" text="Admin View" />
+							<gxt:button.TextButton ui:field="userButton" text="User View" />
+						</g:HorizontalPanel>
 					</gxt:toolbar.ToolBar>
-					<container:VerticalLayoutContainer ui:field="vlc2">
-						<gxt:container.VerticalLayoutContainer ui:field="content" />
-					</container:VerticalLayoutContainer>
+				</container:child>
+				<container:child>
+					<gxt:container.VerticalLayoutContainer ui:field="content" />
+				</container:child>
 			</container:VerticalLayoutContainer>
 		</gxt:ContentPanel>
+		
+		
+		
+		
 </ui:UiBinder> 

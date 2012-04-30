@@ -1,20 +1,34 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-             xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-             xmlns:c="urn:import:edu.usc.epigenome.eccp.client.sampleList" 
-             xmlns:f="urn:import:edu.usc.epigenome.eccp.client.tab">
-	<ui:with field="res" type="edu.usc.epigenome.eccp.client.Resources.UserPanelResources"></ui:with>
+			xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+			xmlns:c="urn:import:edu.usc.epigenome.eccp.client.sampleList" 
+			xmlns:f="urn:import:edu.usc.epigenome.eccp.client.tab"
+			xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container">
+			
+<!-- 	<ui:with type="com.sencha.gxt.core.client.util.Margins" field="westMargins"> -->
+<!-- 		<ui:attributes top="0" right="5" bottom="0" left="5" /> -->
+<!-- 	</ui:with> -->
 
-	<g:SplitLayoutPanel>
-		<g:west size="600">
-			<g:ScrollPanel>
-				<g:HTMLPanel ui:field="layoutReport">
-					<c:sampleList/> 
-				</g:HTMLPanel>
-			</g:ScrollPanel>
-		</g:west>
-		<g:center>
-			<f:TabbedReport/>
-		</g:center>
-	</g:SplitLayoutPanel>
+<!-- 	<ui:with type="com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData" field="westData"> -->
+<!-- 		<ui:attributes minsize="600" size="1000" margins="{westMargins}" collapsible="true" split="true" /> -->
+<!-- 	</ui:with> -->
+
+<!-- 	<ui:with type="com.sencha.gxt.core.client.util.Margins" field="centerMargins"> -->
+<!-- 		<ui:attributes top="0" right="0" bottom="0" left="0" /> -->
+<!-- 	</ui:with> -->
+
+<!-- 	<ui:with type="com.sencha.gxt.widget.core.client.container.MarginData" field="centerData"> -->
+<!-- 		<ui:attributes margins="{centerMargins}" /> -->
+<!-- 	</ui:with> -->
+
+
+
+	<container:BorderLayoutContainer ui:field="main">
+<!-- 		<container:west layoutData="{westData}"> -->
+<!-- 			<c:sampleList /> -->
+<!-- 		</container:west> -->
+<!-- 		<container:center layoutData="{centerData}"> -->
+<!-- 			<f:TabbedReport /> -->
+<!-- 		</container:center> -->
+	</container:BorderLayoutContainer>
 </ui:UiBinder>

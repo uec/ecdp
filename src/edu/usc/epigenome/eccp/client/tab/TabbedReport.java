@@ -10,11 +10,14 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.LibrarySelectedEvent;
 import edu.usc.epigenome.eccp.client.events.LibrarySelectedEventHandler;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
 
 public class TabbedReport extends Composite 
@@ -35,26 +38,28 @@ public class TabbedReport extends Composite
 			public void onLibrarySelected(LibrarySelectedEvent event)
 			{
 				LibraryData d = event.getLibrary();
+			
+				
+				
+				TabItemConfig config2 = new TabItemConfig();
+				config2.setClosable(true);
+				config2.setText("Files: " + d.get("sample_name").getValue());
+				DownloadGridWidget download = new DownloadGridWidget(d.getFiles());
+				HorizontalPanel p2 = new HorizontalPanel();
+				tabPanel.add(p2,config2);
+				p2.setWidth("100%");
+				tabPanel.setActiveWidget(p2);
+				p2.add(download);
+				
+				
 				TabItemConfig config = new TabItemConfig();
 				config.setClosable(true);
-				config.setText(d.get("sample_name").getValue());
+				config.setText("QC: " + d.get("sample_name").getValue());
 				MetricGridWidget metric = new MetricGridWidget(new ArrayList<LibraryProperty>(d.values()));
-				HorizontalPanel p = new HorizontalPanel();
+				SimpleContainer p = new SimpleContainer();
 				tabPanel.add(p,config);
-				p.setWidth("100%");
 				tabPanel.setActiveWidget(p);
 				p.add(metric);
-				
-						
-						
-				//
-				//MetricGridWidget metric = new MetricGridWidget());
-				//tabPanel.add(metric,"metric");
-				
-			//	DownloadGridWidget fileDL = new DownloadGridWidget(d.getFiles());
-				//tabPanel.add(fileDL,"files");
-						
-					//
 			}	        
 	    });
 	}

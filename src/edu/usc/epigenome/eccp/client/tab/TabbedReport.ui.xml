@@ -4,10 +4,5 @@
 			 xmlns:tabs="urn:import:com.sencha.gxt.widget.core.client" 
 			 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
 			 xmlns:e="urn:import:edu.usc.epigenome.eccp.client.pane.sampleReport">
-	 
-	<g:ScrollPanel>
-  		<g:HTMLPanel>		 
-	 		<tabs:TabPanel ui:field="tabPanel"/>
-  		</g:HTMLPanel>
-	</g:ScrollPanel>	 
+	<tabs:TabPanel ui:field="tabPanel"/>  		 
 </ui:UiBinder> 

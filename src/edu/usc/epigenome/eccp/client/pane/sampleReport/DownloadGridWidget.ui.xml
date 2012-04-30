@@ -7,13 +7,15 @@
 	
 	<g:ScrollPanel>
 	<gxt:ContentPanel ui:field="gridPanel" headingText="Download Grid">
-					<container:VerticalLayoutContainer>
+					<container:VerticalLayoutContainer ui:field="vlc">
 						<container:child >
-							<gxt:toolbar.ToolBar ui:field="buttons">
-								<gxt:button.TextButton ui:field="organizeType" text="Organize by Type" />
-								<gxt:button.TextButton ui:field="organizeLocation" text="Organize by Location" />
-								<gxt:button.TextButton ui:field="downloadSelected" text="Download Selected" /> 
-							</gxt:toolbar.ToolBar>
+								<gxt:toolbar.ToolBar ui:field="buttons">
+									<g:HorizontalPanel ui:field="buttonsHP">
+										<gxt:button.TextButton ui:field="organizeType" text="Organize by Type" />
+										<gxt:button.TextButton ui:field="organizeLocation" text="Organize by Location" />
+										<gxt:button.TextButton ui:field="downloadSelected" text="Download Selected" /> 
+									</g:HorizontalPanel>
+								</gxt:toolbar.ToolBar>
 						</container:child>
 						<container:child >
 							<gxt:container.VerticalLayoutContainer ui:field="content" />
