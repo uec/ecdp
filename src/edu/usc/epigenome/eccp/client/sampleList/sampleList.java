@@ -60,10 +60,8 @@ public class sampleList extends Composite
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
 		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {
-				if(item.get("project").getValue().contains(filter))
-					return true;
-				else
-					return false;
+				return item.get("project").getValue().toLowerCase().contains(filter.toLowerCase());
+					
 		}
 		
 	};

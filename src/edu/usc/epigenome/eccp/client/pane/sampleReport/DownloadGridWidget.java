@@ -59,10 +59,7 @@ public class DownloadGridWidget extends Composite
 			@Override
 			protected boolean doSelect(Store<FileData> store, FileData parent, 	FileData item, String filter) 
 			{
-				if(item.getFullPath().contains(filter))
-					return true;
-				else
-					return false;
+				return item.getFullPath().toLowerCase().contains(filter.toLowerCase());					
 			}
 		};
 		
