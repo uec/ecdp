@@ -76,25 +76,25 @@ public class ECControlCenter implements EntryPoint
 	/*******************************************************************
 	 * 	FOR TESTING HOSTED MODE comment out the following section
 	 *******************************************************************/
-	if(Window.Location.getQueryString().contains("gwt"))
-	{
-		if(Window.Location.getQueryString().contains("au"))
-		{
-			if((Window.Location.getParameter("s").length() > 0))
-			{
-				userType = "guest";
-				//GenUserBinderWidget gubw = new GenUserBinderWidget();
-				//RootLayoutPanel.get().add(gubw);
-			}
-		}
-		else
-		{
+//	if(Window.Location.getQueryString().contains("gwt"))
+//	{
+//		if(Window.Location.getQueryString().contains("au"))
+//		{
+//			if((Window.Location.getParameter("s").length() > 0))
+//			{
+//				userType = "guest";
+//				//GenUserBinderWidget gubw = new GenUserBinderWidget();
+//				//RootLayoutPanel.get().add(gubw);
+//			}
+//		}
+//		else
+//		{
 			userType = "super";
 			ECCPBinderWidget sbw = new ECCPBinderWidget();
 			Viewport viewport = new Viewport();
 		    viewport.setWidget(sbw);
 			RootLayoutPanel.get().add(viewport);
-		}
-	}
+//		}
+//	}
   }
 }
