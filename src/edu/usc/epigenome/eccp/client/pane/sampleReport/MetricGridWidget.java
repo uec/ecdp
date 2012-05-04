@@ -72,15 +72,19 @@ public class MetricGridWidget extends Composite {
 	
 	public MetricGridWidget(List<LibraryProperty> data) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.setLayoutData(new VerticalLayoutData(-1,-1));
+		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
+		vlc.getWidget(0).setLayoutData(new VerticalLayoutData(-1,30));
+		
 		createStatisticsGrid();
 		//ZR I hate this dirty hack for making the toolbar appear.
-		buttonsHP.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
+		
 		filter.setEmptyText("Search...");
 		buttonsHP.add(filter);
 		populateGrid(data);	
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
-		vlc.insert(w, 0,new VerticalLayoutData(1400,50));
+		vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
 	}
 	
 	public void createStatisticsGrid() {
@@ -99,7 +103,7 @@ public class MetricGridWidget extends Composite {
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 grid = new Grid<LibraryProperty>(store, colModel);
-		 grid.setHeight(Window.getClientHeight() - 100);
+		 grid.setHeight(Window.getClientHeight() - 130);
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);				

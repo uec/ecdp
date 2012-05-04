@@ -60,14 +60,14 @@ public class sampleList extends Composite
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
 		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {
-				return item.get("project").getValue().toLowerCase().contains(filter.toLowerCase());
+				return item.get("project").getValue().toLowerCase().contains(filter.toLowerCase()) || item.get("sample_name").getValue().toLowerCase().contains(filter.toLowerCase()) ||  item.get("flowcell_serial").getValue().toLowerCase().contains(filter.toLowerCase()) ||  item.get("analysis_id").getValue().toLowerCase().contains(filter.toLowerCase());
 					
 		}
 		
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> cc1,cc2,cc3,cc4,cc5;
+	ColumnConfig<LibraryData, String> cc1,cc2,cc3,cc4,cc5,cc6;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
 	
@@ -88,7 +88,7 @@ public class sampleList extends Composite
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 		 cc1 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 100, "Flowcell");
 		 cc2 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
-		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
+		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 150, "Run");
 		 cc3.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		{
 		      public SafeHtml render(String object) 
@@ -99,11 +99,15 @@ public class sampleList extends Composite
 		 
 		 cc4 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
 		 cc5 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
+		 cc6 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
+		 cc6 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("RunParam_RunID"), 80, "Storage Folder");
 		 columnDefs.add(cc5);
 		 columnDefs.add(cc2);		
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc4);
+		 columnDefs.add(cc6);
 		 columnDefs.add(cc3);
+		 
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());

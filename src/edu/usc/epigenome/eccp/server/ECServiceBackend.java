@@ -434,7 +434,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				 where += " flowcell_serial LIKE '%" + queryParams.getFlowcell() + "%' AND" ;
 			 where += "0=0";
 			 
-			 String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, analysis_id, flowcell_serial, lane, project, sample_name " : " * ";
+			 String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, analysis_id, flowcell_serial, lane, project, sample_name,RunParam_RunID, STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y') as Date_Sequenced  " : " * ";
 			 
 			 	 
 			 

@@ -84,6 +84,8 @@ public class DownloadGridWidget extends Composite
 	public DownloadGridWidget(List<FileData> data) 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
+		this.setLayoutData(new VerticalLayoutData(-1,-1));
+		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
 		//ZR I hate this dirty hack for making the toolbar appear.
 		buttonsHP.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
 		createFileDownloadGrid();
@@ -92,7 +94,7 @@ public class DownloadGridWidget extends Composite
 		populateGrid(data);	
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
-		vlc.insert(w, 0,new VerticalLayoutData(1400,50));
+		vlc.insert(w, 0,new VerticalLayoutData(800,50));
 	}
 
 	public void createFileDownloadGrid() {
@@ -128,7 +130,7 @@ public class DownloadGridWidget extends Composite
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 grid = new Grid<FileData>(store, fileDataColumnModel);
-		 grid.setHeight(Window.getClientHeight() - 100);
+		 grid.setHeight(Window.getClientHeight() - 130);
 		 sm.setSelectionMode(SelectionMode.SIMPLE);
 		 grid.setView(view);
 		 view.groupBy(cc2);
