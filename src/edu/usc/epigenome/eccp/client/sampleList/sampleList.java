@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -11,6 +13,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -56,6 +59,7 @@ public class sampleList extends Composite
 
 	@UiField ContentPanel gridPanel;
 	@UiField FlowLayoutContainer content;
+	@UiField VerticalLayoutContainer vlc;
 	
 	GroupingView<LibraryData> view = new GroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
@@ -80,8 +84,24 @@ public class sampleList extends Composite
 	    createGrid();
 	    gridPanel.addTool(filter);
 	    filter.setEmptyText("Search...");
-	    grid.setHeight(Window.getClientHeight() - 100);
-	    
+	//    vlc.setHeight(Window.getClientHeight());
+	    grid.setHeight(Window.getClientHeight()-100);
+	    Window.addResizeHandler(new ResizeHandler() {
+
+			@Override
+			public void onResize(ResizeEvent event) {
+				// TODO Auto-generated method stub
+				 Info.display("Resize", "widget resized");
+				 content.setHeight(Window.getClientHeight()-100);
+				 setPixelSize(Window.getClientHeight(),Window.getClientWidth());
+				
+			}
+	    	
+	    });
+	   
+	   //  content.setHeight(Window.getClientHeight());
+	  //  content.setScrollMode(ScrollMode.AUTO);
+	  //  vlc.setScrollMode(ScrollMode.NONE);
 	    
 	}
 	
@@ -121,6 +141,7 @@ public class sampleList extends Composite
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
 		 new GridDragSource<LibraryData>(grid);
+		 
 		 
 		 grid.addRowClickHandler(new RowClickHandler()
 		 {
@@ -217,6 +238,7 @@ public class sampleList extends Composite
 	{
 		view.expandAllGroups();
 	}
+
 	
 }
 	

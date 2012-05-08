@@ -11,8 +11,12 @@
   			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">
    				 <ui:attributes width="1" height="1" />
   			  </ui:with>
- 	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center">
-		<container:VerticalLayoutContainer ui:field="vlc">
+  	<container:VerticalLayoutContainer ui:field="vlc">
+ 	<container:child >
+ 	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center"/>
+ 	</container:child>
+ 	
+		
 			<container:child layoutData='{toolBarRowData}'>
 				<gxt:toolbar.ToolBar >
 					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
@@ -25,6 +29,5 @@
 			<container:child layoutData='{contentData}'>
 				<gxt:container.FlowLayoutContainer ui:field="content" />
 			</container:child>
-		</container:VerticalLayoutContainer>
-	</gxt:ContentPanel>
+	</container:VerticalLayoutContainer>
 </ui:UiBinder> 

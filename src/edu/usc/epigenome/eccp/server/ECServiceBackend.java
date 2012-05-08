@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -325,6 +326,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String selectQuery =
 					"Select \n" +
 							"	m.metric as metric, \n" +
+							"	m.isNumeric as isNumeric, \n" +
 							"	m.sort_order as sort_order,\n" +
 							"	IF(ISNULL(m.description),\"No Description\",m.description) as description,\n" +
 							"	IF(ISNULL(m.pretty_name),m.metric,m.pretty_name) as pretty_name,\n" +
@@ -335,14 +337,18 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							"metric m left join category c on m.id_category = c.id left join file_type f on f.id = id_file_type\n" +
 							" order by metric ";
 			ResultSet results = stat.executeQuery(selectQuery);
+	
 			while(results.next())
 			{
 				HashMap<String,String> value = new  HashMap<String,String>();
-				for(int i = 1 ; i <= results.getMetaData().getColumnCount(); i++)
-				 	 value.put( results.getMetaData().getColumnName(i), results.getString(i));
-				metrics.put(results.getString("metric"), value);
-			}
-			
+				for(int i = 1 ; i <= results.getMetaData().getColumnCount(); i++) {	
+			    value.put( results.getMetaData().getColumnName(i), results.getString(i));
+			   
+			   // 	System.out.println("Found isNumeric column in metrics table ");
+				}	
+				
+				metrics.put(results.getString("metric"),value );
+			}		
 		}
 		catch(Exception e)
 		{
@@ -447,6 +453,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			System.out.println("The query that is executed is " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String,HashMap<String,String>> qcTypes = getQCTypes();
+		//	NumberFormat formatter = new DecimalFormat("##.##");
+			DecimalFormat dbl = new DecimalFormat("0.##E00"); 
+            DecimalFormat itgr = new DecimalFormat();
+			itgr.setGroupingSize(3);
+			dbl.setGroupingSize(3);
+
+		
 			//Iterate over the results
 			 while(results.next())
 			 {
@@ -457,7 +470,38 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 //Name
 					 p.setName( results.getMetaData().getColumnName(i));
 					 //Value
-				 	 p.setValue( results.getString(i));
+					 String tvalue = results.getString(i);
+					 String tname=results.getMetaData().getColumnName(i);
+				 if (!(qcTypes.get(p.getName()) == null)) {
+					// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
+					 
+					 if (qcTypes.get(p.getName()).get("isNumeric").equals("1")) {
+						 System.out.println("Numeric metric: "+tname+" "+tvalue);
+						 double dd = Double.valueOf(tvalue);
+						 int n = (int)dd;
+						 if ((dd-n) == 0 ) {
+							 System.out.println(itgr.format(n));
+							 p.setValue(itgr.format(n));
+							
+						 }
+						 else  {
+							 
+							 if (Math.abs(dd) < 1) {
+        						 p.setValue(dbl.format(dd));
+        						 System.out.println(dbl.format(dd));
+							 }
+							 else  {
+								 p.setValue(itgr.format(dd));							
+							     System.out.println(itgr.format(dd));
+							 }
+						 }
+					 }
+					 else p.setValue(tvalue);
+					 
+				 }
+				    
+				 else 	 p.setValue(tvalue);
+				
 				 	 //Category
 				 	if(!queryParams.getIsSummaryOnly())
 				 	{

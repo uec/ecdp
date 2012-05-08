@@ -3,21 +3,26 @@ package edu.usc.epigenome.eccp.client.pane.sampleReport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -37,7 +42,6 @@ import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 
-
 public class MetricGridWidget extends Composite {
 
 	private static MetricGridUiBinder uiBinder = GWT.create(MetricGridUiBinder.class);
@@ -53,6 +57,8 @@ public class MetricGridWidget extends Composite {
 	@UiField ToolBar buttons;
 	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
+	String usageMode = "user";
+	List<LibraryData> data;
 
 	
 	
@@ -63,7 +69,7 @@ public class MetricGridWidget extends Composite {
 			return item.getName().toLowerCase().contains(filter.toLowerCase());
 		}
 	};
-	String mode = "user";
+	
 
 	
 
@@ -77,6 +83,7 @@ public class MetricGridWidget extends Composite {
 	
 	public MetricGridWidget(List<LibraryData> data) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.data=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.getWidget(0).setLayoutData(new VerticalLayoutData(-1,30));
@@ -168,6 +175,7 @@ public class MetricGridWidget extends Composite {
 								Info.display("Error","Failed to add library to table ");
 							}
 	
+	
 							@Override
 							public void onSuccess(ArrayList<LibraryData> result)
 							{
@@ -190,15 +198,50 @@ public class MetricGridWidget extends Composite {
 	}
 	
 	@UiHandler("adminButton")
-	public void groupByType(SelectEvent event)
+	public void setAdminView(SelectEvent event)
 	{
-		Info.display("TODO", "admin view");
+		
+		usageMode="admin";
+		ArrayList<LibraryProperty> data = getUsageModeData();
+	//	populateGrid(data);
+		
 	}
 	
 	@UiHandler("userButton")
-	public void groupByLocation(SelectEvent event)
+	public void setUserView(SelectEvent event)
 	{
-		Info.display("TODO", "user view");
+		
+		usageMode="user";
+		ArrayList<LibraryProperty> data = getUsageModeData();
+	//	populateGrid(data);
+		
 	}
+	public ArrayList<LibraryProperty> getUsageModeData() {
+        
+		ArrayList<LibraryProperty> usageModeData = new ArrayList<LibraryProperty>();
+		if (usageMode.equals("user")) {
+			Info.display("TODO", "user view");
+	/*		for (LibraryProperty property: data) {
+			//	 System.out.println("Usage number: "+property.getUsage());
+				 if (property.getUsage().equals("4")) usageModeData.add(property);
+			} */
+				 
+			}
+		if (usageMode.equals("admin")) {
+			Info.display("TODO", "admin view");
+			
+		/*	for (LibraryProperty property: data)  {
+				//System.out.println("Usage number: "+property.getUsage());
+				 if (property.getUsage().matches("0|1|2|3|4") ) usageModeData.add(property);
+				 
+			}*/
+				 
+		}
+		Info.display("Size of Array", usageModeData.size()+"");
+		return usageModeData;
+		}
+
+	}
+
 	
-}
+
