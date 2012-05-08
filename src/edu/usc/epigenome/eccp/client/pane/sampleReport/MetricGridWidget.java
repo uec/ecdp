@@ -146,7 +146,6 @@ public class MetricGridWidget extends Composite {
 		 filter.bind(store);
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(mergedLibraryData.values()));
 		 view.collapseAllGroups();
-		 Info.display("Notice", "library data loaded");
 		 view.groupBy(cc2);
 		 DropTarget target = new DropTarget(grid)
 		 {
@@ -180,11 +179,9 @@ public class MetricGridWidget extends Composite {
 							}
 					});
 		        }
-		        
 		      }
 		 };
 		 target.setOperation(Operation.COPY);
-		
 	}
 	
 	public void setHeadingText(String title)
