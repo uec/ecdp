@@ -18,6 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
@@ -416,6 +418,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	@Override
 	public ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams)
 	{
+		HttpServletRequest request = this.getThreadLocalRequest();
+		if(request.getUserPrincipal() != null)
+		{
+			if(request.isUserInRole("ECCPAdmin"))
+				System.out.println(request.getUserPrincipal().getName());
+			else
+				System.out.println("NOT ADMIN:" + request.getUserPrincipal().getName());
+		}
 		ArrayList<LibraryData> data = new ArrayList<LibraryData>();
 		java.sql.Connection myConnection = null;
 		try
