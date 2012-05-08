@@ -10,17 +10,14 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
-import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -28,22 +25,18 @@ import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
-import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
-import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
-import edu.usc.epigenome.eccp.client.events.LibrarySelectedEvent;
+
 
 public class MetricGridWidget extends Composite {
 
@@ -161,29 +154,32 @@ public class MetricGridWidget extends Composite {
 		      protected void onDragDrop(DndDropEvent event) 
 		      {
 		        super.onDragDrop(event);
-		        ArrayList<LibraryData> droppedSummarizedLib = (ArrayList<LibraryData>) event.getData();
-		        LibraryData summarizedLibrary = droppedSummarizedLib.get(0);
-				 LibraryDataQuery query = new LibraryDataQuery();
-				 query.setIsSummaryOnly(false);
-				 query.setGetFiles(true);
-				 query.setDBid(summarizedLibrary.get("id_run_sample").getValue());
-				 myServer.getLibraries(query, new AsyncCallback<ArrayList<LibraryData>>(){
-						@Override
-						public void onFailure(Throwable caught)
-						{
-							Info.display("Error","Failed to add library to table ");
-						}
-
-						@Override
-						public void onSuccess(ArrayList<LibraryData> result)
-						{
-						    libraries.addAll(result);
-						    content.remove(0);
-					        mergeData();
-							drawTable();
-				        	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
-						}
-				});
+		        @SuppressWarnings("unchecked")
+				ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
+		        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
+		        {
+					 LibraryDataQuery query = new LibraryDataQuery();
+					 query.setIsSummaryOnly(false);
+					 query.setGetFiles(true);
+					 query.setDBid(summarizedLibrary.get("id_run_sample").getValue());
+					 myServer.getLibraries(query, new AsyncCallback<ArrayList<LibraryData>>(){
+							@Override
+							public void onFailure(Throwable caught)
+							{
+								Info.display("Error","Failed to add library to table ");
+							}
+	
+							@Override
+							public void onSuccess(ArrayList<LibraryData> result)
+							{
+							    libraries.addAll(result);
+							    content.remove(0);
+						        mergeData();
+								drawTable();
+					        	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
+							}
+					});
+		        }
 		        
 		      }
 		 };
