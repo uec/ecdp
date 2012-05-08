@@ -19,6 +19,7 @@ import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.dom.ScrollSupport.ScrollMode;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
@@ -81,6 +82,7 @@ public class sampleList extends Composite
 	    filter.setEmptyText("Search...");
 	    grid.setHeight(Window.getClientHeight() - 100);
 	    
+	    
 	}
 	
 	public void createGrid() {
@@ -118,7 +120,7 @@ public class sampleList extends Composite
 		 view.groupBy(cc5);
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
-		 
+		 new GridDragSource<LibraryData>(grid);
 		 
 		 grid.addRowClickHandler(new RowClickHandler()
 		 {

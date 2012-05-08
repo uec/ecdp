@@ -55,7 +55,9 @@ public class TabbedReport extends Composite
 				TabItemConfig config = new TabItemConfig();
 				config.setClosable(true);
 				config.setText("QC: " + d.get("sample_name").getValue());
-				MetricGridWidget metric = new MetricGridWidget(new ArrayList<LibraryProperty>(d.values()));
+				ArrayList<LibraryData> dataList = new ArrayList<LibraryData>();
+				dataList.add(d);
+				MetricGridWidget metric = new MetricGridWidget(dataList);
 				SimpleContainer p = new SimpleContainer();
 				tabPanel.add(p,config);
 				tabPanel.setActiveWidget(p);
