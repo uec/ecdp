@@ -590,7 +590,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				System.out.println("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
-				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|runs|gastorage[1|2])/");
+				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis)/");
 				Matcher matcher;
 				Pattern laneNumPattern = Pattern.compile("(s|" + lib.get("flowcell_serial").getValue() + ")_(\\d+)[\\._]+");
 				Matcher laneNumMatcher;

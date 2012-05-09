@@ -110,12 +110,17 @@ public class sampleList extends Composite
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 		 cc1 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 100, "Flowcell");
 		 cc2 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
-		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 150, "Run");
+		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
 		 cc3.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		        return SafeHtmlUtils.fromString(object.length() > 40 ? "..." + object.subSequence(object.length() - 40, object.length()) : object);		        
+		    	  String ret = new String(object);
+		    	  ret = ret.replace("/storage/hpcc/uec-gs1/laird/shared/production/ga/flowcells/", "");
+		    	  String[] vals = ret.split("/");
+		    	  ret = vals.length > 2 ? vals[1] : object;
+		    	  
+		    	  return SafeHtmlUtils.fromString(object.length() > 30 ? ret : object);		        
 		      }
 		}));
 		 
