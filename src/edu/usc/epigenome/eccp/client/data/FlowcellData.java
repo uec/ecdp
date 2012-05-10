@@ -2,10 +2,7 @@ package edu.usc.epigenome.eccp.client.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class FlowcellData implements IsSerializable

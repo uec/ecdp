@@ -3,6 +3,10 @@ import java.io.Serializable;
 
 public class LibraryDataQuery implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String flowcell;
 	String DBid;
 	String runName;

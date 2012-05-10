@@ -11,9 +11,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
-
 import edu.usc.epigenome.eccp.client.data.LibraryData;
-import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.LibrarySelectedEvent;
 import edu.usc.epigenome.eccp.client.events.LibrarySelectedEventHandler;
