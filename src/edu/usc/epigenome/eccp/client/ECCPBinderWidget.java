@@ -1,15 +1,15 @@
 package edu.usc.epigenome.eccp.client;
 
-import com.google.gwt.core.client.GWT;
+//import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Composite;
+//import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.util.Margins;
-import com.sencha.gxt.widget.core.client.ContentPanel;
+//import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
+//import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 
@@ -20,7 +20,7 @@ import edu.usc.epigenome.eccp.client.tab.TabbedReport;
 
 public class ECCPBinderWidget extends BorderLayoutContainer{
 
-	private static ECCPBinderWidgetUiBinder uiBinder = GWT.create(ECCPBinderWidgetUiBinder.class);
+	//private static ECCPBinderWidgetUiBinder uiBinder = GWT.create(ECCPBinderWidgetUiBinder.class);
 
 	interface ECCPBinderWidgetUiBinder extends	UiBinder<Widget, ECCPBinderWidget> {}
 	
@@ -60,7 +60,7 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	//    centerData.setMargins(new Margins(5, 0, 5, 5));
 	    
 	   
-	    SimpleContainer center = new SimpleContainer();
+	    // SimpleContainer center = new SimpleContainer();
 	    //center.setHeight(800);
 	    //center.add(new TabbedReport());
 	    setCenterWidget(new TabbedReport(),centerData);
