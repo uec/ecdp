@@ -24,6 +24,7 @@
 					<gxt:button.TextButton ui:field="byProject" text="By Project" />
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
+					<gxt:button.TextButton ui:field="share" text="Share Search Results" />
 				</gxt:toolbar.ToolBar>
 			</container:child>
 			<container:child layoutData='{contentData}'>

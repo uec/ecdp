@@ -22,12 +22,15 @@ import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
+import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
@@ -78,6 +81,7 @@ public class sampleList extends Composite
 	    createGrid();
 	    gridPanel.addTool(filter);
 	    filter.setEmptyText("Search...");
+	    
 	//    vlc.setHeight(Window.getClientHeight());
 	    grid.setHeight(Window.getClientHeight()-100);
 	    Window.addResizeHandler(new ResizeHandler() {
@@ -103,6 +107,13 @@ public class sampleList extends Composite
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 		 cc1 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 100, "Flowcell");
+		 cc1.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+		 {
+		      public SafeHtml render(String object) 
+		      {  
+		    	  return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep1\">"+ object + "</a>");		        
+		      }
+		 }));
 		 cc2 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
 		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
 		 cc3.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
@@ -187,6 +198,8 @@ public class sampleList extends Composite
 			@Override
 			public void onSuccess(ArrayList<LibraryData> result)
 			{
+				if(result.size() < 1)
+					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
 				populateGrid(result);
 			}});
 		 
@@ -236,6 +249,39 @@ public class sampleList extends Composite
 	public void expall(SelectEvent event)
 	{
 		view.expandAllGroups();
+	}
+
+	@UiHandler("share")
+	public void share(SelectEvent event)
+	{
+		 if(filter.getText().length() < 3 || filter.getText().contains("Search..."))
+		 {
+			 Info.display("Error", "enter something is the search box before you can share");
+			 return;
+		 }
+		 
+		 myServer.getEncryptedData(filter.getText(), new AsyncCallback<ArrayList<String>>(){
+			@Override
+			public void onFailure(Throwable caught)
+			{
+				caught.printStackTrace();
+			}
+			@Override
+			public void onSuccess(ArrayList<String> result)
+			{
+				 TextArea text = new TextArea();
+				 text.setText("http://webapp.epigenome.usc.edu/eccpgxt/ECControlCenter.html?t=" + result.get(0));
+				 final Dialog simple = new Dialog();
+				 simple.setHeadingText("This link will take you directly to the search results");
+				 simple.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.NO);
+				 simple.setBodyStyleName("pad-text");
+				 simple.add(text);
+				 simple.setHideOnButtonClick(true);
+				 simple.setWidth(600);
+				 simple.setHeight(200);
+				 simple.show();
+			}});
+		 
 	}
 
 	
