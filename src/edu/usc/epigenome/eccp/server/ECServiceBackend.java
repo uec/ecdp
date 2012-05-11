@@ -1,5 +1,4 @@
 package edu.usc.epigenome.eccp.server;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -455,93 +454,97 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			itgr.setGroupingSize(3);
 			dbl.setGroupingSize(3);
 
-			// Iterate over the results
-			while (results.next())
-			{
-				LibraryData d = new LibraryData();
-				for (int i = 1; i <= results.getMetaData().getColumnCount(); i++)
-				{
-					LibraryProperty p = new LibraryProperty();
-					// Name
-					p.setName(results.getMetaData().getColumnName(i));
-					// Value
-					String tvalue = results.getString(i);
-					//String tname = results.getMetaData().getColumnName(i);
-					if (!(qcTypes.get(p.getName()) == null))
-					{
-						// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
-
-						if (qcTypes.get(p.getName()).get("isNumeric").equals("1"))
-						{
-							//System.out.println("Numeric metric: " + tname + " " + tvalue);
-							double dd = Double.valueOf(tvalue);
-							int n = (int) dd;
-							if ((dd - n) == 0)
-							{
-								//System.out.println(itgr.format(n));
-								p.setValue(itgr.format(n));
-
-							} else
-							{
-
-								if (Math.abs(dd) < 1)
-								{
-									p.setValue(dbl.format(dd));
-									//System.out.println(dbl.format(dd));
-								} else
-								{
-									p.setValue(itgr.format(dd));
-									//System.out.println(itgr.format(dd));
-								}
-							}
-						} else
-							p.setValue(tvalue);
-
-					}
-
-					else
-						p.setValue(tvalue);
-
-					// Category
-					if (!queryParams.getIsSummaryOnly())
-					{
-						if (qcTypes.containsKey(p.getName()))
-						{
-							p.setCategory(qcTypes.get(p.getName()).get("category"));
-							// sort_order
-							p.setSortOrder(qcTypes.get(p.getName()).get("sort_order"));
-							// desc
-							p.setDescription(qcTypes.get(p.getName()).get("description"));
-							// pretty_name
-							p.setPrettyName(qcTypes.get(p.getName()).get("pretty_name"));
-							// parser
-							p.setSource(qcTypes.get(p.getName()).get("parser"));
-							// usage
-							p.setUsage(qcTypes.get(p.getName()).get("usage_enum"));
-						} else
-						{
-							p.setCategory("Unknown");
-							// sort_order
-							p.setSortOrder("100000");
-							// desc
-							p.setDescription("No Description");
-							// pretty_name
-							p.setPrettyName(p.getName());
-							// parser
-							p.setSource("Unknown");
-							// usage
-							p.setUsage("0");
-						}
-					}
-					d.put(p.getName(), p);
-				}
-
-				if (queryParams.getGetFiles())
-					d.setFiles(getFilesforLibrary(d));
-				data.add(d);
-			}
-		} catch (Exception e)
-		{
+		
+			//Iterate over the results
+			 while(results.next())
+			 {
+				 LibraryData d = new LibraryData();
+				 for(int i = 1 ; i <= results.getMetaData().getColumnCount(); i++)
+				 {	 
+					 LibraryProperty p = new LibraryProperty(); 
+					 //Name
+					 p.setName( results.getMetaData().getColumnName(i));
+					 //Value
+					 String tvalue = results.getString(i);
+					 String tname=results.getMetaData().getColumnName(i);
+				 if (!(qcTypes.get(p.getName()) == null)) {
+					// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
+					 
+					 if (qcTypes.get(p.getName()).get("isNumeric").equals("1")) 
+					 {
+				//		 System.out.println("Numeric metric: "+tname+" "+tvalue);
+						 double dd = Double.valueOf(tvalue);
+						 int n = (int)dd;
+						 if ((dd-n) == 0 ) {
+							 System.out.println(itgr.format(n));
+							 p.setValue(itgr.format(n));
+							
+						 }
+						 else  {
+							 
+							 if (Math.abs(dd) < 1) {
+        						 p.setValue(dbl.format(dd));
+        						 System.out.println(dbl.format(dd));
+							 }
+							 else  {
+								 p.setValue(itgr.format(dd));							
+							     System.out.println(itgr.format(dd));
+							 }
+						 }
+					 }
+					 else  {
+						    // p.setValue(tvalue);
+						 System.out.println("tvalue="+tvalue);
+						 if (tvalue !=null)
+						     p.setValue(formatString(tvalue));
+						 else p.setValue(tvalue);
+					 }
+					 
+				 }
+				    
+				 else 	 p.setValue(tvalue);
+				
+				 	 //Category
+				 	if(!queryParams.getIsSummaryOnly())
+				 	{
+					 	 if(qcTypes.containsKey(p.getName()))
+					 	 {
+						 	 p.setCategory(qcTypes.get(p.getName()).get("category"));
+						 	//sort_order
+						 	 p.setSortOrder(qcTypes.get(p.getName()).get("sort_order"));
+						 	//desc
+						 	 p.setDescription(qcTypes.get(p.getName()).get("description"));
+						 	//pretty_name
+						 	 p.setPrettyName(qcTypes.get(p.getName()).get("pretty_name"));
+						 	 //parser
+						 	 p.setSource(qcTypes.get(p.getName()).get("parser"));
+						 	//usage
+						 	 p.setUsage(qcTypes.get(p.getName()).get("usage_enum"));
+					 	 }
+					 	 else
+					 	 {
+					 		 	p.setCategory("Unknown");
+							 	//sort_order
+							 	 p.setSortOrder("100000");
+							 	//desc
+							 	 p.setDescription("No Description");
+							 	//pretty_name
+							 	 p.setPrettyName(p.getName());
+							 	 //parser
+							 	 p.setSource("Unknown");
+							 	//usage
+							 	 p.setUsage("0");
+					 	 }
+				 	}
+				 	  d.put(p.getName(), p);
+				 }
+				 
+				 if(queryParams.getGetFiles())
+					 d.setFiles(getFilesforLibrary(d));
+				 data.add(d);
+			 }
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		} finally
 		{
@@ -555,8 +558,31 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return data;
 	}
-
-	// returns a list of files associated with the given library
+	
+	public String formatString(String s) {
+		String row ="";
+		double dd;
+		DecimalFormat dbl = new DecimalFormat("0.##E00");
+		if (s.matches("(\\s*(-?\\d+\\.\\d+(E[-|+]\\d+)?)\\s*,?)+")) {
+			if (s.matches(".*,.*")) {
+				String [] temp = s.split(",");
+				for (int i=0; i < temp.length; i++) {
+					dd = Double.valueOf( temp[i].replaceAll("\\s", ""));
+					String formatted =  dbl.format(dd);
+					 if (!(i == temp.length-1))
+						    row=row+formatted+",";
+				     else row=row+formatted;	
+					
+				}
+				return row;
+			}
+			else return dbl.format(Double.valueOf(s));
+			
+		}
+		return s;
+	}
+	
+	//returns a list of files associated with the given library
 	public ArrayList<FileData> getFilesforLibrary(LibraryData lib) throws IllegalArgumentException
 	{
 		ArrayList<FileData> files = new ArrayList<FileData>();

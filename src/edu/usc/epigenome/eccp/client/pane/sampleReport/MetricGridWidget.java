@@ -48,6 +48,7 @@ public class MetricGridWidget extends Composite {
 	}
 	ECServiceAsync myServer = (ECServiceAsync) GWT.create(ECService.class);
 	HashMap<String,MultipleLibraryProperty> mergedLibraryData;
+	HashMap<String,MultipleLibraryProperty> currentLibraryData;
 	List<LibraryData> libraries;
 	@UiField ContentPanel gridPanel;
 	@UiField VerticalLayoutContainer content;
@@ -91,6 +92,7 @@ public class MetricGridWidget extends Composite {
 		buttonsHP.add(filter);
 		libraries = data;
 		mergeData();
+		currentLibraryData=getUsageModeData(); 
 		drawTable();
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
@@ -129,9 +131,11 @@ public class MetricGridWidget extends Composite {
 		 ColumnConfig<MultipleLibraryProperty, String> cc1 = new ColumnConfig<MultipleLibraryProperty, String>(properties.name(), 200, "Metric");
 		 ColumnConfig<MultipleLibraryProperty, String> cc2 = new ColumnConfig<MultipleLibraryProperty, String>(properties.category(), 220, "Category");
 		 columnDefs.add(cc1);
-		 columnDefs.add(cc2);		
+		 columnDefs.add(cc2);
 		 
-		 for(int i = 0 ; i < mergedLibraryData.get("flowcell_serial").getValueSize(); i++)
+	
+		 
+		 for(int i = 0 ; i < currentLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
 			 columnDefs.add(cc);
@@ -149,7 +153,7 @@ public class MetricGridWidget extends Composite {
 		 grid.setView(view);
 		 content.add(grid);				
 		 filter.bind(store);
-		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(mergedLibraryData.values()));
+		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		 view.collapseAllGroups();
 		 view.groupBy(cc2);
 		 DropTarget target = new DropTarget(grid)
@@ -180,6 +184,7 @@ public class MetricGridWidget extends Composite {
 							    libraries.addAll(result);
 							    content.remove(0);
 						        mergeData();
+						        currentLibraryData=getUsageModeData();
 								drawTable();
 					        	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
 							}
@@ -199,8 +204,12 @@ public class MetricGridWidget extends Composite {
 	public void setAdminView(SelectEvent event)
 	{
 		
-		usageMode="admin";
-		ArrayList<LibraryProperty> data = getUsageModeData();
+		 usageMode="admin";
+		 currentLibraryData=getUsageModeData();
+		 content.remove(0);
+		 drawTable();
+	
+		
 	//	populateGrid(data);
 		
 	}
@@ -209,16 +218,25 @@ public class MetricGridWidget extends Composite {
 	public void setUserView(SelectEvent event)
 	{
 		
-		usageMode="user";
-		ArrayList<LibraryProperty> data = getUsageModeData();
+		 usageMode="user";		
+		 currentLibraryData=getUsageModeData(); 
+		 content.remove(0);
+		 drawTable();
 	//	populateGrid(data);
 		
 	}
-	public ArrayList<LibraryProperty> getUsageModeData() {
+	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
-		ArrayList<LibraryProperty> usageModeData = new ArrayList<LibraryProperty>();
+	//	ArrayList<LibraryProperty> usageModeData = new ArrayList<LibraryProperty>();
+		HashMap<String,MultipleLibraryProperty> templibdata = new HashMap<String,MultipleLibraryProperty>();
 		if (usageMode.equals("user")) {
-			Info.display("TODO", "user view");
+			Info.display("Notice", "User view");
+			for (String m: mergedLibraryData.keySet() ) {
+				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
+				if (multiProperty.getUsage().equals("4")) templibdata.put(m, multiProperty);
+				
+			}
+			
 	/*		for (LibraryProperty property: data) {
 			//	 System.out.println("Usage number: "+property.getUsage());
 				 if (property.getUsage().equals("4")) usageModeData.add(property);
@@ -226,7 +244,14 @@ public class MetricGridWidget extends Composite {
 				 
 			}
 		if (usageMode.equals("admin")) {
-			Info.display("TODO", "admin view");
+			Info.display("Notice", "Admin view");
+		//	mergeData(); // to re-create mergedLibraryData from libraries
+			for (String m: mergedLibraryData.keySet() ) {
+				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
+				if (multiProperty.getUsage().matches("0|1|2|3|4")) templibdata.put(m, multiProperty);
+				
+			}
+			
 			
 		/*	for (LibraryProperty property: data)  {
 				//System.out.println("Usage number: "+property.getUsage());
@@ -235,8 +260,7 @@ public class MetricGridWidget extends Composite {
 			}*/
 				 
 		}
-		Info.display("Size of Array", usageModeData.size()+"");
-		return usageModeData;
+		return templibdata;
 		}
 
 	}
