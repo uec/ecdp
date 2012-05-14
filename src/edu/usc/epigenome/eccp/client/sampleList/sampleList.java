@@ -191,7 +191,7 @@ public class sampleList extends Composite
 			@Override
 			public void onFailure(Throwable caught)
 			{
-				Info.display("Error","Failed to get Flowcells");
+				Info.display("Error","Failed to get Library List");
 				
 			}
 
@@ -209,7 +209,7 @@ public class sampleList extends Composite
 	{
 		store.replaceAll(data);
 		view.collapseAllGroups();
-		Info.display("Notice", "data loaded");		
+		Info.display("Notice", "Library List Loaded");		
 		
 	}
 	
