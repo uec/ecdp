@@ -425,7 +425,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 p.setName( results.getMetaData().getColumnName(i));
 					 //Value
 					 String tvalue = results.getString(i);
-					 String tname=results.getMetaData().getColumnName(i);
+					 
 				 if (!(qcTypes.get(p.getName()) == null)) {
 					// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
 					 
