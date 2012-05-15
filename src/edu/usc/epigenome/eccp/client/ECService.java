@@ -14,8 +14,6 @@ public interface ECService extends RemoteService
 {
 	ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams);
 	// Utility Functions
-	//Encrypt the given string 
-	String encryptURLEncoded(String srcText) throws IllegalArgumentException;
 	//Encrypt the contents passed for Guest User
 	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;
 	//Get the csv files for generating file list for plots
