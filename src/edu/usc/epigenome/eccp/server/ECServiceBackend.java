@@ -26,7 +26,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FileData;
-import edu.usc.epigenome.eccp.client.data.FlowcellData;
+
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
@@ -132,48 +132,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return java.net.URLEncoder.encode(encryptString(srcText));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.usc.epigenome.eccp.client.ECService#getCSVFiles(java.lang.String,
-	 * java.lang.String, java.lang.String) Function to get List of files to
-	 * generate QC Plots Input given flowcell, sampleID and run_id(analysis_id)
-	 */
-	public FlowcellData getCSVFiles(String run_id, String serial, String sampleID) throws IllegalArgumentException
-	{
-		FlowcellData flowcell = null;
-		// System.out.println("The runID and sample ID is " + run_id +
-		// sampleID);
-		// if(run_id.equals("") && sampleID.equals(""))
-		// flowcell = getFilesforFlowcell(serial);
-		// else
-		// flowcell = getFilesforRunSample(run_id, serial, sampleID);
-		//
-		// ArrayList<LinkedHashMap<String,String>> filesList =
-		// flowcell.fileList;
-		// ArrayList<LinkedHashMap<String, String>> filesToRemove = new
-		// ArrayList<LinkedHashMap<String,String>>();
-		//
-		// for(int i=0;i<filesList.size();i++)
-		// {
-		// LinkedHashMap<String, String>f = filesList.get(i);
-		// if(!f.get("base").contains(".csv"))
-		// {
-		// filesToRemove.add(f);
-		// }
-		// }
-		// //System.out.println("The size of filesToRemove " +
-		// filesToRemove.size());
-		// for(HashMap<String, String> file : filesToRemove)
-		// {
-		// filesList.remove(file);
-		// }
-		// //System.out.println("The size of filesList is  " +
-		// filesList.size());
-		return flowcell;
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
