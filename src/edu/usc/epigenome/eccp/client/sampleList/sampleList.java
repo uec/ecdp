@@ -24,6 +24,7 @@ import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
@@ -57,12 +58,18 @@ public class sampleList extends Composite
 	@UiField ContentPanel gridPanel;
 	@UiField FlowLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
+	@UiField TextButton share;
 	
 	GroupingView<LibraryData> view = new GroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
 		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {
-				return item.get("project").getValue().toLowerCase().contains(filter.toLowerCase()) || item.get("sample_name").getValue().toLowerCase().contains(filter.toLowerCase()) ||  item.get("flowcell_serial").getValue().toLowerCase().contains(filter.toLowerCase()) ||  item.get("analysis_id").getValue().toLowerCase().contains(filter.toLowerCase());
+				return 
+						item.get("project").getValue().toLowerCase().contains(filter.toLowerCase()) || 
+						item.get("sample_name").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
+						item.get("flowcell_serial").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
+						item.get("analysis_id").getValue().toLowerCase().contains(filter.toLowerCase()) ||
+						item.get("geneusID_sample").getValue().toLowerCase().contains(filter.toLowerCase());
 					
 		}
 		
@@ -81,6 +88,10 @@ public class sampleList extends Composite
 	    createGrid();
 	    gridPanel.addTool(filter);
 	    filter.setEmptyText("Search...");
+	    //hide share button when already in a shared search 
+	    if(Window.Location.getQueryString().length() > 0 )
+	    	share.hide();
+	    	
 	    
 	//    vlc.setHeight(Window.getClientHeight());
 	    grid.setHeight(Window.getClientHeight()-100);
