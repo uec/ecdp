@@ -285,7 +285,7 @@ public class sampleList extends Composite
 				 text.setText("http://webapp.epigenome.usc.edu/eccpgxt/ECControlCenter.html?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
 				 simple.setHeadingText("This link will take you directly to the search results");
-				 simple.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.NO);
+				 simple.setPredefinedButtons(PredefinedButton.OK);
 				 simple.setBodyStyleName("pad-text");
 				 simple.add(text);
 				 simple.setHideOnButtonClick(true);

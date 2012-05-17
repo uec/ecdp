@@ -170,7 +170,7 @@ public class DownloadGridWidget extends Composite
 		 text.setText(fileList);
 		 final Dialog simple = new Dialog();
 		 simple.setHeadingText("Paste these links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
-		 simple.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.NO);
+		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);
 		 simple.setHideOnButtonClick(true);

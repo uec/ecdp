@@ -14,6 +14,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.ColumnChart;
+import com.google.gwt.visualization.client.visualizations.ColumnChart.Options;
 
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
@@ -21,8 +26,12 @@ import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
+import com.sencha.gxt.widget.core.client.event.RowClickEvent;
+import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -193,6 +202,16 @@ public class MetricGridWidget extends Composite {
 		      }
 		 };
 		 target.setOperation(Operation.COPY);
+		 grid.addRowClickHandler(new RowClickHandler(){
+
+			@Override
+			public void onRowClick(RowClickEvent event)
+			{
+				MultipleLibraryProperty clickedItem = store.get(event.getRowIndex());
+				plot(clickedItem);
+				
+			}});
+		 
 	}
 	
 	public void setHeadingText(String title)
@@ -200,31 +219,28 @@ public class MetricGridWidget extends Composite {
 		gridPanel.setHeadingText(title);
 	}
 	
+	//show advanced metrics
 	@UiHandler("adminButton")
 	public void setAdminView(SelectEvent event)
 	{
-		
 		 usageMode="admin";
 		 currentLibraryData=getUsageModeData();
 		 content.remove(0);
 		 drawTable();
-	
-		
 	//	populateGrid(data);
-		
 	}
 	
+	//show only simple metrics
 	@UiHandler("userButton")
 	public void setUserView(SelectEvent event)
 	{
-		
 		 usageMode="user";		
 		 currentLibraryData=getUsageModeData(); 
 		 content.remove(0);
 		 drawTable();
 	//	populateGrid(data);
-		
 	}
+	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
 	//	ArrayList<LibraryProperty> usageModeData = new ArrayList<LibraryProperty>();
@@ -261,9 +277,54 @@ public class MetricGridWidget extends Composite {
 				 
 		}
 		return templibdata;
-		}
-
 	}
+	
+	//create a plot of a clicked library metric
+	public void plot(final MultipleLibraryProperty metric)
+	{
+		try
+		{
+			VisualizationUtils.loadVisualizationApi(new Runnable(){
+				public void run()
+				{
+							
+							DataTable dataMatrix = DataTable.create();
+						    dataMatrix.addColumn(ColumnType.STRING, metric.getName());
+						    dataMatrix.addColumn(ColumnType.NUMBER,  metric.getName());
+						    dataMatrix.addRows(metric.getValueSize());
+							
+						    for(int i=0;i< metric.getValueSize();i++)
+							{									
+								dataMatrix.setValue(i, 0, libraries.get(i).get("sample_name").getValue());
+								dataMatrix.setValue(i, 1, Double.parseDouble(metric.getValue(i).replace(",", "")));
+							}								
+							
+							Options options = Options.create();
+							options.setWidth(600);
+							options.setHeight(600);
+							ColumnChart motion = new ColumnChart(dataMatrix, options);
+							
+							//show the plot
+							final Dialog simple = new Dialog();
+							simple.setHeadingText(metric.getName());
+							simple.setPredefinedButtons(PredefinedButton.OK);
+							simple.setBodyStyleName("pad-text");
+							simple.add(motion);
+							simple.setHideOnButtonClick(true);
+							simple.setWidth(650);
+							simple.setHeight(650);
+							simple.show();
+											
+				}}, ColumnChart.PACKAGE);	
+		}
+		catch(Exception e)
+		{
+			Info.display("Error","You can only plot numeric data");
+		}
+	}
+}
+
+
 
 	
 

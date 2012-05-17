@@ -441,7 +441,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						 double dd = Double.valueOf(tvalue);
 						 int n = (int)dd;
 						 if ((dd-n) == 0 ) {
-							 System.out.println(itgr.format(n));
+							 //System.out.println(itgr.format(n));
 							 p.setValue(itgr.format(n));
 							
 						 }
@@ -449,17 +449,17 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							 
 							 if (Math.abs(dd) < 1) {
         						 p.setValue(dbl.format(dd));
-        						 System.out.println(dbl.format(dd));
+        						// System.out.println(dbl.format(dd));
 							 }
 							 else  {
 								 p.setValue(itgr.format(dd));							
-							     System.out.println(itgr.format(dd));
+							     //System.out.println(itgr.format(dd));
 							 }
 						 }
 					 }
 					 else  {
 						    // p.setValue(tvalue);
-						 System.out.println("tvalue="+tvalue);
+						// System.out.println("tvalue="+tvalue);
 						 if (tvalue !=null)
 						     p.setValue(formatString(tvalue));
 						 else p.setValue(tvalue);
