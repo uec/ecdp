@@ -69,7 +69,7 @@ public class sampleList extends Composite
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> cc1,cc2,cc3,cc4,cc5,cc6;
+	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,folderCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
 	
@@ -91,8 +91,7 @@ public class sampleList extends Composite
 				// TODO Auto-generated method stub
 				 Info.display("Resize", "widget resized");
 				 content.setHeight(Window.getClientHeight()-100);
-				 setPixelSize(Window.getClientHeight(),Window.getClientWidth());
-				
+				 setPixelSize(Window.getClientHeight(),Window.getClientWidth());				
 			}
 	    	
 	    });
@@ -106,17 +105,18 @@ public class sampleList extends Composite
 	public void createGrid() {
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
-		 cc1 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 100, "Flowcell");
-		 cc1.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 80, "Flowcell");
+		 flowcellCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		 {
 		      public SafeHtml render(String object) 
 		      {  
 		    	  return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep1\">"+ object + "</a>");		        
 		      }
 		 }));
-		 cc2 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
-		 cc3 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
-		 cc3.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
+		 
+		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
+		 runCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		{
 		      public SafeHtml render(String object) 
 		      {  
@@ -129,17 +129,18 @@ public class sampleList extends Composite
 		      }
 		}));
 		 
-		 cc4 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
-		 cc5 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
-		 cc6 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
-		 cc6 = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("RunParam_RunID"), 80, "Storage Folder");
-		 columnDefs.add(cc5);
-		 columnDefs.add(cc2);		
-		 columnDefs.add(cc1);
-		 columnDefs.add(cc4);
-		 columnDefs.add(cc6);
-		 columnDefs.add(cc3);
-		 
+		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
+		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
+		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
+		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
+		// folderCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("RunParam_RunID"), 80, "Storage Folder");
+		 columnDefs.add(projCol);
+		 columnDefs.add(libCol);
+		 columnDefs.add(geneusCol);
+		 columnDefs.add(flowcellCol);
+		 columnDefs.add(laneCol);
+		 columnDefs.add(dateCol);
+		 columnDefs.add(runCol);
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
@@ -147,7 +148,7 @@ public class sampleList extends Composite
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 view.groupBy(cc5);
+		 view.groupBy(projCol);
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
 		 new GridDragSource<LibraryData>(grid);
@@ -221,21 +222,21 @@ public class sampleList extends Composite
 	@UiHandler("byFlowcell")
 	public void groupByF(SelectEvent event)
 	{
-		view.groupBy(cc1);
+		view.groupBy(flowcellCol);
 		view.collapseAllGroups();
 	}
 	
 	@UiHandler("byLibrary")
 	public void groupByL(SelectEvent event)
 	{
-		view.groupBy(cc2);
+		view.groupBy(libCol);
 		view.collapseAllGroups();
 	}
 	
 	@UiHandler("byProject")
 	public void groupByP(SelectEvent event)
 	{
-		view.groupBy(cc5);
+		view.groupBy(projCol);
 		view.collapseAllGroups();
 	}
 	

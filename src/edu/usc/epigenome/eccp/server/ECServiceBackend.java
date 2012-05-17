@@ -366,16 +366,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (request.getUserPrincipal() != null)
 			{
 				// debug for user role checking
-				if (request.isUserInRole("ECCPWebAdmin"))
-					System.out.println("ECCPWebAdmin:" + request.getUserPrincipal().getName());
-				if (request.isUserInRole("solexaWebData"))
-					System.out.println("solexaWebData:" + request.getUserPrincipal().getName());
+				//if (request.isUserInRole("ECCPWebAdmin"))
+					//System.out.println("ECCPWebAdmin:" + request.getUserPrincipal().getName());
+				//if (request.isUserInRole("solexaWebData"))
+					//System.out.println("solexaWebData:" + request.getUserPrincipal().getName());
 				
-				System.out.println("User:" + request.getUserPrincipal().getName());
-				System.out.println("Query:" + request.getQueryString());
-				System.out.println("URI:" + request.getRequestURL());
-				System.out.println("map size:" + request.getParameterMap().size());
-				System.out.println("ref:" + request.getHeader("referer"));
+				//System.out.println("User:" + request.getUserPrincipal().getName());
+				//System.out.println("Query:" + request.getQueryString());
+				//System.out.println("URI:" + request.getRequestURL());
+				//System.out.println("map size:" + request.getParameterMap().size());
+				//System.out.println("ref:" + request.getHeader("referer"));
 				
 				URL url = new URL(request.getHeader("referer"));
 				MultiMap<String> params = new MultiMap<String>();
@@ -398,7 +398,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			where += "0=0";
 
-			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, analysis_id, flowcell_serial, lane, project, sample_name,RunParam_RunID, STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y') as Date_Sequenced  " : " * ";
+			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, \n" +
+					"If(" +
+					"	ISNULL(RunParam_RunID), " +
+					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
+					"	STR_TO_DATE(concat(\"20\",substring(RunParam_RunID,1,2),\",\",substring(RunParam_RunID,3,2),\",\",substring(RunParam_RunID,5,2)),'%Y,%m,%e')) " +
+					"as Date_Sequenced "
+				: " * ";
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
