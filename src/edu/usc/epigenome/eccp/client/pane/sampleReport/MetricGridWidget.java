@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -48,6 +50,8 @@ import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
+import com.google.gwt.cell.client.Cell.Context;
+import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
 public class MetricGridWidget extends Composite {
 
@@ -58,6 +62,7 @@ public class MetricGridWidget extends Composite {
 	ECServiceAsync myServer = (ECServiceAsync) GWT.create(ECService.class);
 	HashMap<String,MultipleLibraryProperty> mergedLibraryData;
 	HashMap<String,MultipleLibraryProperty> currentLibraryData;
+	HashMap<String,LibraryProperty> tooltips= new HashMap<String,LibraryProperty>();
 	List<LibraryData> libraries;
 	@UiField ContentPanel gridPanel;
 	@UiField VerticalLayoutContainer content;
@@ -100,6 +105,7 @@ public class MetricGridWidget extends Composite {
 		filter.setEmptyText("Search...");
 		buttonsHP.add(filter);
 		libraries = data;
+	    makeToolTips();
 		mergeData();
 		currentLibraryData=getUsageModeData(); 
 		drawTable();
@@ -141,9 +147,19 @@ public class MetricGridWidget extends Composite {
 		 ColumnConfig<MultipleLibraryProperty, String> cc2 = new ColumnConfig<MultipleLibraryProperty, String>(properties.category(), 220, "Category");
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc2);
-		 
-	
-		 
+		 cc1.setCell(new AbstractCell<String>() {
+			@Override
+			public void render(Context context,String value, SafeHtmlBuilder sb) {
+			    LibraryProperty temp = tooltips.get(value);
+			    String description =(temp.getDescription()).replaceAll("\"","'");
+			    String displayName="";
+				if (temp.getPrettyName() == null) displayName=temp.getName();			 					 
+				else displayName=temp.getPrettyName();					
+				sb.appendHtmlConstant("<span qtitle=\"Title\" qtip=\""+description+"\">" + displayName + "</span>");
+				   
+			}	 
+		 });
+	 
 		 for(int i = 0 ; i < currentLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
@@ -161,7 +177,8 @@ public class MetricGridWidget extends Composite {
 		 grid.setHeight(Window.getClientHeight() - 130);
 		 grid.setView(view);
 		 content.add(grid);				
-		 filter.bind(store);
+		 filter.bind(store);		 
+		 new QuickTip(grid); // Add ToolTips to the grid cells in column cc1
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		 view.collapseAllGroups();
 		 view.groupBy(cc2);
@@ -227,7 +244,6 @@ public class MetricGridWidget extends Composite {
 		 currentLibraryData=getUsageModeData();
 		 content.remove(0);
 		 drawTable();
-	//	populateGrid(data);
 	}
 	
 	//show only simple metrics
@@ -238,42 +254,25 @@ public class MetricGridWidget extends Composite {
 		 currentLibraryData=getUsageModeData(); 
 		 content.remove(0);
 		 drawTable();
-	//	populateGrid(data);
 	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
-	//	ArrayList<LibraryProperty> usageModeData = new ArrayList<LibraryProperty>();
 		HashMap<String,MultipleLibraryProperty> templibdata = new HashMap<String,MultipleLibraryProperty>();
 		if (usageMode.equals("user")) {
 			Info.display("Notice", "User view");
 			for (String m: mergedLibraryData.keySet() ) {
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
-				if (multiProperty.getUsage().equals("4")) templibdata.put(m, multiProperty);
-				
+				if (multiProperty.getUsage().equals("4")) templibdata.put(m, multiProperty);				
 			}
-			
-	/*		for (LibraryProperty property: data) {
-			//	 System.out.println("Usage number: "+property.getUsage());
-				 if (property.getUsage().equals("4")) usageModeData.add(property);
-			} */
-				 
 			}
 		if (usageMode.equals("admin")) {
 			Info.display("Notice", "Admin view");
-		//	mergeData(); // to re-create mergedLibraryData from libraries
 			for (String m: mergedLibraryData.keySet() ) {
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
 				if (multiProperty.getUsage().matches("0|1|2|3|4")) templibdata.put(m, multiProperty);
 				
 			}
-			
-			
-		/*	for (LibraryProperty property: data)  {
-				//System.out.println("Usage number: "+property.getUsage());
-				 if (property.getUsage().matches("0|1|2|3|4") ) usageModeData.add(property);
-				 
-			}*/
 				 
 		}
 		return templibdata;
@@ -320,11 +319,26 @@ public class MetricGridWidget extends Composite {
 		catch(Exception e)
 		{
 			Info.display("Error","You can only plot numeric data");
-		}
-	}
+		}		
+	
 }
 
+	
 
 
+	public void makeToolTips () {
+		
+		for(int i = 0; i < libraries.size() ; i ++){
+			for(String key : libraries.get(i).keySet()) {
+			       LibraryProperty p = libraries.get(i).get(key);
+			       if (p.getDescription() !=null)
+			         tooltips.put(p.getName(), p);
+			       else  tooltips.put(p.getName(), p);
+			      
+		    }		
+		}
+	
+}
+}
 	
 
