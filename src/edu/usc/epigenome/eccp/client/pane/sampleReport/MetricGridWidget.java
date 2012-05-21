@@ -53,8 +53,6 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
-
-import com.google.gwt.cell.client.Cell.Context;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
 public class MetricGridWidget extends Composite {
