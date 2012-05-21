@@ -13,6 +13,7 @@
 						<g:HorizontalPanel ui:field="buttonsHP">
 							<gxt:button.TextButton ui:field="adminButton" text="More Metrics" />
 							<gxt:button.TextButton ui:field="userButton" text="Less Metrics" />
+							<gxt:button.TextButton ui:field="download" text="Download Files" />
 						</g:HorizontalPanel>
 					</gxt:toolbar.ToolBar>
 				</container:child>

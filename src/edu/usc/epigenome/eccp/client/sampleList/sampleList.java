@@ -43,7 +43,8 @@ import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
-import edu.usc.epigenome.eccp.client.events.LibrarySelectedEvent;
+import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
 
 public class sampleList extends Composite 
 {
@@ -186,7 +187,10 @@ public class sampleList extends Composite
 						public void onSuccess(ArrayList<LibraryData> result)
 						{
 							if(result.size() > 0)
-								ECCPEventBus.EVENT_BUS.fireEvent(new LibrarySelectedEvent(result.get(0)));
+							{
+								MetricGridWidget metric = new MetricGridWidget(result);
+								ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
+							}
 							else
 								Info.display("Error","Failed to get Library");
 						}});

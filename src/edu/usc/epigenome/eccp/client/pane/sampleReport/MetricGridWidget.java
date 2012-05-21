@@ -44,12 +44,16 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
+import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
+import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
+import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
+
 import com.google.gwt.cell.client.Cell.Context;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
@@ -254,6 +258,18 @@ public class MetricGridWidget extends Composite {
 		 currentLibraryData=getUsageModeData(); 
 		 content.remove(0);
 		 drawTable();
+	}
+	
+	@UiHandler("download")
+	public void downloadFile(SelectEvent event)
+	{
+		List<FileData> files = new ArrayList<FileData>();
+		for(LibraryData lib : libraries)
+		{
+			files.addAll(lib.getFiles());
+		}
+		DownloadGridWidget download = new DownloadGridWidget(files);
+		ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  libraries.get(0).get("sample_name").getValue() + (libraries.size() > 1 ? (" + " + (libraries.size() -1)) + " other libs" : "")));
 	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {

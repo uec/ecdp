@@ -93,7 +93,7 @@ public class DownloadGridWidget extends Composite
 		populateGrid(data);	
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
-		vlc.insert(w, 0,new VerticalLayoutData(800,50));
+		vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
 	}
 
 	public void createFileDownloadGrid() {
