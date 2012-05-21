@@ -3,7 +3,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+//import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
@@ -31,10 +31,13 @@ public class TabbedReport extends Composite
 				TabItemConfig config = new TabItemConfig();
 				config.setClosable(true);
 				config.setText(event.getTabTitle());
-				HorizontalPanel p = new HorizontalPanel();
-				tabPanel.add(p,config);
-				tabPanel.setActiveWidget(p);
-				p.add(event.getWidgetToShow());
+				tabPanel.add(event.getWidgetToShow(),config);
+				tabPanel.setActiveWidget(event.getWidgetToShow());
+//ZR removed to allow full window width fill								
+//				HorizontalPanel p = new HorizontalPanel();
+//				tabPanel.add(p,config);
+//				tabPanel.setActiveWidget(p);
+//				p.add(event.getWidgetToShow());
 			}	        
 	    });
 	}
