@@ -165,7 +165,7 @@ public class MetricGridWidget extends Composite {
 		 for(int i = 0 ; i < currentLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
-			 columnDefs.add(cc);
+			 columnDefs.add(cc);			 
 		 }		 
 		 
 		 ColumnModel<MultipleLibraryProperty> colModel = new ColumnModel<MultipleLibraryProperty>(columnDefs);
@@ -173,10 +173,16 @@ public class MetricGridWidget extends Composite {
 		 GroupingView<MultipleLibraryProperty> view = new GroupingView<MultipleLibraryProperty>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
-		 view.setForceFit(true);
+		 for(int i=2; i < columnDefs.size(); i++)
+		 {
+			 view.setAutoExpandColumn(columnDefs.get(i));
+		 }
+		 view.setAutoExpandMin(100);
+		 view.setAutoExpandMax(2000);
 		 
 		 final	Grid<MultipleLibraryProperty> grid = new Grid<MultipleLibraryProperty>(store, colModel);
 		 grid.setHeight(Window.getClientHeight() - 130);
+		 grid.setWidth(Window.getClientWidth() - 600);
 		 grid.setView(view);
 		 content.add(grid);				
 		 filter.bind(store);		 
