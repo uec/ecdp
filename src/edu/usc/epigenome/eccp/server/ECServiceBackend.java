@@ -439,7 +439,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 {
 				//		 System.out.println("Numeric metric: "+tname+" "+tvalue);
 						 double dd = Double.valueOf(tvalue);
-						 int n = (int)dd;
+						 long n = (long)dd;
 						 if ((dd-n) == 0 ) {
 							 //System.out.println(itgr.format(n));
 							 p.setValue(itgr.format(n));

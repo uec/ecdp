@@ -96,7 +96,7 @@ public class sampleList extends Composite
 	    
 	//    vlc.setHeight(Window.getClientHeight());
 	    grid.setHeight(Window.getClientHeight()-100);
-	    Window.addResizeHandler(new ResizeHandler() {
+	   /* Window.addResizeHandler(new ResizeHandler() {
 
 			@Override
 			public void onResize(ResizeEvent event) {
@@ -107,7 +107,7 @@ public class sampleList extends Composite
 			}
 	    	
 	    });
-	   
+	   */
 	   //  content.setHeight(Window.getClientHeight());
 	  //  content.setScrollMode(ScrollMode.AUTO);
 	  //  vlc.setScrollMode(ScrollMode.NONE);
