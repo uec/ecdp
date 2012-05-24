@@ -1,4 +1,4 @@
-package edu.usc.epigenome.eccp.client.sampleList;
+package edu.usc.epigenome.eccp.client.sencha;
 
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 

@@ -45,6 +45,7 @@ import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
+import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 public class sampleList extends Composite 
 {
