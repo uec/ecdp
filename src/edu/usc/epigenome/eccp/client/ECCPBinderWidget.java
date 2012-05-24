@@ -38,7 +38,7 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	    setPixelSize(Window.getClientWidth(), Window.getClientHeight());
 	    
 		BorderLayoutData westData = new BorderLayoutData(600);
-	//	westData.setMaxSize(1000);
+		westData.setMaxSize(1000);
 	    westData.setMargins(new Margins(5, 0, 5, 5));
 	    
 	    westData.setSplit(true);

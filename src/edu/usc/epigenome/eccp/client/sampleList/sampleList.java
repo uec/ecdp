@@ -61,7 +61,7 @@ public class sampleList extends Composite
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
 	
-	GroupingView<LibraryData> view = new GroupingView<LibraryData>();
+	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
 		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {
@@ -156,7 +156,7 @@ public class sampleList extends Composite
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
-		 view = new GroupingView<LibraryData>();
+		 view = new ResizeGroupingView<LibraryData>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
@@ -265,6 +265,12 @@ public class sampleList extends Composite
 	public void expall(SelectEvent event)
 	{
 		view.expandAllGroups();
+	}
+	
+	@UiHandler("resize")
+	public void fitIt(SelectEvent event)
+	{
+		view.doResize();
 	}
 
 	@UiHandler("share")
