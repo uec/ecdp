@@ -29,7 +29,7 @@
 				</gxt:toolbar.ToolBar>
 			</container:child>
 			<container:child layoutData='{contentData}'>
-				<gxt:container.FlowLayoutContainer ui:field="content" />
+				<gxt:container.VerticalLayoutContainer ui:field="content" />
 			</container:child>
 	</container:VerticalLayoutContainer>
 </ui:UiBinder> 

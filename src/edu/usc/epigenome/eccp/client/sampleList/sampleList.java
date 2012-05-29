@@ -26,7 +26,10 @@ import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.HasLayout;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -47,7 +50,7 @@ import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
-public class sampleList extends Composite 
+public class sampleList extends Composite implements HasLayout
 {
 
 	private static sampleListUiBinder uiBinder = GWT.create(sampleListUiBinder.class);
@@ -58,7 +61,7 @@ public class sampleList extends Composite
 	ECServiceAsync myServer = (ECServiceAsync) GWT.create(ECService.class);
 
 	@UiField ContentPanel gridPanel;
-	@UiField FlowLayoutContainer content;
+	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
 	
@@ -96,19 +99,23 @@ public class sampleList extends Composite
 	    	
 	    
 	//    vlc.setHeight(Window.getClientHeight());
-	    grid.setHeight(Window.getClientHeight()-100);
-	   /* Window.addResizeHandler(new ResizeHandler() {
+
+	    
+	  /*  Window.addResizeHandler(new ResizeHandler() {
 
 			@Override
 			public void onResize(ResizeEvent event) {
 				// TODO Auto-generated method stub
 				 Info.display("Resize", "widget resized");
-				 content.setHeight(Window.getClientHeight()-100);
-				 setPixelSize(Window.getClientHeight(),Window.getClientWidth());				
+				 view.doResize();
+				 vlc.forceLayout();
+
+			//	 content.setHeight(Window.getClientHeight()-100);
+			//	 setPixelSize(Window.getClientHeight(),Window.getClientWidth());				
 			}
 	    	
-	    });
-	   */
+	    });*/
+	   
 	   //  content.setHeight(Window.getClientHeight());
 	  //  content.setScrollMode(ScrollMode.AUTO);
 	  //  vlc.setScrollMode(ScrollMode.NONE);
@@ -306,6 +313,32 @@ public class sampleList extends Composite
 				 simple.show();
 			}});
 		 
+	}
+
+	@Override
+	public void forceLayout() {
+		// TODO Auto-generated method stub
+
+		vlc.forceLayout();
+		gridPanel.forceLayout();
+		content.forceLayout();
+		view.doResize();
+		grid.setHeight(Window.getClientHeight()-70);
+	
+		
+		
+	}
+
+	@Override
+	public boolean isLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isOrWasLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	

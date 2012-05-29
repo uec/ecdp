@@ -1,6 +1,8 @@
 package edu.usc.epigenome.eccp.client;
 
 //import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -8,10 +10,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.util.Margins;
 //import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 //import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.info.Info;
 
 import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.sampleList.sampleList;
@@ -27,7 +31,10 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	static {   UserPanelResources.INSTANCE.userPanel().ensureInjected();}
 	
 	@UiField BorderLayoutContainer  main;
+	SimpleContainer west;
+	SimpleContainer center;
 	sampleList sample;
+
 
 	public ECCPBinderWidget() 
 	{
@@ -46,7 +53,27 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	    westData.setCollapseHidden(true);
 	    westData.setCollapseMini(true);
     
-	    SimpleContainer west = new SimpleContainer();
+	    west = new SimpleContainer();
+	    center = new SimpleContainer();
+	    west.addResizeHandler(new ResizeHandler() {
+
+			@Override
+			public void onResize(ResizeEvent event) {
+				// TODO Auto-generated method stub
+				 Info.display("Resize", "West resized");
+				 west.forceLayout();			
+			}	
+	    });
+	    center.addResizeHandler(new ResizeHandler() {
+
+			@Override
+			public void onResize(ResizeEvent event) {
+				// TODO Auto-generated method stub
+				 Info.display("Resize", "Center resized");
+				 center.forceLayout();			
+			}	
+	    });
+	    
 	    west.setBorders(true);
 	//    west.setPixelSize(500, 500);
 	    setWestWidget(west,westData);
@@ -62,14 +89,13 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	   
 	    // SimpleContainer center = new SimpleContainer();
 	    //center.setHeight(800);
-	    //center.add(new TabbedReport());
-	    setCenterWidget(new TabbedReport(),centerData);
+	    center.add(new TabbedReport());
+	    setCenterWidget(center,centerData);
 	    
 
 	}
 	@Override
 	  protected void onWindowResize(int width, int height) {
 	    setPixelSize(width, height);
-	    
 	  }
 }

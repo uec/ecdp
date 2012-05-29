@@ -7,11 +7,13 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
+import com.sencha.gxt.widget.core.client.container.HasLayout;
+
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEventHandler;
 
-public class TabbedReport extends Composite 
+public class TabbedReport extends Composite implements HasLayout
 {
 
 	private static TabbedReportUiBinder uiBinder = GWT.create(TabbedReportUiBinder.class);
@@ -40,6 +42,25 @@ public class TabbedReport extends Composite
 //				p.add(event.getWidgetToShow());
 			}	        
 	    });
+	}
+
+	@Override
+	public void forceLayout() {
+		
+		tabPanel.forceLayout();
+		
+	}
+
+	@Override
+	public boolean isLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isOrWasLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
