@@ -123,7 +123,8 @@ public class sampleList extends Composite
 		 {
 		      public SafeHtml render(String object) 
 		      {  
-		    	  return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep1\">"+ object + "</a>");		        
+		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"> (p)</a> " +
+		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"> (i)</a>");		        
 		      }
 		 }));
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
