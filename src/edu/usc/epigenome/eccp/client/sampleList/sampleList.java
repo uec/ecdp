@@ -276,12 +276,6 @@ public class sampleList extends Composite implements HasLayout
 		view.expandAllGroups();
 	}
 	
-	@UiHandler("resize")
-	public void fitIt(SelectEvent event)
-	{
-		view.doResize();
-	}
-
 	@UiHandler("share")
 	public void share(SelectEvent event)
 	{
