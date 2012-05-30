@@ -40,7 +40,7 @@
    </auth-constraint>
 </security-constraint>
 <login-config><auth-method>BASIC</auth-method></login-config>
-<security-role><role-name>ECCPWebAdmin</role-name></security-role>
+<security-role><role-name>solexaWebData</role-name></security-role>
 -->
 
 </web-app>
