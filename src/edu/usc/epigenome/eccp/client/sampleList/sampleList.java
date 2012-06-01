@@ -125,7 +125,7 @@ public class sampleList extends Composite implements HasLayout
 	public void createGrid() {
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
-		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 80, "Flowcell");
+		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 90, "Flowcell");
 		 flowcellCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		 {
 		      public SafeHtml render(String object) 

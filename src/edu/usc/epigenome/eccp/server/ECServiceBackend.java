@@ -432,7 +432,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 //Value
 					 String tvalue = results.getString(i);
 					 
-				 if (!(qcTypes.get(p.getName()) == null)) {
+				 if (qcTypes.containsKey(p.getName())) 
+				 {
 					// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
 					 
 					 if (qcTypes.get(p.getName()).get("isNumeric").equals("1")) 
