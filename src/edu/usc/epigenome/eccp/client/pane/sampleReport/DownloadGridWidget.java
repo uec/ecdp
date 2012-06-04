@@ -23,6 +23,7 @@ import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -39,14 +40,15 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.FileDataModel;
+import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 
-public class DownloadGridWidget extends Composite
+public class DownloadGridWidget extends Composite implements HasLayout
 {
 	private static DownloadGridWidgetUiBinder uiBinder = GWT.create(DownloadGridWidgetUiBinder.class);
 	interface DownloadGridWidgetUiBinder extends UiBinder<Widget, DownloadGridWidget> 	{}
 	ECServiceAsync myServer = (ECServiceAsync) GWT.create(ECService.class);
-	GroupingView<FileData> view = new GroupingView<FileData>();
+	ResizeGroupingView<FileData> view = new ResizeGroupingView<FileData>();
 	
 	@UiField ToolBar buttons;
 	@UiField HorizontalPanel buttonsHP;
@@ -124,7 +126,7 @@ public class DownloadGridWidget extends Composite
 		buttons.add(filter);
 		 
 		 
-		 view = new GroupingView<FileData>();
+		 view = new ResizeGroupingView<FileData>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
@@ -183,5 +185,27 @@ public class DownloadGridWidget extends Composite
 	public void groupByLocation(SelectEvent event)
 	{
 		 view.groupBy(cc3);
+	}
+
+	@Override
+	public void forceLayout() {
+		// TODO Auto-generated method stub
+		view.doResize();
+		vlc.forceLayout();
+		content.forceLayout();
+		grid.setHeight(Window.getClientHeight()-110);
+		
+	}
+
+	@Override
+	public boolean isLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isOrWasLayoutRunning() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

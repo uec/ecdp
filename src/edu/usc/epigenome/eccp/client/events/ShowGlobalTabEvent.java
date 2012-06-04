@@ -51,7 +51,8 @@ public class ShowGlobalTabEvent extends GwtEvent<ShowGlobalTabEventHandler>
 	@Override
 	protected void dispatch(ShowGlobalTabEventHandler handler)
 	{
-		handler.onShowWidgetInTab(this);		
+		handler.onShowWidgetInTab(this);
+	
 	}
 	
 }

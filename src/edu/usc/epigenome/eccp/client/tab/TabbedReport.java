@@ -1,5 +1,7 @@
 package edu.usc.epigenome.eccp.client.tab;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -12,6 +14,7 @@ import com.sencha.gxt.widget.core.client.container.HasLayout;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEventHandler;
+import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
 
 public class TabbedReport extends Composite implements HasLayout
 {
@@ -25,7 +28,19 @@ public class TabbedReport extends Composite implements HasLayout
 	public TabbedReport()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()     
+		tabPanel.setResizeTabs(true);
+		// This handler handles tab content resize on a tab click
+		SelectionHandler<Widget> handler = new SelectionHandler<Widget>() {
+		      @Override
+		      public void onSelection(SelectionEvent<Widget> event) {
+		        MetricGridWidget w = (MetricGridWidget)event.getSelectedItem();
+		        w.forceLayout();
+		      }
+			
+		    };
+		tabPanel.addSelectionHandler(handler);
+		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()  
+		
 		{
 			@Override
 			public void onShowWidgetInTab(ShowGlobalTabEvent event)
@@ -34,7 +49,7 @@ public class TabbedReport extends Composite implements HasLayout
 				config.setClosable(true);
 				config.setText(event.getTabTitle());
 				tabPanel.add(event.getWidgetToShow(),config);
-				tabPanel.setActiveWidget(event.getWidgetToShow());
+				tabPanel.setActiveWidget(event.getWidgetToShow()); 
 //ZR removed to allow full window width fill								
 //				HorizontalPanel p = new HorizontalPanel();
 //				tabPanel.add(p,config);
@@ -46,7 +61,6 @@ public class TabbedReport extends Composite implements HasLayout
 
 	@Override
 	public void forceLayout() {
-		
 		tabPanel.forceLayout();
 		
 	}
@@ -62,5 +76,6 @@ public class TabbedReport extends Composite implements HasLayout
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 
 }
