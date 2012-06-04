@@ -28,7 +28,6 @@ public class TabbedReport extends Composite implements HasLayout
 	public TabbedReport()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		tabPanel.setResizeTabs(true);
 		// This handler handles tab content resize on a tab click
 		SelectionHandler<Widget> handler = new SelectionHandler<Widget>() {
 		      @Override
