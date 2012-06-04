@@ -12,9 +12,10 @@ import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
+
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEventHandler;
-import edu.usc.epigenome.eccp.client.pane.sampleReport.MetricGridWidget;
+
 
 public class TabbedReport extends Composite implements HasLayout
 {
@@ -28,16 +29,17 @@ public class TabbedReport extends Composite implements HasLayout
 	public TabbedReport()
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		// This handler handles tab content resize on a tab click
+	
 		SelectionHandler<Widget> handler = new SelectionHandler<Widget>() {
 		      @Override
 		      public void onSelection(SelectionEvent<Widget> event) {
-		        MetricGridWidget w = (MetricGridWidget)event.getSelectedItem();
+		        HasLayout w = (HasLayout)event.getSelectedItem();
 		        w.forceLayout();
 		      }
 			
 		    };
 		tabPanel.addSelectionHandler(handler);
+		
 		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()  
 		
 		{
@@ -75,6 +77,6 @@ public class TabbedReport extends Composite implements HasLayout
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 
 }
