@@ -244,7 +244,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL to connect to the database
-			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
@@ -348,7 +348,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL for database connection
-			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
@@ -561,7 +561,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL to connect to the database
-			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
+			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
