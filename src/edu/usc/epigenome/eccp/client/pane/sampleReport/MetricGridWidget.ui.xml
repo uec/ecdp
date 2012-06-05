@@ -14,6 +14,7 @@
 							<gxt:button.TextButton ui:field="adminButton" text="More Metrics" />
 							<gxt:button.TextButton ui:field="userButton" text="Less Metrics" />
 							<gxt:button.TextButton ui:field="download" text="Download Files" />
+							<gxt:button.TextButton ui:field="toSpreadsheet" text="Save as Spreadsheet" />
 						</g:HorizontalPanel>
 					</gxt:toolbar.ToolBar>
 				</container:child>

@@ -37,6 +37,7 @@ import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
+import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
@@ -307,6 +308,29 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		DownloadGridWidget download = new DownloadGridWidget(files);
 		ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  libraries.get(0).get("sample_name").getValue() + (libraries.size() > 1 ? (" + " + (libraries.size() -1)) + " other libs" : "")));
 	}
+	
+	
+	@UiHandler("toSpreadsheet")
+	public void showCSV(SelectEvent event)
+	{
+		String csv = "";
+		for(MultipleLibraryProperty metric : gridPointer.getStore().getAll())
+		{
+			csv += metric.getName() + "\t" + metric.getPrettyName() + "\n";
+		}
+		 TextArea text = new TextArea();
+		 text.setText(csv);
+		 final Dialog simple = new Dialog();
+		 simple.setHeadingText("Tab-seperated metrics (pastable in Excel)");
+		 simple.setPredefinedButtons(PredefinedButton.OK);
+		 simple.setBodyStyleName("pad-text");
+		 simple.add(text);
+		 simple.setHideOnButtonClick(true);
+		 simple.setWidth(600);
+		 simple.setHeight(400);
+		 simple.show();
+	}
+	
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
