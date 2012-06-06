@@ -310,18 +310,26 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	}
 	
 	
-	@UiHandler("toSpreadsheet")
+	@UiHandler("toSpreadSheet")
 	public void showCSV(SelectEvent event)
 	{
-		String csv = "";
+
+		List<ColumnConfig<MultipleLibraryProperty, ?>> configs = gridPointer.getColumnModel().getColumns();
+		String header = "";
+		for (ColumnConfig<MultipleLibraryProperty, ?> col: configs) {
+
+			header+=col.getHeader().asString()+ "\t";
+		}
+		String csv = "Metric Name in Database"+"\t"+ header+"\n";
 		for(MultipleLibraryProperty metric : gridPointer.getStore().getAll())
 		{
-			csv += metric.getName() + "\t" + metric.getPrettyName() + "\n";
+			
+			csv += metric.getName() + "\t" + metric.getPrettyName() +"\t"+ metric.getCategory()+"\t"+metric.getAllValues()+"\n";
 		}
 		 TextArea text = new TextArea();
 		 text.setText(csv);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Tab-seperated metrics (pastable in Excel)");
+		 simple.setHeadingText("Tab-separated metrics (pastable in Excel)");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);

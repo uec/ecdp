@@ -36,5 +36,15 @@ public class MultipleLibraryProperty extends LibraryProperty
 		else 
 			return this.value.size();
 	}
+	public String getAllValues() {
+		String s="";
+		if(this.value != null) {
+		      for (String v: value) {
+			          s+=v+"\t";
+		       }
+		}
+	//	System.out.println(s);
+		return s;
+	}
 	
 }
