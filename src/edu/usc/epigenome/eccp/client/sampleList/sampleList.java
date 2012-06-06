@@ -130,8 +130,8 @@ public class sampleList extends Composite implements HasLayout
 		 {
 		      public SafeHtml render(String object) 
 		      {  
-		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"> (p)</a> " +
-		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/eccpgxt/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"> (i)</a>");		        
+		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"> (p)</a> " +
+		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"> (i)</a>");		        
 		      }
 		 }));
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
@@ -295,7 +295,7 @@ public class sampleList extends Composite implements HasLayout
 			public void onSuccess(ArrayList<String> result)
 			{
 				 TextArea text = new TextArea();
-				 text.setText("http://webapp.epigenome.usc.edu/eccpgxt/ECControlCenter.html?t=" + result.get(0));
+				 text.setText("http://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
 				 simple.setHeadingText("This link will take you directly to the search results");
 				 simple.setPredefinedButtons(PredefinedButton.OK);
