@@ -366,16 +366,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (request.getUserPrincipal() != null)
 			{
 				// debug for user role checking
-				//if (request.isUserInRole("ECCPWebAdmin"))
-					//System.out.println("ECCPWebAdmin:" + request.getUserPrincipal().getName());
-				//if (request.isUserInRole("solexaWebData"))
-					//System.out.println("solexaWebData:" + request.getUserPrincipal().getName());
+				if (request.isUserInRole("ECCPWebAdmin"))
+					System.out.println("ECCPWebAdmin:" + request.getUserPrincipal().getName());
+				if (request.isUserInRole("solexaWebData"))
+					System.out.println("solexaWebData:" + request.getUserPrincipal().getName());
 				
-				//System.out.println("User:" + request.getUserPrincipal().getName());
-				//System.out.println("Query:" + request.getQueryString());
-				//System.out.println("URI:" + request.getRequestURL());
-				//System.out.println("map size:" + request.getParameterMap().size());
-				//System.out.println("ref:" + request.getHeader("referer"));
+				System.out.println("User:" + request.getUserPrincipal().getName());
+				System.out.println("Query:" + request.getQueryString());
+				System.out.println("URI:" + request.getRequestURL());
+				System.out.println("map size:" + request.getParameterMap().size());
+				System.out.println("ref:" + request.getHeader("referer"));
 				
 				URL url = new URL(request.getHeader("referer"));
 				MultiMap<String> params = new MultiMap<String>();
