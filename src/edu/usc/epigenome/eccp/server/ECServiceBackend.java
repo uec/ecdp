@@ -404,7 +404,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
 					"	STR_TO_DATE(concat(\"20\",substring(RunParam_RunID,1,2),\",\",substring(RunParam_RunID,3,2),\",\",substring(RunParam_RunID,5,2)),'%Y,%m,%e')) " +
 					"as Date_Sequenced "
-				: " * ";
+				: " * ,"+
+				"If(" +
+				"	ISNULL(RunParam_RunID), " +
+				"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
+				"	STR_TO_DATE(concat(\"20\",substring(RunParam_RunID,1,2),\",\",substring(RunParam_RunID,3,2),\",\",substring(RunParam_RunID,5,2)),'%Y,%m,%e')) " +
+				"as Date_Sequenced_temp ";
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
@@ -503,6 +508,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 	 }
 				 	}
 				 	  d.put(p.getName(), p);
+				 }
+				 if (d.containsKey("Date_Sequenced_temp")) {
+					 LibraryProperty date = d.get("Date_Sequenced");
+					 String newDate = d.get("Date_Sequenced_temp").getValue();
+					 date.setValue(newDate);
+					 d.remove("Date_Sequenced_temp");					 
 				 }
 				 
 				 if(queryParams.getGetFiles())
