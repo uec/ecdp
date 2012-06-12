@@ -20,7 +20,7 @@
 		byte[] encodedBytes = new BASE64Decoder().decodeBuffer(encFileName);
 		String filePath = new String( desCipher.doFinal(encodedBytes));
 		
-		if(!filePath.startsWith("/storage/") || filePath.contains("../"))
+		if(!filePath.startsWith("/storage/"))
 			return;
 				
 		
