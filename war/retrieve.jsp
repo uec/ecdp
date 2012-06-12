@@ -20,6 +20,11 @@
 		byte[] encodedBytes = new BASE64Decoder().decodeBuffer(encFileName);
 		String filePath = new String( desCipher.doFinal(encodedBytes));
 		
+		if (request.getUserPrincipal() != null)
+		{
+			System.err.println(request.getUserPrincipal().getName() + " downloading " + filePath);
+		}	
+		
 		if(!filePath.startsWith("/storage/"))
 			return;
 				
@@ -44,6 +49,7 @@
 				response.setHeader("Content-Length", Long.toString(myfile.length()));
 			
 			//read from the file; write to the ServletOutputStream
+			System.err.println("Streaming file: " + filePath);
 			while ((readBytes = buf.read()) != -1)
 				myOut.write(readBytes);
 			
@@ -64,6 +70,7 @@
 	catch(Exception e)
 	{
 		out.println("Unauthorized File Request");	
+		e.printStackTrace();
 	}
 	
 	
