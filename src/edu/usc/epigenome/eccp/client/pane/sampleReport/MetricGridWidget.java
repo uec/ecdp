@@ -84,15 +84,22 @@ public class MetricGridWidget extends Composite implements HasLayout{
     
 	
 	
-	StoreFilterField<MultipleLibraryProperty> filter = new StoreFilterField<MultipleLibraryProperty>() {
+	StoreFilterField<MultipleLibraryProperty> filter = new StoreFilterField<MultipleLibraryProperty>() 
+	{
 		@Override
 		protected boolean doSelect(Store<MultipleLibraryProperty> store, MultipleLibraryProperty parent,MultipleLibraryProperty item, String filter) 
 		{
-			Boolean PrettyMatch = false;
-			if(item.getPrettyName() != null)
-				PrettyMatch = item.getPrettyName().toLowerCase().contains(filter.toLowerCase());
-			return item.getName().toLowerCase().contains(filter.toLowerCase()) || PrettyMatch;
-					
+			boolean match = false;
+			boolean prettyMatch = false;
+			
+			for(String token : filter.split("\\s"))
+			{
+				if(item.getPrettyName() != null)
+					prettyMatch = item.getPrettyName().toLowerCase().contains(token.toLowerCase());
+				
+				match = match || prettyMatch ||	item.getName().toLowerCase().contains(token.toLowerCase());
+			}
+			return match;					
 		}
 	};
 	
@@ -329,13 +336,13 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 TextArea text = new TextArea();
 		 text.setText(csv);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Tab-separated metrics (pastable in Excel)");
+		 simple.setHeadingText("Tab-separated metrics (Paste into Excel)");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);
 		 simple.setHideOnButtonClick(true);
-		 simple.setWidth(600);
-		 simple.setHeight(400);
+		 simple.setWidth(700);
+		 simple.setHeight(500);
 		 simple.show();
 	}
 	
