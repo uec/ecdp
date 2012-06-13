@@ -18,8 +18,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
+import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
@@ -39,6 +42,7 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
+import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
 import com.sencha.gxt.widget.core.client.info.Info;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
@@ -81,9 +85,10 @@ public class sampleList extends Composite implements HasLayout
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,folderCol;
+	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,folderCol,tempCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
+
 	
 
 	@UiConstructor
@@ -91,6 +96,7 @@ public class sampleList extends Composite implements HasLayout
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 	    createGrid();
+	   
 	    gridPanel.addTool(filter);
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
@@ -154,6 +160,10 @@ public class sampleList extends Composite implements HasLayout
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
 		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
+		 
+		 
+		 
+	//	 tempCol = new ColumnConfig<LibraryData, String>(null, 80, "ConcatCol");
 		// folderCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("RunParam_RunID"), 80, "Storage Folder");
 		 columnDefs.add(projCol);
 		 columnDefs.add(libCol);
@@ -162,6 +172,7 @@ public class sampleList extends Composite implements HasLayout
 		 columnDefs.add(laneCol);
 		 columnDefs.add(dateCol);
 		 columnDefs.add(runCol);
+	//	 columnDefs.add(tempCol);
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
@@ -170,8 +181,15 @@ public class sampleList extends Composite implements HasLayout
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 view.groupBy(projCol);
+		 StoreSortInfo info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
+		 store.addSortInfo(info);
+		 
+		 
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
+	//	 ArrayList<GroupingData<?>> groups = new ArrayList<GroupingData<?>>();
+	//	 ArrayList<String> concatColumn = new ArrayList<String>();
+		 
 		 new GridDragSource<LibraryData>(grid);
 		 
 		 
