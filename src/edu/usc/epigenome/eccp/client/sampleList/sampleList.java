@@ -88,6 +88,7 @@ public class sampleList extends Composite implements HasLayout
 	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,folderCol,tempCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
+	StoreSortInfo info;
 
 	
 
@@ -160,7 +161,7 @@ public class sampleList extends Composite implements HasLayout
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
 		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
-		 
+		
 		 
 		 
 	//	 tempCol = new ColumnConfig<LibraryData, String>(null, 80, "ConcatCol");
@@ -181,8 +182,7 @@ public class sampleList extends Composite implements HasLayout
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 view.groupBy(projCol);
-		 StoreSortInfo info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
-		 store.addSortInfo(info);
+
 		 
 		 
 		 grid = new Grid<LibraryData>(store, columnModel);
@@ -280,6 +280,15 @@ public class sampleList extends Composite implements HasLayout
 	{
 		view.groupBy(projCol);
 		view.collapseAllGroups();
+	}
+	@UiHandler("byDate")
+	public void groupByD(SelectEvent event)
+	{
+		 view.groupBy(dateCol);
+		 info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
+		 store.addSortInfo(info);
+		 view.collapseAllGroups();
+		
 	}
 	
 	@UiHandler("collapse")

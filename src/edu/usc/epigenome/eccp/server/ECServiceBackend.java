@@ -509,11 +509,25 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				 	}
 				 	  d.put(p.getName(), p);
 				 }
-				 if (d.containsKey("Date_Sequenced_temp")) {
-					 LibraryProperty date = d.get("Date_Sequenced");
-					 String newDate = d.get("Date_Sequenced_temp").getValue();
-					 date.setValue(newDate);
-					 d.remove("Date_Sequenced_temp");					 
+				 LibraryProperty date = d.get("Date_Sequenced");
+				 String val = d.get("Date_Sequenced").getValue();
+				 if (val !=null) {
+				    if (d.containsKey("Date_Sequenced_temp")) {					
+					    String newDate = d.get("Date_Sequenced_temp").getValue();
+					    date.setValue(newDate);
+					    d.remove("Date_Sequenced_temp");
+				    }
+				 }
+				 else {
+					 if (d.containsKey("Date_Sequenced_temp")) {					
+						 String newDate = d.get("Date_Sequenced_temp").getValue();
+						    if (newDate!=null) {
+						          date.setValue(newDate);
+						          d.remove("Date_Sequenced_temp");
+						    }
+						    else date.setValue("No Date Entered");
+					    }
+					 else date.setValue("No Date Entered");
 				 }
 				 
 				 if(queryParams.getGetFiles())

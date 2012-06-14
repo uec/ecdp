@@ -22,6 +22,7 @@
 					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
 					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
 					<gxt:button.TextButton ui:field="byProject" text="By Project" />
+					<gxt:button.TextButton ui:field="byDate" text="By Date" />
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 					<gxt:button.TextButton ui:field="share" text="Share Search Results" />					

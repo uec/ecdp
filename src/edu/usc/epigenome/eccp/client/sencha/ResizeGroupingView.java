@@ -46,10 +46,10 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		      groupingColumn = column;
 		      if (column != null) {
 		        if (grid.getLoader() == null || !grid.getLoader().isRemoteSort()) {
-		          lastStoreSort = createStoreSortInfo(column, SortDir.ASC);
+		          lastStoreSort = createStoreSortInfo(column, SortDir.DESC);
 		          ds.addSortInfo(0, lastStoreSort);// this triggers the sort
 		        } else {
-		          lastSort = new SortInfoBean(column.getValueProvider(), SortDir.ASC);
+		          lastSort = new SortInfoBean(column.getValueProvider(), SortDir.DESC);
 		          grid.getLoader().addSortInfo(0, lastSort);
 		          grid.getLoader().load();
 		        }
