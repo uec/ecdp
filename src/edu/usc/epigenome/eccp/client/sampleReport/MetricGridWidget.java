@@ -54,6 +54,7 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
+import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChart;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
@@ -367,45 +368,15 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	//create a plot of a clicked library metric
 	public void plot(final MultipleLibraryProperty metric)
 	{
-		try
+		if(metric.getAllValues().contains("JSON") && metric.getAllValues().contains("Scatter Plot"))
 		{
-			VisualizationUtils.loadVisualizationApi(new Runnable(){
-				public void run()
-				{
-							
-							DataTable dataMatrix = DataTable.create();
-						    dataMatrix.addColumn(ColumnType.STRING, metric.getName());
-						    dataMatrix.addColumn(ColumnType.NUMBER,  metric.getName());
-						    dataMatrix.addRows(metric.getValueSize());
-							
-						    for(int i=0;i< metric.getValueSize();i++)
-							{									
-								dataMatrix.setValue(i, 0, libraries.get(i).get("sample_name").getValue());
-								dataMatrix.setValue(i, 1, Double.parseDouble(metric.getValue(i).replace(",", "")));
-							}								
-							
-							Options options = Options.create();
-							options.setWidth(600);
-							options.setHeight(600);
-							ColumnChart motion = new ColumnChart(dataMatrix, options);
-							
-							//show the plot
-							final Dialog simple = new Dialog();
-							simple.setHeadingText(metric.getName());
-							simple.setPredefinedButtons(PredefinedButton.OK);
-							simple.setBodyStyleName("pad-text");
-							simple.add(motion);
-							simple.setHideOnButtonClick(true);
-							simple.setWidth(650);
-							simple.setHeight(650);
-							simple.show();
-				}}, ColumnChart.PACKAGE);	
+			
 		}
-		catch(Exception e)
+		else
 		{
-			Info.display("Error","You can only plot numeric data");
-		}		
-	
+			BarChart b = new BarChart(metric,libraries);
+			b.show();
+		}
 	}
 
 	public void makeToolTips () 
