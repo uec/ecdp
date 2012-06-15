@@ -3,6 +3,6 @@
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
 			 xmlns:tabs="urn:import:com.sencha.gxt.widget.core.client" 
 			 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
-			 xmlns:e="urn:import:edu.usc.epigenome.eccp.client.pane.sampleReport">
+			 xmlns:e="urn:import:edu.usc.epigenome.eccp.client.sampleReport">
 	<tabs:TabPanel ui:field="tabPanel"/>  		 
 </ui:UiBinder> 
