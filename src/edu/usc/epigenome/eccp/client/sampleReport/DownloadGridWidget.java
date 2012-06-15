@@ -1,4 +1,4 @@
-package edu.usc.epigenome.eccp.client.pane.sampleReport;
+package edu.usc.epigenome.eccp.client.sampleReport;
 
 import java.util.ArrayList;
 import java.util.List;
