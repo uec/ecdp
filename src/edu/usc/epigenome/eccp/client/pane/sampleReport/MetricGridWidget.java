@@ -41,8 +41,6 @@ import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GroupingView;
-import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import edu.usc.epigenome.eccp.client.ECService;
@@ -57,9 +55,7 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
-
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
-import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
 
 public class MetricGridWidget extends Composite implements HasLayout{
 
@@ -268,16 +264,15 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		      }
 		 };
 		 target.setOperation(Operation.COPY);
-		 gridPointer.addRowClickHandler(new RowClickHandler(){
-
+		 gridPointer.addRowClickHandler(new RowClickHandler()
+		 {
 			@Override
 			public void onRowClick(RowClickEvent event)
 			{
 				MultipleLibraryProperty clickedItem = store.get(event.getRowIndex());
 				plot(clickedItem);
-				
-			}});
-		 
+			}
+		});
 	}
 	
 	public void setHeadingText(String title)
@@ -365,7 +360,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				if (multiProperty.getUsage().matches("0|1|2|3|4")) templibdata.put(m, multiProperty);
 				
 			}
-				 
 		}
 		return templibdata;
 	}
@@ -405,7 +399,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 							simple.setWidth(650);
 							simple.setHeight(650);
 							simple.show();
-											
 				}}, ColumnChart.PACKAGE);	
 		}
 		catch(Exception e)
@@ -413,24 +406,19 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			Info.display("Error","You can only plot numeric data");
 		}		
 	
-}
+	}
 
-	
-
-
-	public void makeToolTips () {
-		
+	public void makeToolTips () 
+	{
 		for(int i = 0; i < libraries.size() ; i ++){
 			for(String key : libraries.get(i).keySet()) {
 			       LibraryProperty p = libraries.get(i).get(key);
 			       if (p.getDescription() !=null)
 			         tooltips.put(p.getName(), p);
 			       else  tooltips.put(p.getName(), p);
-			      
 		    }		
 		}
-	
-}
+	}
 
 	@Override
 	public void forceLayout() {

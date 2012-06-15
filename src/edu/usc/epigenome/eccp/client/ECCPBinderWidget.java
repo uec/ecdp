@@ -14,7 +14,6 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 //import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
-import edu.usc.epigenome.eccp.client.Resources.UserPanelResources;
 import edu.usc.epigenome.eccp.client.sampleList.sampleList;
 import edu.usc.epigenome.eccp.client.tab.TabbedReport;
 
@@ -25,7 +24,7 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 
 	interface ECCPBinderWidgetUiBinder extends	UiBinder<Widget, ECCPBinderWidget> {}
 	
-	static {   UserPanelResources.INSTANCE.userPanel().ensureInjected();}
+	
 	
 	@UiField BorderLayoutContainer  main;
 	SimpleContainer west;
