@@ -115,9 +115,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		this.data=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
-	//	vlc.getWidget(0).setLayoutData(new VerticalLayoutData(-1,30));
-		//ZR I hate this dirty hack for making the toolbar appear.
-		
 		filter.setEmptyText("Search...");
 		buttonsHP.add(filter);
 		libraries = data;
@@ -125,9 +122,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		mergeData();
 		currentLibraryData=getUsageModeData(); 
 		drawTable();
-	//	Widget w = vlc.getWidget(0);
-	//	vlc.remove(0);
-	//	vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
 	}
 	
 	void mergeData()
@@ -157,7 +151,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		mergedLibraryData = libdata;	
 	}
 	
-	public void drawTable() {
+	public void drawTable() 
+	{
+		filter.clear();
 		//SET UP COLUMNS
 		 List<ColumnConfig<MultipleLibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<MultipleLibraryProperty, ?>>();
 		 ColumnConfig<MultipleLibraryProperty, String> cc1 = new ColumnConfig<MultipleLibraryProperty, String>(properties.name(), 250, "Metric");

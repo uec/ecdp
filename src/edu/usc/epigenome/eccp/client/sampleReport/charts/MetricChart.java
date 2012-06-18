@@ -15,7 +15,7 @@ public abstract class MetricChart
 		simple.setBodyStyleName("pad-text");
 		simple.add(chart);
 		simple.setHideOnButtonClick(true);
-		simple.setWidth(650);
+		simple.setWidth(750);
 		simple.setHeight(650);
 		simple.show();
 	}

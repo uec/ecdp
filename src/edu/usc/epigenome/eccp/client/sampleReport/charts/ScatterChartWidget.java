@@ -92,7 +92,7 @@ public class ScatterChartWidget  extends MetricChart
 					
 					Options options = Options.create();
 					options.setTitle(title.get(0));
-					options.setWidth(600);
+					options.setWidth(700);
 					options.setHeight(600);
 					
 					ScatterChart motion = new ScatterChart(dataMatrix, options);
