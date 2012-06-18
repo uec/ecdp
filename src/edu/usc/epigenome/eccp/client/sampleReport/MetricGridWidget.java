@@ -19,9 +19,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.visualizations.ColumnChart;
-import com.google.gwt.visualization.client.visualizations.ColumnChart.Options;
-
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
@@ -55,6 +52,7 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChart;
+import edu.usc.epigenome.eccp.client.sampleReport.charts.ScatterChartWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
@@ -370,7 +368,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	{
 		if(metric.getAllValues().contains("JSON") && metric.getAllValues().contains("Scatter Plot"))
 		{
-			
+			ScatterChartWidget s = new ScatterChartWidget(metric,libraries);
+			s.show();
 		}
 		else
 		{

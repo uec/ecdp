@@ -5,5 +5,5 @@ import com.google.web.bindery.autobean.shared.AutoBeanFactory;
 
 public interface XYDataFactory extends AutoBeanFactory
 {
-	AutoBean<XYData> xyData();
+	AutoBean<XYData> xYData();
 }
