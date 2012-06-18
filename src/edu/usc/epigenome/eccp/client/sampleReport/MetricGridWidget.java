@@ -79,7 +79,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	Grid<MultipleLibraryProperty> gridPointer;
     
 	
-	
+	//handle live filtering of metrics, match multiple properties against filter txt
 	StoreFilterField<MultipleLibraryProperty> filter = new StoreFilterField<MultipleLibraryProperty>() 
 	{
 		@Override
@@ -124,6 +124,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		drawTable();
 	}
 	
+	//merge all selected/added libraries into a single object for display purposes
 	void mergeData()
 	{
 		HashMap<String,MultipleLibraryProperty> libdata = new HashMap<String,MultipleLibraryProperty>();
@@ -151,6 +152,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		mergedLibraryData = libdata;	
 	}
 	
+	
+	
+	//creates the table based upon the currently selected libraries. when new libraries are drag-n-dropped into the table, add them and redraw
 	public void drawTable() 
 	{
 		filter.clear();
@@ -192,7 +196,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 ColumnModel<MultipleLibraryProperty> colModel = new ColumnModel<MultipleLibraryProperty>(columnDefs);
 		 final ListStore<MultipleLibraryProperty> store = new ListStore<MultipleLibraryProperty>(properties.key());
 		 ResizeGroupingView<MultipleLibraryProperty> view = new ResizeGroupingView<MultipleLibraryProperty>();
-
+		//relpaced with our own grouping view that better does resizing of windows
 		// GroupingView<MultipleLibraryProperty> view = new GroupingView<MultipleLibraryProperty>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
@@ -220,7 +224,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 
 
-		 
+		 //Handle Drag and drop of libraries from the samplelist to the main metric table
 		 DropTarget target = new DropTarget(gridPointer)
 		 {
 		      @Override
@@ -259,6 +263,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		      }
 		 };
 		 target.setOperation(Operation.COPY);
+		 
+		 //Plot the current row
 		 gridPointer.addRowClickHandler(new RowClickHandler()
 		 {
 			@Override
@@ -270,6 +276,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		});
 	}
 	
+	//set the title in the top bar
 	public void setHeadingText(String title)
 	{
 		gridPanel.setHeadingText(title);
@@ -295,6 +302,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 drawTable();
 	}
 	
+	//display the download-files widget for these libraries
 	@UiHandler("download")
 	public void downloadFile(SelectEvent event)
 	{
@@ -307,7 +315,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  libraries.get(0).get("sample_name").getValue() + (libraries.size() > 1 ? (" + " + (libraries.size() -1)) + " other libs" : "")));
 	}
 	
-	
+	//display the current table as a tab-delim textbox for pasting in excel
 	@UiHandler("toSpreadSheet")
 	public void showCSV(SelectEvent event)
 	{
