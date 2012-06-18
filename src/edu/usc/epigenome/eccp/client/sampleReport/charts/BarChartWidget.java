@@ -9,12 +9,12 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 
-public class BarChart  extends MetricChart
+public class BarChartWidget  extends MetricChart
 {
 	MultipleLibraryProperty metric;
 	List<LibraryData> libraries;
 	
-	public BarChart(MultipleLibraryProperty metric, List<LibraryData> libraries)
+	public BarChartWidget(MultipleLibraryProperty metric, List<LibraryData> libraries)
 	{
 		this.metric = metric;
 		this.libraries = libraries;	

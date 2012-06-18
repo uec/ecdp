@@ -51,7 +51,7 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
-import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChart;
+import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChartWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.ScatterChartWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
@@ -373,7 +373,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		}
 		else
 		{
-			BarChart b = new BarChart(metric,libraries);
+			BarChartWidget b = new BarChartWidget(metric,libraries);
 			b.show();
 		}
 	}
