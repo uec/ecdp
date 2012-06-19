@@ -14,15 +14,22 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 	  private StoreSortInfo<M> lastStoreSort;
 	  private SortInfo lastSort;
 	
+	
 	public void doResize()
 	{
 		this.layout();
 	}
 	
-	/*public List<GroupingData<M>> getGroupData() {
-		return this.getGroupData();
+   
+	/*public void groupByASC(ColumnConfig<M, ?> column) {
+		
+		
+		super.groupBy(column);
+		System.out.println("Called superclass groupBy");
 	}*/
-	 public void groupBy(ColumnConfig<M, ?> column) {
+	public void groupBy(ColumnConfig<M, ?> column) {
+
+	//	System.out.println("HERE in overridden groupBy");
 		    if (grid == null) {
 		      // if still being configured, save the grouping column for later
 		      groupingColumn = column;

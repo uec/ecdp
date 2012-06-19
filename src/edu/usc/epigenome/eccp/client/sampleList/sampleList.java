@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -19,6 +24,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.util.KeyNav;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
@@ -35,6 +41,8 @@ import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
+import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
+import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent.RowDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.form.TextArea;
@@ -192,13 +200,14 @@ public class sampleList extends Composite implements HasLayout
 		 
 		 new GridDragSource<LibraryData>(grid);
 		 
-		 
-		 grid.addRowClickHandler(new RowClickHandler()
+		 grid.addRowDoubleClickHandler(new RowDoubleClickHandler()
 		 {
 			@Override
-			public void onRowClick(RowClickEvent event)
+			
+			public void onRowDoubleClick(RowDoubleClickEvent event)
 			{
-				LibraryData summarizedLibrary = store.get(event.getRowIndex());
+				// final Boolean b = event.getEvent().getShiftKey();
+				 LibraryData summarizedLibrary = store.get(event.getRowIndex());
 				 LibraryDataQuery query = new LibraryDataQuery();
 				 query.setIsSummaryOnly(false);
 				 query.setGetFiles(true);
@@ -215,15 +224,18 @@ public class sampleList extends Composite implements HasLayout
 						{
 							if(result.size() > 0)
 							{
-								MetricGridWidget metric = new MetricGridWidget(result);
-								ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
-							}
+								        MetricGridWidget metric = new MetricGridWidget(result);
+								        ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
+						    }
 							else
 								Info.display("Error","Failed to get Library");
 						}});
 			}
+			
 		});
-		 
+         
+         
+		
 		 filter.bind(store);
 		 content.add(grid);
 		 LibraryDataQuery query = new LibraryDataQuery();
@@ -285,8 +297,8 @@ public class sampleList extends Composite implements HasLayout
 	public void groupByD(SelectEvent event)
 	{
 		 view.groupBy(dateCol);
-		 info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
-		 store.addSortInfo(info);
+	//	 info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
+	//	 store.addSortInfo(info);
 		 view.collapseAllGroups();
 		
 	}
