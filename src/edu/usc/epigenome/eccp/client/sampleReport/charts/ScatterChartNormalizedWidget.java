@@ -17,12 +17,12 @@ import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.XYDataFactory;
 import edu.usc.epigenome.eccp.client.data.XYData;
-public class ScatterChartWidget  extends MetricChart
+public class ScatterChartNormalizedWidget  extends MetricChart
 {
 	MultipleLibraryProperty metric;
 	List<LibraryData> libraries;
 	
-	public ScatterChartWidget(MultipleLibraryProperty metric, List<LibraryData> libraries)
+	public ScatterChartNormalizedWidget(MultipleLibraryProperty metric, List<LibraryData> libraries)
 	{
 		this.metric = metric;
 		this.libraries = libraries;	
@@ -48,17 +48,10 @@ public class ScatterChartWidget  extends MetricChart
 					AutoBean<XYData> autoBeanXYData = AutoBeanCodex.decode(scatterFactory, XYData.class, metric.getValue(i).replaceFirst("\\s+", ""));
 					XYData scatter = autoBeanXYData.as();
 					
-					Double sum = 1d;
-					if(metric.getValueSize() > 1)
-					{
-						title.add(scatter.getTitle() + " (Normalized)");
-						sum = 0d;
-						for(int j=0;j< scatter.getY().size();j++)
-							sum+=scatter.getY().get(j);
-					}
-					else
-						title.add(scatter.getTitle());
-					
+					Double sum=0d;
+					for(int j=0;j< scatter.getY().size();j++)
+						sum+=scatter.getY().get(j);
+						
 					for(int j=0;j< scatter.getX().size();j++)
 					{					
 						Double x = scatter.getX().get(j);
@@ -71,7 +64,7 @@ public class ScatterChartWidget  extends MetricChart
 						}
 						data.get(x).set(i, y/sum);
 					}
-					
+					title.add(scatter.getTitle());
 				}
 				catch(Exception e)
 				{
@@ -105,7 +98,7 @@ public class ScatterChartWidget  extends MetricChart
 					Options options = Options.create();
 					options.setTitle(title.get(0));
 					options.setWidth(700);
-					options.setHeight(550);
+					options.setHeight(600);
 					ScatterChart motion = new ScatterChart(dataMatrix, options);
 					
 					
