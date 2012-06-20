@@ -2,6 +2,7 @@ package edu.usc.epigenome.eccp.client.sencha;
 
 import java.util.List;
 
+import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.SortInfoBean;
@@ -19,14 +20,7 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 	{
 		this.layout();
 	}
-	
-   
-	/*public void groupByASC(ColumnConfig<M, ?> column) {
-		
-		
-		super.groupBy(column);
-		System.out.println("Called superclass groupBy");
-	}*/
+	// Overrides
 	public void groupBy(ColumnConfig<M, ?> column) {
 
 	//	System.out.println("HERE in overridden groupBy");
@@ -53,10 +47,10 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		      groupingColumn = column;
 		      if (column != null) {
 		        if (grid.getLoader() == null || !grid.getLoader().isRemoteSort()) {
-		          lastStoreSort = createStoreSortInfo(column, SortDir.DESC);
+		          lastStoreSort = createStoreSortInfo(column, SortDir.ASC);
 		          ds.addSortInfo(0, lastStoreSort);// this triggers the sort
 		        } else {
-		          lastSort = new SortInfoBean(column.getValueProvider(), SortDir.DESC);
+		          lastSort = new SortInfoBean(column.getValueProvider(), SortDir.ASC);
 		          grid.getLoader().addSortInfo(0, lastSort);
 		          grid.getLoader().load();
 		        }
@@ -68,5 +62,33 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		      }
 		    }
 		  }
+	 public <V> StoreSortInfo<M> createStoreSortInfo(ColumnConfig<M, V> column, SortDir sortDir) {
+		    if (column.getComparator() == null) {
+		      // These casts can fail, but in dev mode the exception will be caught by
+		      // the try/catch in doSort, unless there are no items in the Store
+		      if (column.getHeader().asString().equals("Date"))	{
+		    	  System.out.println(" No comparator. Sort Order Before: "+sortDir.toString());
+		    	  sortDir=SortDir.toggle(sortDir);
+		    	  System.out.println("No comparator. Sort Order After: "+sortDir.toString());
+		      }
+		      
+		      @SuppressWarnings({"unchecked", "rawtypes"})
+		      ValueProvider<M, Comparable> vp = (ValueProvider) column.getValueProvider();
+		      @SuppressWarnings("unchecked")
+		      StoreSortInfo<M> s = new StoreSortInfo<M>(vp, sortDir);
+		      return s;
+		    } else {
+		    	
+		    if (column.getHeader().asString().equals("Date"))	{
+		    	  System.out.println("Sort Order Before: "+sortDir.toString());
+		    	  sortDir=SortDir.toggle(sortDir);
+		    	  System.out.println("Sort Order After: "+sortDir.toString());
+		    
+		    }
+		    	  return new StoreSortInfo<M>(column.getValueProvider(), column.getComparator(), sortDir);		    	  
+		     
+		    }
+		  }
+
 
 }

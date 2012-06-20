@@ -1,6 +1,8 @@
 package edu.usc.epigenome.eccp.client.sampleList;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -93,7 +95,7 @@ public class sampleList extends Composite implements HasLayout
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,folderCol,tempCol;
+	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
 	StoreSortInfo info;
@@ -169,11 +171,20 @@ public class sampleList extends Composite implements HasLayout
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
 		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
-		
-		 
-		 
-	//	 tempCol = new ColumnConfig<LibraryData, String>(null, 80, "ConcatCol");
-		// folderCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("RunParam_RunID"), 80, "Storage Folder");
+		 Comparator<String> c = new Comparator<String>(){
+
+			public int compare(String o1, String o2) {
+				String d = "No Date Entered";
+				if (o1.matches(d)) 
+					if (o2.matches(d)) return 0;
+					else return -1;
+				else if (o2.matches(d)) return 1;
+				     else return (o1.compareTo(o2));
+				
+			}
+			 
+		 };
+		 dateCol.setComparator(c);
 		 columnDefs.add(projCol);
 		 columnDefs.add(libCol);
 		 columnDefs.add(geneusCol);
@@ -181,7 +192,6 @@ public class sampleList extends Composite implements HasLayout
 		 columnDefs.add(laneCol);
 		 columnDefs.add(dateCol);
 		 columnDefs.add(runCol);
-	//	 columnDefs.add(tempCol);
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
