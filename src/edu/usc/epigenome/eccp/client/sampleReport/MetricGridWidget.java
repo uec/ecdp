@@ -7,7 +7,10 @@ import java.util.List;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -19,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
+import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
@@ -190,6 +194,17 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 for(int i = 0 ; i < currentLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
+			 cc.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+						{
+						      public SafeHtml render(String object) 
+						      {  
+						    	  if(object.equals("0"))
+						    		  return SafeHtmlUtils.fromString("N/A");
+						    	  if(object.contains("JSON"))
+						    	  	  return SafeHtmlUtils.fromString("Multi-dimensional data, click for chart");
+						    	  return SafeHtmlUtils.fromString(object);		        
+						      }
+						}));
 			 columnDefs.add(cc);			 
 		 }		 
 		 
