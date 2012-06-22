@@ -381,8 +381,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				MultiMap<String> params = new MultiMap<String>();
 				if(url.getQuery() != null)
 					UrlEncoded.decodeTo(url.getQuery(), params, "UTF-8");
-					
-				if (!request.isUserInRole("ECCPWebAdmin") || params.containsKey("t") || params.containsKey("q"))
+				if(request.isUserInRole("ECCPWebAdmin") && params.containsKey("superquery"))
+					where += decryptTextMD5(params.getString("superquery")) + " AND ";
+				else if (!request.isUserInRole("ECCPWebAdmin") || params.containsKey("t") || params.containsKey("q"))
 				{
 					String contents = "";
 					if(params.containsKey("t"))
@@ -395,7 +396,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					where += "id_run_sample IN (select id_run_sample from view_run_metric where MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE)) AND ";
 				}
 			}
-
+			
 			where += "0=0";
 
 			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, \n" +

@@ -46,6 +46,7 @@ import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent.RowDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -113,7 +114,9 @@ public class sampleList extends Composite implements HasLayout
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 )
 	    	share.hide();
-	    	
+	    
+	    if(Window.Location.getQueryString().contains("GODMODE"))
+	    	godmode();
 	    
 	//    vlc.setHeight(Window.getClientHeight());
 
@@ -276,6 +279,46 @@ public class sampleList extends Composite implements HasLayout
 		view.collapseAllGroups();
 		Info.display("Notice", "Library List Loaded");		
 		
+	}
+	
+	public void godmode()
+	{
+		 final TextArea text = new TextArea();
+		  final Dialog simple = new Dialog();
+		 simple.setHeadingText("SELECT * from view_run_metric WHERE");
+		 simple.setPredefinedButtons(PredefinedButton.OK);
+		 simple.setBodyStyleName("pad-text");
+		 simple.add(text);
+		 simple.setHideOnButtonClick(true);
+		 simple.setWidth(600);
+		 simple.setHeight(200);
+		 simple.show();
+		 TextButton ok = simple.getButtonById(PredefinedButton.OK.name());
+		 final ArrayList<Boolean> showOnce= new ArrayList<Boolean>();
+		 ok.addSelectHandler(new SelectHandler(){
+			@Override
+			public void onSelect(SelectEvent event)
+			{
+				myServer.getEncryptedData(text.getText(), new AsyncCallback<ArrayList<String>>(){
+					@Override
+					public void onFailure(Throwable caught)
+					{	
+						caught.printStackTrace();
+					}
+					@Override
+					public void onSuccess(ArrayList<String> result)
+					{
+						text.setText("http://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?superquery=" + result.get(0)); 
+						simple.setHeadingText("Your query is available at the following link");
+						if(showOnce.size() < 1)
+							simple.show();
+						showOnce.add(true);
+					
+					}});
+				
+			}});
+		 
+		 
 	}
 	
 	public void setHeadingText(String title)
