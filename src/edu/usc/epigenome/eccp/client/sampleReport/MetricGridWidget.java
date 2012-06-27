@@ -442,6 +442,13 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		// TODO Auto-generated method stub
 		return false;
 	}
+	public void setUsageMode(String mode) {
+		usageMode=mode;
+		currentLibraryData=getUsageModeData(); 
+		ListStore<MultipleLibraryProperty> store = gridPointer.getStore();
+		store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
+		
+	}
 }
 	
 

@@ -303,14 +303,18 @@ public class sampleList extends Composite implements HasLayout
 					if(result.size() > 0)
 					{
 						        if (menuItem.getText().equals("QC window")) {
-						            MetricGridWidget metric = new MetricGridWidget(result);
+						            MetricGridWidget metric = new MetricGridWidget(result);					            
 						            ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
 						         }
 						        if (menuItem.getText().equals("Download Files")) {
 						            DownloadGridWidget download = new DownloadGridWidget(result.get(0).getFiles());
 								    ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  result.get(0).get("sample_name").getValue()));
 							    }
-					        
+						        if (menuItem.getText().equals("QC metrics to spreadsheet")) {
+						            MetricGridWidget metric = new MetricGridWidget(result);
+						            metric.setUsageMode("admin");
+						            metric.showCSV(new SelectEvent());						            						      
+						         }
 						        
 				    }
 					else
@@ -326,8 +330,7 @@ public class sampleList extends Composite implements HasLayout
 	         openQCGrid.addSelectionHandler(new SelectionHandler<Item>(){
 
 				@Override
-				public void onSelection(SelectionEvent<Item> event) {
-					
+				public void onSelection(SelectionEvent<Item> event) {					
 				//	Info.display("Info","Open QC window clicked");
 					LibraryData library = grid.getSelectionModel().getSelectedItem();
 					menuItem = openQCGrid;
@@ -340,17 +343,25 @@ public class sampleList extends Composite implements HasLayout
 	         openDownloadFiles.addSelectionHandler(new SelectionHandler<Item>(){
 
 					@Override
-					public void onSelection(SelectionEvent<Item> event) {
-						
+					public void onSelection(SelectionEvent<Item> event) {						
 					//	Info.display("Info","Download Files window clicked");
 						LibraryData library = grid.getSelectionModel().getSelectedItem();
 						menuItem = openDownloadFiles;
 						getContextData(library);
 												 					
 					}});
-	         /*final MenuItem spreadSheet = new MenuItem();
-	         spreadSheet.setText("Save QC metrics as spreadsheet");
-	         contextMenu.add(spreadSheet);*/
+	         final MenuItem spreadSheet = new MenuItem();
+	         spreadSheet.setText("QC metrics to spreadsheet");
+	         contextMenu.add(spreadSheet);
+	         spreadSheet.addSelectionHandler(new SelectionHandler<Item>(){
+
+					@Override
+					public void onSelection(SelectionEvent<Item> event) {
+						LibraryData library = grid.getSelectionModel().getSelectedItem();
+						menuItem = spreadSheet;
+						getContextData(library);
+												 					
+					}});
 	         
 	}
 	
