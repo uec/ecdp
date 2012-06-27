@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 
@@ -265,13 +266,24 @@ public class MetricGridWidget extends Composite implements HasLayout{
 							@Override
 							public void onSuccess(ArrayList<LibraryData> result)
 							{
-							    libraries.addAll(result);
+							    Boolean contains = false;
+								for (LibraryData lib: libraries) {
+								       for (LibraryData l : result) {
+							    	        if (l.get("id_run_sample").getValue().equals(lib.get("id_run_sample").getValue()))
+							    	        	contains=true;
+							            }
+								}
+								if (!contains) {
+									libraries.addAll(result);
+								//	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
+								}
+							   
 							    content.remove(0);
 						        mergeData();
 						        currentLibraryData=getUsageModeData();
 								drawTable();
 								forceLayout();
-					        	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
+				        	
 							}
 					});
 		        }
@@ -365,14 +377,14 @@ public class MetricGridWidget extends Composite implements HasLayout{
         
 		HashMap<String,MultipleLibraryProperty> templibdata = new HashMap<String,MultipleLibraryProperty>();
 		if (usageMode.equals("user")) {
-			Info.display("Notice", "User view");
+		//	Info.display("Notice", "User view");
 			for (String m: mergedLibraryData.keySet() ) {
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
 				if (multiProperty.getUsage().equals("4")) templibdata.put(m, multiProperty);				
 			}
 			}
 		if (usageMode.equals("admin")) {
-			Info.display("Notice", "Admin view");
+		//	Info.display("Notice", "Admin view");
 			for (String m: mergedLibraryData.keySet() ) {
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
 				if (multiProperty.getUsage().matches("0|1|2|3|4")) templibdata.put(m, multiProperty);

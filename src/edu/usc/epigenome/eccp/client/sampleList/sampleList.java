@@ -7,11 +7,15 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -20,9 +24,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -55,6 +62,10 @@ import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
 import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
+
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
@@ -62,6 +73,7 @@ import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
+import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
@@ -100,6 +112,7 @@ public class sampleList extends Composite implements HasLayout
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
 	StoreSortInfo info;
+	MenuItem menuItem;
 
 	
 
@@ -108,7 +121,6 @@ public class sampleList extends Composite implements HasLayout
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 	    createGrid();
-	   
 	    gridPanel.addTool(filter);
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
@@ -150,8 +162,8 @@ public class sampleList extends Composite implements HasLayout
 		 {
 		      public SafeHtml render(String object) 
 		      {  
-		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"> (p)</a> " +
-		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"> (i)</a>");		        
+		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (p)</a> " +
+		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (i)</a>");		        
 		      }
 		 }));
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
@@ -211,7 +223,7 @@ public class sampleList extends Composite implements HasLayout
 	//	 ArrayList<GroupingData<?>> groups = new ArrayList<GroupingData<?>>();
 	//	 ArrayList<String> concatColumn = new ArrayList<String>();
 		 
-		 new GridDragSource<LibraryData>(grid);
+		 new GridDragSource<LibraryData>(grid);		
 		 
 		 grid.addRowDoubleClickHandler(new RowDoubleClickHandler()
 		 {
@@ -247,7 +259,7 @@ public class sampleList extends Composite implements HasLayout
 			
 		});
          
-         
+         contextMenu();
 		
 		 filter.bind(store);
 		 content.add(grid);
@@ -271,6 +283,75 @@ public class sampleList extends Composite implements HasLayout
 				populateGrid(result);
 			}});
 		 
+	}
+	
+	public void getContextData(final LibraryData library) {
+		 LibraryDataQuery query = new LibraryDataQuery();
+		 query.setIsSummaryOnly(false);
+		 query.setGetFiles(true);
+		 query.setDBid(library.get("id_run_sample").getValue());
+		 myServer.getLibraries(query, new AsyncCallback<ArrayList<LibraryData>>(){
+				@Override
+				public void onFailure(Throwable caught)
+				{
+					Info.display("Error","Failed to get Library");
+				}
+
+				@Override
+				public void onSuccess(ArrayList<LibraryData> result)
+				{
+					if(result.size() > 0)
+					{
+						        if (menuItem.getText().equals("QC window")) {
+						            MetricGridWidget metric = new MetricGridWidget(result);
+						            ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
+						         }
+						        if (menuItem.getText().equals("Download Files")) {
+						            DownloadGridWidget download = new DownloadGridWidget(result.get(0).getFiles());
+								    ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  result.get(0).get("sample_name").getValue()));
+							    }
+					        
+						        
+				    }
+					else
+						Info.display("Error","Failed to get Library");
+				}});		
+	}
+	public void contextMenu() {
+		     Menu contextMenu= new Menu();
+	         final MenuItem openQCGrid = new MenuItem();
+	         openQCGrid.setText("QC window");
+	         contextMenu.add(openQCGrid);
+	         grid.setContextMenu(contextMenu);
+	         openQCGrid.addSelectionHandler(new SelectionHandler<Item>(){
+
+				@Override
+				public void onSelection(SelectionEvent<Item> event) {
+					
+				//	Info.display("Info","Open QC window clicked");
+					LibraryData library = grid.getSelectionModel().getSelectedItem();
+					menuItem = openQCGrid;
+					getContextData(library);
+											 					
+				}});
+	         final MenuItem openDownloadFiles = new MenuItem();
+	         openDownloadFiles.setText("Download Files");
+	         contextMenu.add(openDownloadFiles);
+	         openDownloadFiles.addSelectionHandler(new SelectionHandler<Item>(){
+
+					@Override
+					public void onSelection(SelectionEvent<Item> event) {
+						
+					//	Info.display("Info","Download Files window clicked");
+						LibraryData library = grid.getSelectionModel().getSelectedItem();
+						menuItem = openDownloadFiles;
+						getContextData(library);
+												 					
+					}});
+	         /*final MenuItem spreadSheet = new MenuItem();
+	         spreadSheet.setText("Save QC metrics as spreadsheet");
+	         contextMenu.add(spreadSheet);*/
+	         
 	}
 	
 	public void populateGrid(ArrayList<LibraryData> data)
