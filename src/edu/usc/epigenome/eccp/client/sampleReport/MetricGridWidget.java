@@ -20,9 +20,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.VisualizationUtils;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
@@ -233,6 +230,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 gridPointer.setView(viewPointer);
 		 content.add(gridPointer);				
 		 filter.bind(store);		 
+		 @SuppressWarnings("unused")
 		 QuickTip q =new QuickTip(gridPointer); // Add ToolTips to the grid cells in column cc1
 		// ToolTipConfig ttc= new ToolTipConfig();
 		// q.setToolTipConfig(ttc);

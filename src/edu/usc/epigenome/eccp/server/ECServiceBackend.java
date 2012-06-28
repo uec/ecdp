@@ -551,25 +551,33 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return data;
 	}
 	
-	public String formatString(String s) {
-		String row ="";
-		double dd;
-		DecimalFormat dbl = new DecimalFormat("0.##E00");
-		if (s.matches("(\\s*(-?\\d+\\.\\d+(E[-|+]\\d+)?)\\s*,?)+")) {
-			if (s.matches(".*,.*")) {
-				String [] temp = s.split(",");
-				for (int i=0; i < temp.length; i++) {
-					dd = Double.valueOf( temp[i].replaceAll("\\s", ""));
-					String formatted =  dbl.format(dd);
-					 if (!(i == temp.length-1))
-						    row=row+formatted+",";
-				     else row=row+formatted;	
-					
+	public String formatString(String s) 
+	{
+		try
+		{
+			String row ="";
+			double dd;
+			DecimalFormat dbl = new DecimalFormat("0.##E00");
+			if (s.matches("(\\s*(-?\\d+\\.\\d+(E[-|+]\\d+)?)\\s*,?)+")) {
+				if (s.matches(".*,.*")) {
+					String [] temp = s.split(",");
+					for (int i=0; i < temp.length; i++) {
+						dd = Double.valueOf( temp[i].replaceAll("\\s", ""));
+						String formatted =  dbl.format(dd);
+						 if (!(i == temp.length-1))
+							    row=row+formatted+",";
+					     else row=row+formatted;	
+						
+					}
+					return row;
 				}
-				return row;
+				else return dbl.format(Double.valueOf(s));
+				
 			}
-			else return dbl.format(Double.valueOf(s));
-			
+		}
+		catch(Exception e)
+		{
+			return s;
 		}
 		return s;
 	}

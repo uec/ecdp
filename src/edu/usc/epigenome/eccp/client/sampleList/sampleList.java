@@ -162,8 +162,8 @@ public class sampleList extends Composite implements HasLayout
 		 {
 		      public SafeHtml render(String object) 
 		      {  
-		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (p)</a> " +
-		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (i)</a>");		        
+		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (i)</a> " +
+		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (p)</a>");		        
 		      }
 		 }));
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
