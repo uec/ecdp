@@ -84,6 +84,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	
 	public DownloadGridWidget(List<FileData> data) 
 	{
+		;
 		initWidget(uiBinder.createAndBindUi(this));
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
@@ -92,7 +93,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
 		buttonsHP.add(filter);
-		populateGrid(data);	
+		populateGrid(filterLameFiles(data));	
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
 		vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
@@ -139,7 +140,20 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 sm.bindGrid(grid);
 	}
 
+	List<FileData>  filterLameFiles(List<FileData> data)
+	{
+		ArrayList<FileData> ret = new ArrayList<FileData>();
+		for(FileData f : data)
+		{
+			if(f.getName().contains("ContamCheck")) continue;
+			if(f.getName().contains("BinDepths")) continue;
+			if(f.getName().contains("DownsampleDups")) continue;
+			if(f.getName().contains("flagstat")) continue;
 			
+			ret.add(f);
+		}
+		return ret;
+	}
 	
 	public void populateGrid(List<FileData> data)
 	{
@@ -203,6 +217,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		return false;
 	}
 
+	
+	
 	@Override
 	public boolean isOrWasLayoutRunning() {
 		// TODO Auto-generated method stub
