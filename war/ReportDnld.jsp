@@ -109,9 +109,11 @@ try{
 				else if(results.getString("organism").contains("Phi"))
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa");
 				else if(results.getString("processing").contains("RNA-seq"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/female.hg19");
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19");
 				else if(results.getString("processing").contains("BS-seq"))
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa");
+				else if(results.getString("processing").contains("ChIP-seq"))
+                    myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa");
 				else
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa");
 	
