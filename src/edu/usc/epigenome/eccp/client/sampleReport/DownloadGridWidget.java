@@ -110,7 +110,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + object + " \">download</a>");		        
+		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"/gareports/retrieve.jsp?resource=" + object + " \">download</a>");		        
 		      }
 		}));
 		 //columnDefs.add(sm.getColumn());
@@ -179,13 +179,13 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		
 		 for(FileData f : sm.getSelectedItems())
 		 {
-			 fileList += "http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + f.getDownloadLocation() + "\n";
+			 fileList += "https://webapp.epigenome.usc.edu/gareports/retrieve.jsp?resource=" + f.getDownloadLocation() + "\n";
 		 }
 		 
 		 TextArea text = new TextArea();
 		 text.setText(fileList);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Paste these links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
+		 simple.setHeadingText("Paste these secure links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);

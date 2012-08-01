@@ -130,28 +130,6 @@ public class sampleList extends Composite implements HasLayout
 	    if(Window.Location.getQueryString().contains("GODMODE"))
 	    	godmode();
 	    
-	//    vlc.setHeight(Window.getClientHeight());
-
-	    
-	  /*  Window.addResizeHandler(new ResizeHandler() {
-
-			@Override
-			public void onResize(ResizeEvent event) {
-				// TODO Auto-generated method stub
-				 Info.display("Resize", "widget resized");
-				 view.doResize();
-				 vlc.forceLayout();
-
-			//	 content.setHeight(Window.getClientHeight()-100);
-			//	 setPixelSize(Window.getClientHeight(),Window.getClientWidth());				
-			}
-	    	
-	    });*/
-	   
-	   //  content.setHeight(Window.getClientHeight());
-	  //  content.setScrollMode(ScrollMode.AUTO);
-	  //  vlc.setScrollMode(ScrollMode.NONE);
-	    
 	}
 	
 	public void createGrid() {
@@ -162,8 +140,12 @@ public class sampleList extends Composite implements HasLayout
 		 {
 		      public SafeHtml render(String object) 
 		      {  
-		    	  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (i)</a> " +
-		    			  "<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (p)</a>");		        
+		    	  //only show param links if admin (ie no query string)
+		    	  if(Window.Location.getQueryString().length() < 1 )
+		    		  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (i)</a> " +
+		    			  "<a target=\"new\" href=\"/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (p)</a>");
+		    	  else
+		    		  return SafeHtmlUtils.fromTrustedString(object);
 		      }
 		 }));
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
@@ -400,7 +382,7 @@ public class sampleList extends Composite implements HasLayout
 					@Override
 					public void onSuccess(ArrayList<String> result)
 					{
-						text.setText("http://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?superquery=" + result.get(0)); 
+						text.setText("/gareports/ECControlCenter.html?superquery=" + result.get(0)); 
 						simple.setHeadingText("Your query is available at the following link");
 						if(showOnce.size() < 1)
 							simple.show();
@@ -479,7 +461,7 @@ public class sampleList extends Composite implements HasLayout
 			public void onSuccess(ArrayList<String> result)
 			{
 				 TextArea text = new TextArea();
-				 text.setText("http://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?t=" + result.get(0));
+				 text.setText("/gareports/ECControlCenter.html?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
 				 simple.setHeadingText("This link will take you directly to the search results");
 				 simple.setPredefinedButtons(PredefinedButton.OK);
@@ -502,20 +484,15 @@ public class sampleList extends Composite implements HasLayout
 		content.forceLayout();
 		view.doResize();
 		grid.setHeight(Window.getClientHeight()-70);
-	
-		
-		
 	}
 
 	@Override
 	public boolean isLayoutRunning() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isOrWasLayoutRunning() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
