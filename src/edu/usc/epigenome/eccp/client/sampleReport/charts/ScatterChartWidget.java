@@ -21,6 +21,7 @@ public class ScatterChartWidget  extends MetricChart
 {
 	MultipleLibraryProperty metric;
 	List<LibraryData> libraries;
+	boolean autoscale = true;
 	
 	public ScatterChartWidget(MultipleLibraryProperty metric, List<LibraryData> libraries)
 	{
@@ -48,8 +49,11 @@ public class ScatterChartWidget  extends MetricChart
 					AutoBean<XYData> autoBeanXYData = AutoBeanCodex.decode(scatterFactory, XYData.class, metric.getValue(i).replaceFirst("\\s+", ""));
 					XYData scatter = autoBeanXYData.as();
 					
+					if(scatter.getAutoscale() != null && !scatter.getAutoscale().contains("true"))
+						autoscale = false;
+					
 					Double sum = 1d;
-					if(metric.getValueSize() > 1)
+					if(metric.getValueSize() > 1 && scatter.getNormalize() != null && scatter.getNormalize().contains("true"))
 					{
 						title.add(scatter.getTitle() + " (Normalized)");
 						sum = 0d;
@@ -106,6 +110,8 @@ public class ScatterChartWidget  extends MetricChart
 					options.setTitle(title.get(0));
 					options.setWidth(700);
 					options.setHeight(550);
+					if(!autoscale)
+						options.setMin(0.0d);
 					ScatterChart motion = new ScatterChart(dataMatrix, options);
 					
 					

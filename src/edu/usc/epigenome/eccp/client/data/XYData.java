@@ -10,6 +10,10 @@ public interface XYData
 	public void setFormat(String format);
 	public String getTitle();
 	public void setTitle(String title);
+	public String getAutoscale();
+	public void setAutoscale(String autoscale);
+	public String getNormalize();
+	public void setNormalize(String normalize);
 	public String getXLabel();
 	public void setXLabel(String xLabel);
 	public String getYLabel();
