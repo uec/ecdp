@@ -354,8 +354,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		String csv = "Metric Name in Database"+"\t"+ header+"\n";
 		for(MultipleLibraryProperty metric : gridPointer.getStore().getAll())
 		{
-			
-			csv += metric.getName() + "\t" + metric.getPrettyName() +"\t"+ metric.getCategory()+"\t"+metric.getAllValues()+"\n";
+			String metricVal = metric.getAllValues().contains("JSON") ? "" : metric.getAllValues();
+			csv += metric.getName() + "\t" + metric.getPrettyName() +"\t"+ metric.getCategory()+"\t"+metricVal+"\n";
 		}
 		 TextArea text = new TextArea();
 		 text.setText(csv);
