@@ -242,7 +242,6 @@ public class sampleList extends Composite implements HasLayout
 		});
          
          contextMenu();
-		
 		 filter.bind(store);
 		 content.add(grid);
 		 LibraryDataQuery query = new LibraryDataQuery();

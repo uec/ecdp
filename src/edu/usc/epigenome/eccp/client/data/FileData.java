@@ -16,7 +16,7 @@ public class FileData implements Serializable
 	String category;
 	String downloadLocation;
 	String lane;
-	
+	String description;
 	
 	public void setAll(String name, String fullPath, String location, String type,String source,	String category, String downloadLocation)
 	{
@@ -95,6 +95,14 @@ public class FileData implements Serializable
 	public void setLane(String lane)
 	{
 		this.lane = lane;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+		
+	}
+	public String getDescription() {
+		return description;
 	}
 
 

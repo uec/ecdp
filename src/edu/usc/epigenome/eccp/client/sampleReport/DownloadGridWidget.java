@@ -1,10 +1,14 @@
 package edu.usc.epigenome.eccp.client.sampleReport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,11 +39,13 @@ import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
 import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.tips.QuickTip;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.FileDataModel;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 
@@ -69,6 +75,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4;
 	ListStore<FileData> store;
 	Grid<FileData> grid;
+	List<FileData> fileData;
+	HashMap<String,String> tooltips= new HashMap<String,String> ();
 	IdentityValueProvider<FileData> identity = new IdentityValueProvider<FileData>();
 	CheckBoxSelectionModel<FileData> sm  = new CheckBoxSelectionModel<FileData>(identity);
 	
@@ -80,12 +88,13 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		initWidget(uiBinder.createAndBindUi(this));
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
+		
 	}
 	
 	public DownloadGridWidget(List<FileData> data) 
 	{
-		;
 		initWidget(uiBinder.createAndBindUi(this));
+		fileData=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
 		//ZR I hate this dirty hack for making the toolbar appear.
@@ -93,7 +102,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
 		buttonsHP.add(filter);
-		populateGrid(filterLameFiles(data));	
+		populateGrid(fileData);	
+		makeToolTips();
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
 		vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
@@ -103,6 +113,16 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		//SET UP COLUMNS
 	     List<ColumnConfig<FileData, ?>> columnDefs = new ArrayList<ColumnConfig<FileData, ?>>();
 		 cc1 = new ColumnConfig<FileData, String>(properties.name(), 300, "File Name");
+		 cc1.setCell(new AbstractCell<String>() {
+				@Override
+				public void render(Context context,String value, SafeHtmlBuilder sb) {
+					
+				    String description = tooltips.get(value).replaceAll("\"","'");	
+					sb.appendHtmlConstant( "<span qtip=\""+
+						//	               "<b>Description: </b> "+
+							                description+"\">"+value +"</span>");			              					   
+				}	 
+			 });
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
 		 cc3 = new ColumnConfig<FileData, String>(properties.location(), 200, "File Location");
 		 cc4 = new ColumnConfig<FileData, String>(properties.downloadLocation(), 100, "Download");
@@ -110,7 +130,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"/gareports/retrieve.jsp?resource=" + object + " \">download</a>");		        
+		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + object + " \">download</a>");		        
 		      }
 		}));
 		 //columnDefs.add(sm.getColumn());
@@ -138,6 +158,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 view.groupBy(cc2);
 		 content.add(grid);
 		 sm.bindGrid(grid);
+		 QuickTip q =new QuickTip(grid);
 	}
 
 	List<FileData>  filterLameFiles(List<FileData> data)
@@ -199,6 +220,11 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	public void groupByLocation(SelectEvent event)
 	{
 		 view.groupBy(cc3);
+	}
+	public void makeToolTips() {
+		for (FileData d: fileData) {
+			tooltips.put(d.getName(), d.getDescription());
+		}
 	}
 
 	@Override

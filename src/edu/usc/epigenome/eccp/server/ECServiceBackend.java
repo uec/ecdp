@@ -244,7 +244,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+		//	String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
@@ -348,8 +349,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL for database connection
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
-
+			// String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+			String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
@@ -602,7 +603,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (myConnection != null)
 			{
 				Statement st1 = myConnection.createStatement();
-				String selectFiles = "select f.file_fullpath, file_type.id_category, c.name from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
+				String selectFiles = "select f.file_fullpath, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
 				System.out.println("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
@@ -615,6 +616,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				{
 					String fullPath = rs1.getString("f.file_fullpath");
 					String type = rs1.getString("c.name");
+					String description = rs1.getString("description");
 					FileData file = new FileData();
 					matcher = pattern.matcher(fullPath);
 
@@ -635,7 +637,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							file.setLane(laneNumMatcher.group(2));
 						else
 							file.setLane("0");
-
+                        file.setDescription(description);
 						files.add(file);
 					}
 				}

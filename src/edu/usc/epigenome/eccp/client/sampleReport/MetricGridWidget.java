@@ -22,7 +22,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.SortDir;
+import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
@@ -46,6 +49,7 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
+import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
@@ -236,7 +240,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		// q.setToolTipConfig(ttc);
 		// q.getElement().getStyle().setBackgroundColor("background-color: red");
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
-
+         StoreSortInfo info = new StoreSortInfo(cc1.getValueProvider(), SortDir.DESC);
+	     store.addSortInfo(info);
 
 		 //Handle Drag and drop of libraries from the samplelist to the main metric table
 		 DropTarget target = new DropTarget(gridPointer)
