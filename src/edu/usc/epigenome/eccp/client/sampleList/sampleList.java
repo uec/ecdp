@@ -460,7 +460,7 @@ public class sampleList extends Composite implements HasLayout
 			public void onSuccess(ArrayList<String> result)
 			{
 				 TextArea text = new TextArea();
-				 text.setText("/gareports/ECControlCenter.html?t=" + result.get(0));
+				 text.setText("https://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
 				 simple.setHeadingText("This link will take you directly to the search results");
 				 simple.setPredefinedButtons(PredefinedButton.OK);
