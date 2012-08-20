@@ -120,8 +120,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 				    String description = tooltips.get(value).replaceAll("\"","'");	
 					sb.appendHtmlConstant( "<span qtip=\""+
 						//	               "<b>Description: </b> "+
-							                description+"\"> <img src=\"/Users/natalia/Desktop/pics_2.png\"/>"+
-						                    value +"</span>");			              					   
+							                description+"\">"+value +"</span>");			              					   
 				}	 
 			 });
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
