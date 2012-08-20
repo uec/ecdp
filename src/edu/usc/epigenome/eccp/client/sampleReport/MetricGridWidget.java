@@ -351,6 +351,65 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	{
 
 		List<ColumnConfig<MultipleLibraryProperty, ?>> configs = gridPointer.getColumnModel().getColumns();
+		String header = "Metric Name in Database";
+		ArrayList <String> rows= new ArrayList<String>();		
+		rows.add("Metric Name in Database");
+
+		for (ColumnConfig<MultipleLibraryProperty, ?> col: configs) {
+			header = col.getHeader().asString();
+			rows.add(header);
+			
+		}
+	
+			for(MultipleLibraryProperty metric : gridPointer.getStore().getAll()) {
+				
+				ArrayList <String> lines= new ArrayList<String>();
+	
+				// Metric name in db (pretty name) is always the first row in lines.
+				lines.add(metric.getPrettyName());
+				
+				// The order in which  metrics are added to lines should correspond to the order in columndefs list
+				lines.add(metric.getName());
+				lines.add(metric.getCategory());
+
+				for (int i = 0; i < metric.getValueSize(); i++) {
+					
+					if (metric.getValue(i).contains("JSON")) {
+				//		System.out.println("Found JSON");
+						lines.add("Multi-Dimensional Data");
+					}
+					else lines.add(metric.getValue(i));
+				    
+				}
+				for (int i=0; i < rows.size(); i++ ) {
+					
+					String t = rows.get(i);
+					rows.set(i, t+"\t"+lines.get(i));
+				}
+		    
+		}
+			String csv="";
+			for (String r : rows) {
+				csv= csv + r +"\n"; 
+			}
+
+		 TextArea text = new TextArea();
+		 text.setText(csv);
+		 final Dialog simple = new Dialog();
+		 simple.setHeadingText("Tab-separated metrics (Paste into Excel)");
+		 simple.setPredefinedButtons(PredefinedButton.OK);
+		 simple.setBodyStyleName("pad-text");
+		 simple.add(text);
+		 simple.setHideOnButtonClick(true);
+		 simple.setWidth(700);
+		 simple.setHeight(500);
+		 simple.show();
+	}
+	
+	/*public void showCSV(SelectEvent event)
+	{
+
+		List<ColumnConfig<MultipleLibraryProperty, ?>> configs = gridPointer.getColumnModel().getColumns();
 		String header = "";
 		for (ColumnConfig<MultipleLibraryProperty, ?> col: configs) {
 
@@ -373,7 +432,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 simple.setWidth(700);
 		 simple.setHeight(500);
 		 simple.show();
-	}
+	}*/
 	
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
