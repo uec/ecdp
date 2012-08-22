@@ -160,6 +160,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 content.add(grid);
 		 sm.bindGrid(grid);
 		 QuickTip q =new QuickTip(grid);
+		 q.getToolTipConfig().setTrackMouse(true);
+		 q.getToolTipConfig().setDismissDelay(2000000000);
 	}
 
 	List<FileData>  filterLameFiles(List<FileData> data)

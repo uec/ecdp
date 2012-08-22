@@ -236,6 +236,10 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 filter.bind(store);		 
 		 @SuppressWarnings("unused")
 		 QuickTip q =new QuickTip(gridPointer); // Add ToolTips to the grid cells in column cc1
+		 q.getToolTipConfig().setTrackMouse(true);
+		 q.getToolTipConfig().setDismissDelay(2000000000);
+		 
+		 
 		// ToolTipConfig ttc= new ToolTipConfig();
 		// q.setToolTipConfig(ttc);
 		// q.getElement().getStyle().setBackgroundColor("background-color: red");
