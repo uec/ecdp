@@ -377,12 +377,15 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				lines.add(metric.getCategory());
 
 				for (int i = 0; i < metric.getValueSize(); i++) {
+				  if (metric.getValue(i) !=null && !metric.getValue(i).equals("0")) {
 					
-					if (metric.getValue(i).contains("JSON")) {
-				//		System.out.println("Found JSON");
-						lines.add("Multi-Dimensional Data");
-					}
-					else lines.add(metric.getValue(i));
+					  if (metric.getValue(i).contains("JSON")) {
+				  //		System.out.println("Found JSON");
+						    lines.add("Multi-Dimensional Data");
+					  }
+					 else lines.add(metric.getValue(i));
+				  }
+				  else lines.add("N/A");
 				    
 				}
 				for (int i=0; i < rows.size(); i++ ) {
