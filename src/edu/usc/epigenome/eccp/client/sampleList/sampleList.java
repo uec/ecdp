@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
@@ -108,7 +110,7 @@ public class sampleList extends Composite implements HasLayout
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol;
+	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,libTypeCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
 	StoreSortInfo info;
@@ -165,6 +167,19 @@ public class sampleList extends Composite implements HasLayout
 		}));
 		 
 		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
+		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing"), 30, "LibType");
+		 libTypeCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+	     {
+			 public SafeHtml render(String object) 
+		      {  
+		    	  String type = new String(object);
+		    	  String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
+		    	  type = type.replaceAll(pattern, "$2");
+				return SafeHtmlUtils.fromString(type);
+		    	 	        
+		      }			 
+	     }));
+		 libTypeCol.setWidth(80);
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
 		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
@@ -184,6 +199,7 @@ public class sampleList extends Composite implements HasLayout
 		 dateCol.setComparator(c);
 		 columnDefs.add(projCol);
 		 columnDefs.add(libCol);
+		 columnDefs.add(libTypeCol);
 		 columnDefs.add(geneusCol);
 		 columnDefs.add(flowcellCol);
 		 columnDefs.add(laneCol);

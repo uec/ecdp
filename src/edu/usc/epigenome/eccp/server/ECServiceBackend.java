@@ -400,7 +400,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 			where += "0=0";
 
-			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, \n" +
+			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing, \n" +
 					"If(" +
 					"	ISNULL(RunParam_RunID), " +
 					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
