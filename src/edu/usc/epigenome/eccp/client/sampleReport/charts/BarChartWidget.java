@@ -43,6 +43,7 @@ public class BarChartWidget  extends MetricChart
 							Options options = Options.create();
 							options.setWidth(600);
 							options.setHeight(600);
+							options.setAxisFontSize(10);
 							ColumnChart motion = new ColumnChart(dataMatrix, options);
 							
 							//show the plot
