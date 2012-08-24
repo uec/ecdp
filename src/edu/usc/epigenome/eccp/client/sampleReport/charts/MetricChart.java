@@ -27,7 +27,6 @@ public abstract class MetricChart
 			public void onResize(ResizeEvent event)
 			{
 				simple.hide();
-				Info.display("Notice",""+ event.getHeight() + event.getWidth());	
 				show( event.getWidth(), event.getHeight());
 			}});
 	}
