@@ -32,6 +32,12 @@ public class ScatterChartWidget  extends MetricChart
 	@Override
 	public void show()
 	{
+		show(750,600);		
+	}
+	
+	@Override
+	public void show(final int width, final int height)
+	{
 		try
 		{
 			final HashMap<Double,ArrayList<Double>> data = new HashMap<Double,ArrayList<Double>>();
@@ -108,15 +114,15 @@ public class ScatterChartWidget  extends MetricChart
 					
 					Options options = Options.create();
 					options.setTitle(title.get(0));
-					options.setWidth(700);
-					options.setHeight(550);
+					options.setWidth(width - 150);
+					options.setHeight(height - 50);
 					if(!autoscale)
 						options.setMin(0.0d);
 					ScatterChart motion = new ScatterChart(dataMatrix, options);
 					
 					
 					//show the plot
-					showDialog(metric.getName(),motion);
+					showDialog(metric.getName(),motion,width,height);
 				}}, ScatterChart.PACKAGE);	
 		}
 		catch(Exception e)
@@ -125,5 +131,7 @@ public class ScatterChartWidget  extends MetricChart
 		}		
 		
 	}
+
+
 
 }

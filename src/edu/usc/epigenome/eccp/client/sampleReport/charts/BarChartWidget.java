@@ -23,6 +23,12 @@ public class BarChartWidget  extends MetricChart
 	@Override
 	public void show()
 	{
+		show(750,650);
+		
+	}
+	
+	public void show( final int width, final int height)
+	{
 		try
 		{
 			VisualizationUtils.loadVisualizationApi(new Runnable(){
@@ -41,13 +47,13 @@ public class BarChartWidget  extends MetricChart
 							}								
 							
 							Options options = Options.create();
-							options.setWidth(600);
-							options.setHeight(600);
+							options.setWidth(width - 150);
+							options.setHeight(height - 50);
 							options.setAxisFontSize(10);
 							ColumnChart motion = new ColumnChart(dataMatrix, options);
 							
 							//show the plot
-							showDialog(metric.getName(),motion);
+							showDialog(metric.getName(),motion,width,height);
 				}}, ColumnChart.PACKAGE);	
 		}
 		catch(Exception e)
