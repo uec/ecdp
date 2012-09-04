@@ -120,7 +120,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 				    String description = tooltips.get(value).replaceAll("\"","'");	
 					sb.appendHtmlConstant( "<span qtip=\""+
 						//	               "<b>Description: </b> "+
-							                description+"\"> <img src=\"/Users/natalia/Desktop/pics_2.png\"/>"+
+						//	                description+"\"> <img src=\"/Users/natalia/Desktop/pics_2.png\"/>"+
+		                description+"\"> "+
 						                    value +"</span>");			              					   
 				}	 
 			 });
