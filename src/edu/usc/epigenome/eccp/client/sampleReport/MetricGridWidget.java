@@ -166,18 +166,20 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		filter.clear();
 		//SET UP COLUMNS
 		 List<ColumnConfig<MultipleLibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<MultipleLibraryProperty, ?>>();
-		 ColumnConfig<MultipleLibraryProperty, String> cc1 = new ColumnConfig<MultipleLibraryProperty, String>(properties.name(), 250, "Metric");
+		 ColumnConfig<MultipleLibraryProperty, String> cc1 = new ColumnConfig<MultipleLibraryProperty, String>(properties.prettyName(), 250, "Metric");
 		 ColumnConfig<MultipleLibraryProperty, String> cc2 = new ColumnConfig<MultipleLibraryProperty, String>(properties.category(), 220, "Category");
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc2);
 		 cc1.setCell(new AbstractCell<String>() {
 			@Override
 			public void render(Context context,String value, SafeHtmlBuilder sb) {
+				
 			    LibraryProperty temp = tooltips.get(value);
 			    String description =(temp.getDescription()).replaceAll("\"","'");
 			    String displayName="";
-				if (temp.getPrettyName() == null) displayName=temp.getName();			 					 
-				else displayName=temp.getPrettyName();		
+			    displayName = value;
+		//		if (temp.getPrettyName() == null) displayName=temp.getName();			 					 
+		//		else displayName=temp.getPrettyName();		
 				sb.appendHtmlConstant(
 									   "<span qtip=\""+
 					//	               "<b>Description: </b> "+
@@ -244,8 +246,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		// q.setToolTipConfig(ttc);
 		// q.getElement().getStyle().setBackgroundColor("background-color: red");
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
-         StoreSortInfo info = new StoreSortInfo(cc1.getValueProvider(), SortDir.DESC);
-	     store.addSortInfo(info);
 
 		 //Handle Drag and drop of libraries from the samplelist to the main metric table
 		 DropTarget target = new DropTarget(gridPointer)
@@ -308,6 +308,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				plot(clickedItem);
 			}
 		});
+         StoreSortInfo<MultipleLibraryProperty> sortByPrettyName = new StoreSortInfo<MultipleLibraryProperty>(cc1.getValueProvider(), SortDir.ASC);
+         gridPointer.getStore().addSortInfo(sortByPrettyName);
+	     
 	}
 	
 	//set the title in the top bar
@@ -411,36 +414,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 simple.setWidth(700);
 		 simple.setHeight(500);
 		 simple.show();
-	}
-	
-	/*public void showCSV(SelectEvent event)
-	{
-
-		List<ColumnConfig<MultipleLibraryProperty, ?>> configs = gridPointer.getColumnModel().getColumns();
-		String header = "";
-		for (ColumnConfig<MultipleLibraryProperty, ?> col: configs) {
-
-			header+=col.getHeader().asString()+ "\t";
-		}
-		String csv = "Metric Name in Database"+"\t"+ header+"\n";
-		for(MultipleLibraryProperty metric : gridPointer.getStore().getAll())
-		{
-			String metricVal = metric.getAllValues().contains("JSON") ? "" : metric.getAllValues();
-			csv += metric.getName() + "\t" + metric.getPrettyName() +"\t"+ metric.getCategory()+"\t"+metricVal+"\n";
-		}
-		 TextArea text = new TextArea();
-		 text.setText(csv);
-		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Tab-separated metrics (Paste into Excel)");
-		 simple.setPredefinedButtons(PredefinedButton.OK);
-		 simple.setBodyStyleName("pad-text");
-		 simple.add(text);
-		 simple.setHideOnButtonClick(true);
-		 simple.setWidth(700);
-		 simple.setHeight(500);
-		 simple.show();
-	}*/
-	
+	}	
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
@@ -483,9 +457,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		for(int i = 0; i < libraries.size() ; i ++){
 			for(String key : libraries.get(i).keySet()) {
 			       LibraryProperty p = libraries.get(i).get(key);
-			       if (p.getDescription() !=null)
-			         tooltips.put(p.getName(), p);
-			       else  tooltips.put(p.getName(), p);
+		    	   tooltips.put(p.getPrettyName(), p);			       
 		    }		
 		}
 	}
