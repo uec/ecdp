@@ -1,0 +1,25 @@
+On your Mac:
+
+in eclipse:
+	right click on project, google->GWT compile
+
+in shell	
+rm eccpgxt.zip
+zip -r eccpgxt.zip war
+scp eccpgxt.zip natalia@webapp.epigenome.usc.edu:/tmp
+
+
+On webapp.epigenome.usc.edu:
+sudo su
+/root/replace.sh
+
+remove "<--" and "-->" around <security-constraints>
+esc :wq
+
+will pause for 10 seconds, verify website is offline, then verify that it is back online.
+
+
+
+
+
+
