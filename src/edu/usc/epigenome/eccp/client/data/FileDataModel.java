@@ -16,5 +16,5 @@ public interface FileDataModel extends PropertyAccess<FileData>
 	 ValueProvider<FileData, String> category();
 	 ValueProvider<FileData, String> source();
 	 ValueProvider<FileData, String> lane();
-	
+	 ValueProvider<FileData, String> size();
 }

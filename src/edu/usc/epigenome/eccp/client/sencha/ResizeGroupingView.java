@@ -22,7 +22,6 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 	
 	   private  StoreSortInfo<M> lastStoreSort;
 	   private  SortInfo lastSort;
-   
 	
 	  public void doResize()
 	    {
@@ -84,8 +83,9 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		        lastSort = null;
 		        // full redraw without groups
 		        refresh(false);
-		      }
+		      }		      
 		    }
+		    		    
 		  }
 	 public <V> StoreSortInfo<M> createStoreSortInfo(ColumnConfig<M, V> column, SortDir sortDir) {
 		    if (column.getComparator() == null) {
@@ -178,6 +178,4 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 			this.lastSort = lastSort;
 		}
 		
-
-
 }

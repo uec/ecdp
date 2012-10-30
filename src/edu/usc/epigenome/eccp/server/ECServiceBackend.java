@@ -349,9 +349,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL for database connection
-			 String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+		     String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 			//String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
-			// create the connection
+         //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
+			
+			 // create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
 			
@@ -582,6 +584,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return s;
 	}
+	public String humanReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	   // String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+	    String pre = ("KMGTPE").charAt(exp-1)+"";
+	    return String.format("%d %s", (int) (bytes / Math.pow(unit, exp)), pre);
+	}
 	
 	//returns a list of files associated with the given library
 	public ArrayList<FileData> getFilesforLibrary(LibraryData lib) throws IllegalArgumentException
@@ -597,13 +607,15 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			// URL to connect to the database
 			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+		    //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
+			
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
 			if (myConnection != null)
 			{
 				Statement st1 = myConnection.createStatement();
-				String selectFiles = "select f.file_fullpath, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
+				String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
 				System.out.println("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
@@ -617,6 +629,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					String fullPath = rs1.getString("f.file_fullpath");
 					String type = rs1.getString("c.name");
 					String description = rs1.getString("description");
+					String size = rs1.getString("f.file_size");
 					FileData file = new FileData();
 					matcher = pattern.matcher(fullPath);
 
@@ -638,6 +651,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						else
 							file.setLane("0");
                         file.setDescription(description);
+                        
+                        if (size != null) 
+                             file.setSize(humanReadableByteCount(Long.parseLong(size), true));
+                        else file.setSize("N/A");
 						files.add(file);
 					}
 				}

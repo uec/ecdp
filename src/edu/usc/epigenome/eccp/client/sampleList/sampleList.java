@@ -38,6 +38,7 @@ import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.KeyNav;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
+import com.sencha.gxt.data.shared.SortInfoBean;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
@@ -73,6 +74,7 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
@@ -113,8 +115,9 @@ public class sampleList extends Composite implements HasLayout
 	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,libTypeCol;
 	ListStore<LibraryData> store;
 	Grid<LibraryData> grid;
-	StoreSortInfo info;
+	StoreSortInfo<LibraryData> sortByDate;
 	MenuItem menuItem;
+	Comparator<String>  dateComparator;
 
 	
 
@@ -183,7 +186,7 @@ public class sampleList extends Composite implements HasLayout
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
 		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), 80, "Date");
-		 Comparator<String> c = new Comparator<String>(){
+		 dateComparator = new Comparator<String>(){
 
 			public int compare(String o1, String o2) {
 				String d = "No Date Entered";
@@ -196,7 +199,7 @@ public class sampleList extends Composite implements HasLayout
 			}
 			 
 		 };
-		 dateCol.setComparator(c);
+		 dateCol.setComparator(dateComparator);
 		 columnDefs.add(projCol);
 		 columnDefs.add(libCol);
 		 columnDefs.add(libTypeCol);
@@ -279,7 +282,9 @@ public class sampleList extends Composite implements HasLayout
 					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
 				populateGrid(result);
 			}});
-		 
+		 // Add sorting by date column to the grid
+         sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
+         grid.getStore().addSortInfo(sortByDate);
 	}
 	
 	public void getContextData(final LibraryData library) {
@@ -418,8 +423,10 @@ public class sampleList extends Composite implements HasLayout
 	@UiHandler("byFlowcell")
 	public void groupByF(SelectEvent event)
 	{
+
 		view.groupBy(flowcellCol);
 		view.collapseAllGroups();
+
 	}
 	
 	@UiHandler("byLibrary")
@@ -434,13 +441,17 @@ public class sampleList extends Composite implements HasLayout
 	{
 		view.groupBy(projCol);
 		view.collapseAllGroups();
+		store.getSortInfo().clear();
+//		StoreSortInfo<LibraryData> sortInfo=new StoreSortInfo<LibraryData>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), dateCol.getComparator(), SortDir.DESC);	
+		store.getSortInfo().add(0, view.getLastStoreSort());
+        store.getSortInfo().add(1, sortByDate);
+
 	}
 	@UiHandler("byDate")
 	public void groupByD(SelectEvent event)
 	{
-		 view.groupBy(dateCol);
-	//	 info = new StoreSortInfo(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), SortDir.DESC);
-	//	 store.addSortInfo(info);
+
+		 view.groupBy(dateCol);		 
 		 view.collapseAllGroups();
 		
 	}

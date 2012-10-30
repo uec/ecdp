@@ -17,8 +17,9 @@ public class FileData implements Serializable
 	String downloadLocation;
 	String lane;
 	String description;
+	String size;
 	
-	public void setAll(String name, String fullPath, String location, String type,String source,	String category, String downloadLocation)
+	public void setAll(String name, String fullPath, String location, String type,String source,	String category, String downloadLocation, String size)
 	{
 		this.name=name;
 		this.fullPath = fullPath;
@@ -27,8 +28,17 @@ public class FileData implements Serializable
 		this.source=source;
 		this.category=category;
 		this.downloadLocation=downloadLocation;
+		this.size=size;
 	}
 	
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
 	public String getFullPath()
 	{
 		return fullPath;

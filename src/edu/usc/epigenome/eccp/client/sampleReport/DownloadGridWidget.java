@@ -72,7 +72,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
-	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4;
+	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4,cc5;
 	ListStore<FileData> store;
 	Grid<FileData> grid;
 	List<FileData> fileData;
@@ -135,18 +135,21 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + object + " \">download</a>");		        
 		      }
 		}));
+		 cc5 = new ColumnConfig<FileData, String>(properties.size(), 50, "Size");
+		 
 		 //columnDefs.add(sm.getColumn());
 		 columnDefs.add(cc1);
 		 columnDefs.add(cc2);		
 		 columnDefs.add(cc3);
+		 columnDefs.add(cc5);
 		 columnDefs.add(cc4);
          fileDataColumnModel = new ColumnModel<FileData>(columnDefs);
 		 store = new ListStore<FileData>(properties.key());
 		
 		
-		filter.bind(store);
-		filter.setEmptyText("Search...");
-		buttons.add(filter);
+		 filter.bind(store);
+		 filter.setEmptyText("Search...");
+		 buttons.add(filter);
 		 
 		 
 		 view = new ResizeGroupingView<FileData>();
