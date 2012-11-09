@@ -396,7 +396,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					if(contents.length() < 3)
 						contents = "NOTHINGBUTGARBAGE";
 					System.out.println("URL PARAM DEC: " + contents);
-					where += "id_run_sample IN (select id_run_sample from view_run_metric where MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE)) AND ";
+					where += "MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
 				}
 			}
 			
