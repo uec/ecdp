@@ -38,6 +38,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
+	String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
+	
 	/*
 	 * Method to get the md5 hash of the input string takes string as an input
 	 * parameter and returns the md5 hash of the input string
@@ -244,8 +246,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
-		//	String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
+			String dbURL = db + username + "&password=" + password;
+		//	String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+			//String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
@@ -349,7 +352,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL for database connection
-		     String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+			String dbURL = db + username + "&password=" + password;
+		 // String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 			//String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
          //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
 			
@@ -533,7 +537,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					    }
 					 else date.setValue("No Date Entered");
 				 }
-				 
 				 if(queryParams.getGetFiles())
 					 d.setFiles(getFilesforLibrary(d));
 				 data.add(d);
@@ -551,8 +554,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				e.printStackTrace();
 			}
 		}
+				
 		return data;
 	}
+	
 	
 	public String formatString(String s) 
 	{
@@ -606,7 +611,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String password = "LQSadm80";
 
 			// URL to connect to the database
-			String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
+			String dbURL = db + username + "&password=" + password;
+			//String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
 		    //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
 			
 			// create the connection

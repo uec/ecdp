@@ -2,8 +2,12 @@ package edu.usc.epigenome.eccp.client.tab;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasResizeHandlers;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -16,6 +20,8 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.CardLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.Viewport;
@@ -49,10 +55,13 @@ public class TabbedReport extends Composite implements HasLayout
 		      public void onSelection(SelectionEvent<Widget> event) {
 		        HasLayout w = (HasLayout)event.getSelectedItem();
 		        w.forceLayout();
+		        tabPanel.forceLayout();
 		      }			
 		    };
+		    
 		tabPanel.addSelectionHandler(handler);
-				
+		tabPanel.setTabScroll(true);
+			
 		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()  
 
 		{
@@ -72,6 +81,7 @@ public class TabbedReport extends Composite implements HasLayout
 			}	        
 	    });
 	}
+	
 	// Adds ECCPHelp tab with a "Help pages" link to online help
 	public void showHelp() {
 		
@@ -109,8 +119,8 @@ public class TabbedReport extends Composite implements HasLayout
 
 	@Override
 	public void forceLayout() {
-		tabPanel.forceLayout();
-		
+	    tabPanel.forceLayout();	   
+        
 	}
 
 	@Override
@@ -124,6 +134,7 @@ public class TabbedReport extends Composite implements HasLayout
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 	
 
 }

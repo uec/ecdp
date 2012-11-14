@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.util.Format;
 import com.sencha.gxt.core.client.util.KeyNav;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
@@ -45,12 +46,15 @@ import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
+import com.sencha.gxt.widget.core.client.event.HideEvent;
+import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
@@ -238,11 +242,12 @@ public class sampleList extends Composite implements HasLayout
 				 query.setIsSummaryOnly(false);
 				 query.setGetFiles(true);
 				 query.setDBid(summarizedLibrary.get("id_run_sample").getValue());
+				
 				 myServer.getLibraries(query, new AsyncCallback<ArrayList<LibraryData>>(){
 						@Override
 						public void onFailure(Throwable caught)
-						{
-							Info.display("Error","Failed to get Library");
+						{							
+							Info.display("Error","Failed to get Library");					    
 						}
 
 						@Override
@@ -253,9 +258,26 @@ public class sampleList extends Composite implements HasLayout
 								        MetricGridWidget metric = new MetricGridWidget(result);
 								        ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(metric,result.get(0).get("sample_name").getValue()));
 						    }
-							else
-								Info.display("Error","Failed to get Library");
-						}});
+							else {
+							//	Info.display("Error_1","Failed to get Library");
+							      MessageBox box = new MessageBox("Database was updated", "");
+					              box.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.CANCEL);
+					              box.setIcon(MessageBox.ICONS.question());
+					              box.setMessage("Would you like to reload the data?");
+					              box.addHideHandler(new HideHandler() {
+					 
+					              @Override
+					                 public void onHide(HideEvent event) {
+					                   Dialog btn = (Dialog) event.getSource();
+					                   String msg = Format.substitute("The '{0}' button was pressed", btn.getHideButton().getText());					          
+					                   if (btn.getHideButton().getText().equals("Yes")) {
+					            	  // Info.display("MessageBox", msg);
+					                	   Window.Location.reload();
+					                   }
+					                 }
+					              });
+					             box.show();
+				   }}});
 			}
 			
 		});

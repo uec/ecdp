@@ -5,7 +5,7 @@
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
              
               <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="toolBarRowData">
-   				 <ui:attributes width="1" height="100" />
+   				 <ui:attributes width="1" height="30" />
   			  </ui:with>
   			  
   			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">

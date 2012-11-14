@@ -12,7 +12,7 @@ scp eccpgxt.zip natalia@webapp.epigenome.usc.edu:/tmp
 On webapp.epigenome.usc.edu:
 sudo su
 /root/replace.sh
-
+vi will open for  /opt/tomcat6/webapps/ECCPBinder/WEB-INF/web.xml
 remove "<--" and "-->" around <security-constraints>
 esc :wq
 
