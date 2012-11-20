@@ -108,6 +108,8 @@ try{
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa");
 				else if(results.getString("organism").contains("Phi"))
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa");
+				else if(results.getString("organism").contains("rabidop"))
+					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/arabidopsis/tair8.pluscontam.fa");
 				else if(results.getString("processing").contains("RNA-seq"))
 					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19");
 				else if(results.getString("processing").contains("BS-seq"))
