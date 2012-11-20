@@ -4,11 +4,17 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
 		
-		
+              <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="toolBarRowData">
+   				 <ui:attributes width="1" height="30" />
+  			  </ui:with>
+  			  
+  			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">
+   				<!--  <ui:attributes width="1" height="1" /> -->
+  			  </ui:with>	
 		
 		<gxt:ContentPanel ui:field="gridPanel" headingText="Metrics">
 			<container:VerticalLayoutContainer ui:field="vlc">
-				<container:child>
+				<container:child layoutData='{toolBarRowData}'>
 					<gxt:toolbar.ToolBar ui:field="buttons">
 						<g:HorizontalPanel ui:field="buttonsHP">
 							<gxt:button.TextButton ui:field="adminButton" text="More Metrics" />
@@ -18,7 +24,7 @@
 						</g:HorizontalPanel>
 					</gxt:toolbar.ToolBar>
 				</container:child>
-				<container:child>
+				<container:child layoutData='{contentData}'>
 					<gxt:container.VerticalLayoutContainer ui:field="content" />
 				</container:child>
 			</container:VerticalLayoutContainer>

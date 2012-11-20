@@ -175,7 +175,7 @@ public class sampleList extends Composite implements HasLayout
 		 
 		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
 		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing"), 30, "LibType");
-		 libTypeCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+		/* libTypeCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 	     {
 			 public SafeHtml render(String object) 
 		      {  
@@ -185,7 +185,7 @@ public class sampleList extends Composite implements HasLayout
 				return SafeHtmlUtils.fromString(type);
 		    	 	        
 		      }			 
-	     }));
+	     }));*/
 		 libTypeCol.setWidth(80);
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
@@ -341,9 +341,25 @@ public class sampleList extends Composite implements HasLayout
 						         }
 						        
 				    }
-					else
-						Info.display("Error","Failed to get Library");
-				}});		
+					else {
+			//			Info.display("Error","Failed to get Library");
+				      MessageBox box = new MessageBox("Database was updated", "");
+		              box.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.CANCEL);
+		              box.setIcon(MessageBox.ICONS.question());
+		              box.setMessage("Would you like to reload the data?");
+		              box.addHideHandler(new HideHandler() {
+		 
+		              @Override
+		                 public void onHide(HideEvent event) {
+		                   Dialog btn = (Dialog) event.getSource();					          
+		                   if (btn.getHideButton().getText().equals("Yes")) {
+		                	   Window.Location.reload();
+		                   }
+		                 }
+		              });
+		             box.show();
+					    
+				}}});		
 	}
 	public void contextMenu() {
 		     Menu contextMenu= new Menu();
@@ -477,7 +493,14 @@ public class sampleList extends Composite implements HasLayout
 		 view.collapseAllGroups();
 		
 	}
-	
+	@UiHandler("byLibType")
+	public void groupByLT(SelectEvent event)
+	{
+
+		 view.groupBy(libTypeCol);		 
+		 view.collapseAllGroups();
+		
+	}
 	@UiHandler("collapse")
 	public void colall(SelectEvent event)
 	{

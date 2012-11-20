@@ -9,7 +9,7 @@
   			  </ui:with>
   			  
   			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">
-   				 <ui:attributes width="1" height="1" />
+   				<!--  <ui:attributes width="1" height="1" /> -->
   			  </ui:with>
   	<container:VerticalLayoutContainer ui:field="vlc">
  	<container:child >
@@ -23,6 +23,7 @@
 					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
 					<gxt:button.TextButton ui:field="byProject" text="By Project" />
 					<gxt:button.TextButton ui:field="byDate" text="By Date" />
+					<gxt:button.TextButton ui:field="byLibType" text="By LibType" />
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 					<gxt:button.TextButton ui:field="share" text="Share Search Results" />					

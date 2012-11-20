@@ -14,8 +14,11 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 //import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.info.Info;
+
 import edu.usc.epigenome.eccp.client.sampleList.sampleList;
 import edu.usc.epigenome.eccp.client.tab.TabbedReport;
+import edu.usc.epigenome.eccp.client.tab.TabbedReportTest;
 
 
 public class ECCPBinderWidget extends BorderLayoutContainer{
@@ -75,13 +78,8 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 
 	    MarginData centerData = new MarginData();
 	    centerData.setMargins(new Margins(5));
-	//    centerData.setSplit(true);
-	//    centerData.setMargins(new Margins(5, 0, 5, 5));
-	    
-	   
-	    // SimpleContainer center = new SimpleContainer();
-	    //center.setHeight(800);
 	    center.add(new TabbedReport());
+	//    center.add(new TabbedReportTest());
 	    setCenterWidget(center,centerData);
 	    
 

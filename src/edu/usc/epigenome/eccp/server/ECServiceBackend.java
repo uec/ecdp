@@ -515,7 +515,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 							 	 p.setUsage("0");
 					 	 }
 				 	}
-				 	  d.put(p.getName(), p);
+				 	d.put(p.getName(), p);				 	  
+				 	  
 				 }
 				 LibraryProperty date = d.get("Date_Sequenced");
 				 String val = d.get("Date_Sequenced").getValue();
@@ -537,6 +538,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					    }
 					 else date.setValue("No Date Entered");
 				 }
+				 //extract LibType data from database column "processing"
+				 LibraryProperty libType = d.get("processing");
+				 String libTypeValue = d.get("processing").getValue();
+				 if (libTypeValue !=null ) {
+			    	  String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
+			    	  libType.setValue(libTypeValue.replaceAll(pattern, "$2"));
+			    	  
+				 }
+				 else libType.setValue("Unknown");
+				 
 				 if(queryParams.getGetFiles())
 					 d.setFiles(getFilesforLibrary(d));
 				 data.add(d);
