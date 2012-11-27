@@ -12,6 +12,7 @@
 <%
 	// you  can get your base and parent from the database
 	String encFileName = request.getParameter("resource");
+	
 
 	try
 	{
@@ -21,7 +22,7 @@
 		desCipher.init(Cipher.DECRYPT_MODE, keySpec, desCipher.getParameters());
 		byte[] encodedBytes = new BASE64Decoder().decodeBuffer(encFileName);
 		String filePath = new String(desCipher.doFinal(encodedBytes));
-
+		
 		if (request.getUserPrincipal() != null)
 		{
 			System.err.println(request.getUserPrincipal().getName() + " downloading " + filePath);
@@ -29,7 +30,10 @@
 
 		if (!filePath.startsWith("/storage/"))
 			return;
-
+		
+		String originalFileName = new File(filePath).getName();
+		
+		
 		//Retrieve the file
 		BufferedInputStream buf = null;
 		ServletOutputStream myOut = null;
@@ -70,7 +74,26 @@
 
 			//set response headers
 			response.setContentType("application/octet-stream");
-			response.addHeader("Content-Disposition", "attachment; filename=" + myfile.getName());
+			
+			//handle symlink names, we want the downloaded name to match the symlink itself, not the target.
+			//response.addHeader("Content-Disposition", "attachment; filename=" + myfile.getName());
+			if(myfile.getName().endsWith(".gz") && !originalFileName.endsWith(".gz"))
+			{
+				response.addHeader("Content-Disposition", "attachment; filename=" + originalFileName + ".gz");
+			}
+			else if(myfile.getName().endsWith(".zip") && !originalFileName.endsWith(".zip"))
+			{
+				response.addHeader("Content-Disposition", "attachment; filename=" + originalFileName + ".zip");
+			}
+			else if(myfile.getName().endsWith(".bz2") && !originalFileName.endsWith(".bz2"))
+			{
+				response.addHeader("Content-Disposition", "attachment; filename=" + originalFileName + ".bz2");
+			}
+			else
+				response.addHeader("Content-Disposition", "attachment; filename=" + originalFileName);
+	
+			
+			//set file length
 			if (myfile.length() <= Integer.MAX_VALUE)
 				response.setContentLength((int) myfile.length());
 			else
