@@ -234,6 +234,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 gridPointer = grid;
 	//	 grid.setWidth(Window.getClientWidth() - 600);
 		 gridPointer.setView(viewPointer);
+		 gridPointer.setAllowTextSelection(true);
 		 content.add(gridPointer);				
 		 filter.bind(store);		 
 		 @SuppressWarnings("unused")
@@ -386,7 +387,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				  //		System.out.println("Found JSON");
 						    lines.add("Multi-Dimensional Data");
 					  }
-					 else lines.add(metric.getValue(i));
+					 else lines.add(metric.getValue(i).replaceAll("\\r|\\n", ""));
+					  
 				  }
 				  else lines.add("N/A");
 				    

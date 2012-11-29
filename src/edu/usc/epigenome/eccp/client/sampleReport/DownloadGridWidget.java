@@ -159,6 +159,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 grid = new Grid<FileData>(store, fileDataColumnModel);
 		 grid.setHeight(Window.getClientHeight() - 130);
 		 sm.setSelectionMode(SelectionMode.SIMPLE);
+		 grid.setAllowTextSelection(true);
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);

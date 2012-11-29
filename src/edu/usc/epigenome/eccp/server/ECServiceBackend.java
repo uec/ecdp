@@ -502,17 +502,28 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 	 }
 					 	 else
 					 	 {
-					 		 	p.setCategory("Unknown");
-							 	//sort_order
-							 	 p.setSortOrder("100000");
-							 	//desc
-							 	 p.setDescription("No Description");
-							 	//pretty_name
-							 	 p.setPrettyName(p.getName());
-							 	 //parser
-							 	 p.setSource("Unknown");
-							 	//usage
-							 	 p.setUsage("0");
+					 		 	// this is for moving geneusID_sample to "Less metrics". 
+					 		    // the category and usage are set to be the same as for sample_name metric
+					 		    if (p.getName().equals("geneusID_sample")) {
+					 		 		 p.setPrettyName("LIMS id");
+					 		 		 p.setCategory(qcTypes.get("sample_name").get("category"));
+					 		 		 p.setUsage(qcTypes.get("sample_name").get("usage_enum"));
+					 		 	 }
+					 		 	 else  { 
+					 		 		 //category
+					 		 		 p.setCategory("Unknown");
+									 //usage
+								 	 p.setUsage("0");
+									 //pretty_name
+								 	 p.setPrettyName(p.getName());
+					 		 	 }
+							 	     //sort_order
+							 	     p.setSortOrder("100000");
+							 	     //desc
+							 	     p.setDescription("No Description");
+							 	     //parser
+							 	     p.setSource("Unknown");
+
 					 	 }
 				 	}
 				 	d.put(p.getName(), p);				 	  
