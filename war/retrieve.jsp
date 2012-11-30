@@ -44,7 +44,7 @@
 			try
 			{
 				String inputPath = new String(filePath);
-				String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/symlinks.pl", inputPath};
+				String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/symlink.pl", inputPath};
 				Runtime oRuntime = Runtime.getRuntime();
 				Process oProcess = null;
 
