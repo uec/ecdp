@@ -32,6 +32,7 @@ import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
@@ -75,10 +76,11 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	List<LibraryData> libraries;
 	@UiField ContentPanel gridPanel;
 	@UiField VerticalLayoutContainer content;
-
+	
 	@UiField ToolBar buttons;
 	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
+	@UiField TextButton mergeLibs;
 	String usageMode = "user";
 	List<LibraryData> data;
 	ResizeGroupingView<MultipleLibraryProperty> viewPointer;
@@ -116,7 +118,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		buttons.add(filter);
 	}
 	
-	public MetricGridWidget(List<LibraryData> data) {
+	public MetricGridWidget(List<LibraryData> data) 
+	{
+		
 		initWidget(uiBinder.createAndBindUi(this));
 		this.data=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
@@ -124,6 +128,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		filter.setEmptyText("Search...");
 		buttonsHP.add(filter);
 		libraries = data;
+		if(libraries.size() < 2)
+			mergeLibs.disable();
 	    makeToolTips();
 		mergeData();
 		currentLibraryData=getUsageModeData(); 
@@ -281,8 +287,13 @@ public class MetricGridWidget extends Composite implements HasLayout{
 							    	        	contains=true;
 							            }
 								}
-								if (!contains) {
+								if (!contains) 
+								{
 									libraries.addAll(result);
+									if(libraries.size() < 2)
+										mergeLibs.disable();
+									else
+										mergeLibs.enable();
 								//	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
 								}
 							   
@@ -417,6 +428,12 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 simple.setHeight(500);
 		 simple.show();
 	}	
+	
+	@UiHandler("mergeLibs")
+	public void createMerge(SelectEvent event)
+	{
+		Info.display("test", "merging libs");
+	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
         
