@@ -1,9 +1,12 @@
 package edu.usc.epigenome.eccp.server;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +18,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -703,6 +707,38 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			}
 		}
 		return files;
+	}
+
+	@Override
+	public String createMergeWorkflow(List<LibraryData> libs)
+	{
+		String ret = "";
+		try
+		{
+			String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
+			Runtime oRuntime = Runtime.getRuntime();
+			Process oProcess = null;
+
+			oProcess = oRuntime.exec(aCmdArgs);
+			oProcess.waitFor();
+			/* dump output stream */
+			BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
+			OutputStreamWriter os = new OutputStreamWriter(oProcess.getOutputStream());
+			for(LibraryData lib : libs)
+				os.write(lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n");
+			
+			String line = null;
+			while((line = is.readLine()) != null)
+				ret += line + "\n";
+			
+
+
+		} catch (Exception e)
+		{
+			ret += "ERROR ENCOUNTERED\n";
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 }

@@ -432,7 +432,29 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	@UiHandler("mergeLibs")
 	public void createMerge(SelectEvent event)
 	{
-		Info.display("test", "merging libs");
+		myServer.createMergeWorkflow(libraries, new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught)
+			{
+				Info.display("ERROR","could not create merging workflow");				
+			}
+
+			@Override
+			public void onSuccess(String result)
+			{
+				 TextArea text = new TextArea();
+				 text.setText(result);
+				 final Dialog simple = new Dialog();
+				 simple.setHeadingText("merging workflow (Pastable at hpcc)");
+				 simple.setPredefinedButtons(PredefinedButton.OK);
+				 simple.setBodyStyleName("pad-text");
+				 simple.add(text);
+				 simple.setHideOnButtonClick(true);
+				 simple.setWidth(700);
+				 simple.setHeight(500);
+				 simple.show();				
+			}});
 	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {

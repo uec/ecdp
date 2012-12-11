@@ -1,6 +1,8 @@
 package edu.usc.epigenome.eccp.client;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
@@ -17,5 +19,6 @@ public interface ECService extends RemoteService
 	//Encrypt the contents passed for Guest User
 	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;
 	//Get the csv files for generating file list for plots
-	String getCSVFromDisk(String filePath) throws IllegalArgumentException;	
+	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
+	String createMergeWorkflow(List<LibraryData> libs);
 }
