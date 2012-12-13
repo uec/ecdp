@@ -8,17 +8,20 @@ print getHeader();
 
 while(my $line=<> )
 {
+	
 	my($sample,$dir) = split(/\s+/,$line);
 	chomp $dir;
 	$dir =~ /\/(\w+)_(\w+)_(\w+)$/;
 	my $flowcell = $1;
 	my $lane = $2;
 	my $lib = $3;
+	#print STDERR "1:$flowcell 2:$lane 3:$lib dir:$dir\n";
+	next if !$lib;
 	
 	$localDir = $dir;
 	$localDir =~ s/^\/export/\/storage\/hpcc/;
 	
-	my $file = "ERROR: CANT FIND BAM FILE FOR MERGE!";
+	my $file = "ERROR: CANT FIND BAM FILE FOR MERGE! tried:\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam $localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam\n$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam";
 	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam";
 	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" ;
 	

@@ -735,6 +735,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			/* dump output stream */
 			BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
 			OutputStreamWriter os = new OutputStreamWriter(oProcess.getOutputStream());
+			
+			String line = null;
+			
+			
 			for(LibraryData lib : libs)
 			{
 				String libLine = lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n"; 
@@ -742,8 +746,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				ret += "#" + libLine;
 			}
 			os.flush();
-			
-			String line = null;
+			os.close();
+		
 			while((line = is.readLine()) != null)
 				ret += line + "\n";
 			

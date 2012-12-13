@@ -20,7 +20,7 @@
 							<gxt:button.TextButton ui:field="adminButton" text="More Metrics" />
 							<gxt:button.TextButton ui:field="userButton" text="Less Metrics" />
 							<gxt:button.TextButton ui:field="download" text="Download Files" />
-							<gxt:button.TextButton ui:field="mergeLibs" text="Merge Libraries" />
+							<gxt:button.TextButton ui:field="mergeLibs" text="Merge Libraries" toolTip="Administratrs can merge multiple lanes of a given Library. ADMIN ONLY FEATURE"/>
 							<gxt:button.TextButton ui:field="toSpreadSheet" text="Save as SpreadSheet" />
 						</g:HorizontalPanel>
 					</gxt:toolbar.ToolBar>

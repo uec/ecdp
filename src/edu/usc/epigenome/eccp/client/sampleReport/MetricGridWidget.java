@@ -120,7 +120,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	
 	public MetricGridWidget(List<LibraryData> data) 
 	{
-		
 		initWidget(uiBinder.createAndBindUi(this));
 		this.data=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
@@ -290,7 +289,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 								if (!contains) 
 								{
 									libraries.addAll(result);
-									if(libraries.size() < 2)
+									if(libraries.size() < 2 || Window.Location.getHref().contains("gareports"))
 										mergeLibs.disable();
 									else
 										mergeLibs.enable();
