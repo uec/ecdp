@@ -713,6 +713,17 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	public String createMergeWorkflow(List<LibraryData> libs)
 	{
 		String ret = "";
+//		for(LibraryData lib : libs)
+//		{
+//			
+//			String libLine = lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n"; 
+//			
+//			ret += "#" + libLine;
+//		}
+//		
+		
+		
+		
 		try
 		{
 			String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
@@ -720,18 +731,23 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Process oProcess = null;
 
 			oProcess = oRuntime.exec(aCmdArgs);
-			oProcess.waitFor();
+			//oProcess.waitFor();
 			/* dump output stream */
 			BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
 			OutputStreamWriter os = new OutputStreamWriter(oProcess.getOutputStream());
 			for(LibraryData lib : libs)
-				os.write(lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n");
+			{
+				String libLine = lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n"; 
+				os.write(libLine);
+				ret += "#" + libLine;
+			}
+			os.flush();
 			
 			String line = null;
 			while((line = is.readLine()) != null)
 				ret += line + "\n";
 			
-
+			oProcess.waitFor();
 
 		} catch (Exception e)
 		{
