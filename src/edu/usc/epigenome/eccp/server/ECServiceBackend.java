@@ -34,6 +34,8 @@ import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
+
+import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -759,6 +761,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			e.printStackTrace();
 		}
 		return ret;
+	}
+
+	@Override
+	public String getLibrariesJSON(LibraryDataQuery queryParams)
+	{
+		Gson gson = new Gson();
+		return gson.toJson(getLibraries(queryParams));
 	}
 
 }

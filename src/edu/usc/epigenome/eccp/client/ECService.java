@@ -15,6 +15,7 @@ import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 public interface ECService extends RemoteService
 {
 	ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams);
+	String getLibrariesJSON(LibraryDataQuery queryParams);
 	// Utility Functions
 	//Encrypt the contents passed for Guest User
 	ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException;

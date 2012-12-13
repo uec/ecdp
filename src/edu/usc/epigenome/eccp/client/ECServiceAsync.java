@@ -21,4 +21,6 @@ public interface ECServiceAsync
 
 	//create a merging workflow for use at hpcc
 	void createMergeWorkflow(List<LibraryData> libs, AsyncCallback<String> callback);
+
+	void getLibrariesJSON(LibraryDataQuery queryParams, AsyncCallback<String> callback);
 }
