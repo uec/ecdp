@@ -45,7 +45,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
 	String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
-	
+	//String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=";
 	/*
 	 * Method to get the md5 hash of the input string takes string as an input
 	 * parameter and returns the md5 hash of the input string

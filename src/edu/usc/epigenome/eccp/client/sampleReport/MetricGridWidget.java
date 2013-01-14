@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -45,6 +47,9 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
@@ -81,6 +86,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton mergeLibs;
+	@UiField TextButton viewButton;
 	String usageMode = "user";
 	List<LibraryData> data;
 	ResizeGroupingView<MultipleLibraryProperty> viewPointer;
@@ -125,10 +131,13 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
 		filter.setEmptyText("Search...");
-		buttonsHP.add(filter);
+		buttonsHP.add(filter);		
 		libraries = data;
 		if(libraries.size() < 2)
 			mergeLibs.disable();
+		createMenu();
+	    if(Window.Location.getQueryString().length() > 0 )
+	    	viewButton.getMenu().getWidget(2).setVisible(false);
 	    makeToolTips();
 		mergeData();
 		currentLibraryData=getUsageModeData(); 
@@ -200,7 +209,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			}	 
 		 });
 	 
-		 for(int i = 0 ; i < currentLibraryData.get("flowcell_serial").getValueSize(); i++)
+		 for(int i = 0 ; i < mergedLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
 			 cc.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
@@ -329,27 +338,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	{
 		gridPanel.setHeadingText(title);
 	}
-	
-	//show advanced metrics
-	@UiHandler("adminButton")
-	public void setAdminView(SelectEvent event)
-	{
-		 usageMode="admin";
-		 currentLibraryData=getUsageModeData();
-		 content.remove(0);
-		 drawTable();
-	}
-	
-	//show only simple metrics
-	@UiHandler("userButton")
-	public void setUserView(SelectEvent event)
-	{
-		 usageMode="user";		
-		 currentLibraryData=getUsageModeData(); 
-		 content.remove(0);
-		 drawTable();
-	}
-	
+
 	//display the download-files widget for these libraries
 	@UiHandler("download")
 	public void downloadFile(SelectEvent event)
@@ -427,7 +416,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 simple.setHeight(500);
 		 simple.show();
 	}	
-	
+
 	@UiHandler("mergeLibs")
 	public void createMerge(SelectEvent event)
 	{
@@ -457,7 +446,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
-        
+     //   System.out.println("Usage mode: "+usageMode);
 		HashMap<String,MultipleLibraryProperty> templibdata = new HashMap<String,MultipleLibraryProperty>();
 		if (usageMode.equals("user")) {
 		//	Info.display("Notice", "User view");
@@ -465,15 +454,26 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
 				if (multiProperty.getUsage().equals("4")) templibdata.put(m, multiProperty);				
 			}
-			}
+		}
 		if (usageMode.equals("admin")) {
 		//	Info.display("Notice", "Admin view");
 			for (String m: mergedLibraryData.keySet() ) {
 				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
-				if (multiProperty.getUsage().matches("0|1|2|3|4")) templibdata.put(m, multiProperty);
-				
+			//	System.out.println("Admin view: "+multiProperty.getUsage());
+				if (multiProperty.getUsage().matches("1|4")) templibdata.put(m, multiProperty);				
 			}
 		}
+		if (usageMode.equals("other")) {
+			for (String m: mergedLibraryData.keySet() ) {
+				MultipleLibraryProperty multiProperty = mergedLibraryData.get(m);
+			//	System.out.println("Unused view: "+multiProperty.getUsage()+"\tName:"+multiProperty.getName());
+				if (multiProperty.getUsage().matches("0")) templibdata.put(m, multiProperty);								
+			}
+			if (templibdata.isEmpty()) {
+				System.out.println("Empty templibdata");
+				return currentLibraryData;
+			}			
+		}		
 		return templibdata;
 	}
 	
@@ -501,6 +501,40 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		    }		
 		}
 	}
+	public void createMenu() {
+		Menu viewMenu = new Menu();
+		MenuItem item1 = new MenuItem();
+		item1.setText("Summary Metrics");		
+		MenuItem item2 = new MenuItem();
+		item2.setText("Advanced Metrics");
+		MenuItem item3 = new MenuItem();
+		item3.setText("Unused Metrics");
+		viewMenu.add(item1);
+		viewMenu.add(item2);
+		viewMenu.add(item3);
+		viewButton.setMenu(viewMenu);
+		viewMenu.addSelectionHandler(new SelectionHandler<Item>(){
+			@Override
+			public void onSelection(SelectionEvent<Item> event) {						
+				 MenuItem item = (MenuItem) event.getSelectedItem();
+				 if (item.getText().equals("Summary Metrics")) {
+					 usageMode="user";
+					 setHeadingText("Metrics - Summary View");
+				 }
+				 else if(item.getText().equals("Advanced Metrics")) {
+					 usageMode="admin"; 
+					 setHeadingText("Metrics - Advanced View");
+				 }
+				 else if(item.getText().equals("Unused Metrics")) {
+					 usageMode="other";
+					 setHeadingText("Metrics - Unused Metrics View");
+				 }
+				 currentLibraryData=getUsageModeData(); 
+				 content.remove(0);
+			     drawTable();
+				 }										 					
+		});
+	}	
 
 	@Override
 	public void forceLayout() {
