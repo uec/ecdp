@@ -73,7 +73,7 @@ try{
 			{
 				myOut.println();
 				i++;
-				myOut.println("#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + ")");
+				myOut.println("#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + " of " + results.getString("organism") +")");
 				myOut.println("Sample."+ i + ".SampleID = " + results.getString("geneusID_sample"));
 				String lane = results.getString("lane");
 				String barcode = results.getString("barcode");
@@ -94,31 +94,47 @@ try{
 						myOut.println("Sample."+ i + ".Input = s_" + lane + "_" + barcode + "_sequence.txt");
 				}
 				
-				if(results.getString("processing").contains("ChIP-seq"))
-					myOut.println("Sample."+ i + ".Workflow = chipseq");
-				else if(results.getString("processing").contains("BS-seq"))
-					myOut.println("Sample."+ i + ".Workflow = bisulfite");
-				else if(results.getString("processing").contains("RNA-seq"))
-					myOut.println("Sample."+ i + ".Workflow = rnaseq");
-				else
-					myOut.println("Sample."+ i + ".Workflow = regular");
+				String workflow = "unaligned";
+				String genome = "/home/uec-00/shared/production/genomes/unaligned/unaligned.fa";
+				
+				if(results.getString("processing").toLowerCase().contains("chip"))
+					workflow = "chipseq";
+				else if(results.getString("processing").toLowerCase().contains("bs"))
+					workflow = "bisulfite";
+				else if(results.getString("processing").toLowerCase().contains("rna"))
+					workflow = "rnaseq";
+				else if(results.getString("processing").toLowerCase().contains("genom") || results.getString("processing").toLowerCase().contains("regul"))
+					workflow = "regular";
 				
 				
-				if(results.getString("organism").contains("Mus"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa");
-				else if(results.getString("organism").contains("Phi"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa");
-				else if(results.getString("organism").contains("rabidop"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/arabidopsis/tair8.pluscontam.fa");
-				else if(results.getString("processing").contains("RNA-seq"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19");
-				else if(results.getString("processing").contains("BS-seq"))
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa");
-				else if(results.getString("processing").contains("ChIP-seq"))
-                    myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa");
-				else
-					myOut.println("Sample."+ i + ".Reference = /home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa");
-	
+				
+				if(results.getString("organism").toLowerCase().contains("mus"))
+					genome = "/home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa";
+				else if(results.getString("organism").toLowerCase().contains("phi"))
+					genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+				else if(results.getString("organism").toLowerCase().contains("phi"))
+					genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+				else if(results.getString("organism").toLowerCase().contains("rabidop"))
+					genome = "/home/uec-00/shared/production/genomes/arabidopsis/tair8.pluscontam.fa";
+				else if(results.getString("organism").toLowerCase().contains("gallus"))
+					genome = "/home/uec-00/shared/production/genomes/chicken/Gallus_gallus.WASHUC2.68.dna.toplevel.fa";
+				//handle human
+				else if(results.getString("organism").toLowerCase().contains("homo") || results.getString("organism").toLowerCase().contains("human"))
+				{
+					if(results.getString("processing").toLowerCase().contains("rna") || results.getString("processing").toLowerCase().contains("chip") )
+						genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
+					else
+						genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";
+				}
+				
+				//handle rnaseq genomes
+				if(results.getString("processing").toLowerCase().contains("rna"))
+					genome = genome.substring(0, genome.length() - 3);
+				
+				myOut.println("Sample."+ i + ".Workflow = " + workflow);
+				myOut.println("Sample."+ i + ".Reference = " + genome);
+				
+				
 			}
 			myOut.println();
 		}
