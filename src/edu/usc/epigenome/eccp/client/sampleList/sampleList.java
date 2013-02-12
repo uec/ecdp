@@ -219,7 +219,7 @@ public class sampleList extends Composite implements HasLayout
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 view.groupBy(projCol);
+		 view.groupBy(dateCol);
 
 		 
 		 

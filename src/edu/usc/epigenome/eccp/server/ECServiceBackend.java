@@ -44,8 +44,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
-	String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
+	  String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
 	//String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=";
+	//String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=";
 	/*
 	 * Method to get the md5 hash of the input string takes string as an input
 	 * parameter and returns the md5 hash of the input string
@@ -508,8 +509,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 	 }
 					 	 else
 					 	 {
-					 		 	// this is for moving geneusID_sample to "Less metrics". 
-					 		    // the category and usage are set to be the same as for sample_name metric
+					 		 	// this is for showing geneusID_sample in "Summary View". 
+					 		    // the category and usage are set to be the same as for sample_name/library metric
 					 		    if (p.getName().equals("geneusID_sample")) {
 					 		 		 p.setPrettyName("LIMS id");
 					 		 		 p.setCategory(qcTypes.get("sample_name").get("category"));
@@ -672,10 +673,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 						file.setName(getFileName(fullPath));
 						file.setFullPath(fullPath);
-						if (type == null)
-							file.setType("Unknown");
-						else
-							file.setType(type);
+						if (getFileName(fullPath).matches(".*NC_001416.*")) file.setType("006. Lambda Control Files");
+						else {
+						       if (type == null) file.setType("Unknown");
+						       else file.setType(type);
+						}
+					
 						file.setLocation(fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
 						file.setDownloadLocation(encryptURLEncoded(fullPath));
 

@@ -22,8 +22,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
+import com.sencha.gxt.core.client.dom.XElement;
+import com.sencha.gxt.core.client.util.Util;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance;
+import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance.GroupHeaderTemplate;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
@@ -38,6 +42,8 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
+import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
+import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingViewAppearance;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -46,8 +52,10 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.FileDataModel;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
+import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
-
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Element;
 
 public class DownloadGridWidget extends Composite implements HasLayout
 {
@@ -76,7 +84,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	ListStore<FileData> store;
 	Grid<FileData> grid;
 	List<FileData> fileData;
-	HashMap<String,String> tooltips= new HashMap<String,String> ();
+//	HashMap<String,String> tooltips= new HashMap<String,String> ();
+	HashMap<String,FileData> tooltips = new HashMap<String,FileData>();
 	IdentityValueProvider<FileData> identity = new IdentityValueProvider<FileData>();
 	CheckBoxSelectionModel<FileData> sm  = new CheckBoxSelectionModel<FileData>(identity);
 	
@@ -94,7 +103,10 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	public DownloadGridWidget(List<FileData> data) 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		fileData=data;
+		// This if-else hides "Unknown" group and "Internal pipeline files" group from a regular user
+		if(Window.Location.getQueryString().length() > 0 )
+		      fileData=filterFileData(data);
+		else fileData=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
 		vlc.setLayoutData(new VerticalLayoutData(-1,-1));
 		//ZR I hate this dirty hack for making the toolbar appear.
@@ -107,6 +119,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		Widget w = vlc.getWidget(0);
 		vlc.remove(0);
 		vlc.insert(w, 0,new VerticalLayoutData(-1,-1));
+		
 	}
 
 	public void createFileDownloadGrid() {
@@ -117,14 +130,18 @@ public class DownloadGridWidget extends Composite implements HasLayout
 				@Override
 				public void render(Context context,String value, SafeHtmlBuilder sb) {
 					
-				    String description = tooltips.get(value).replaceAll("\"","'");	
+					FileData d =  tooltips.get(value);
+				//	System.out.println("Name: "+d.getName()+ " Value: "+value);
+				    String description = d.getDescription().replaceAll("\"","'");				        				    
 					sb.appendHtmlConstant( "<span qtip=\""+
 						//	               "<b>Description: </b> "+
 						//	                description+"\"> <img src=\"/Users/natalia/Desktop/pics_2.png\"/>"+
-		                description+"\"> "+
-						                    value +"</span>");			              					   
+		                                    description+"\"> "+
+						                    value +"</span>");							                   			
 				}	 
-			 });
+			 } 
+			 );
+		
 		 cc2 = new ColumnConfig<FileData, String>(properties.type(), 220, "File Type");
 		 cc3 = new ColumnConfig<FileData, String>(properties.location(), 200, "File Location");
 		 cc4 = new ColumnConfig<FileData, String>(properties.downloadLocation(), 100, "Download");
@@ -144,14 +161,10 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 columnDefs.add(cc5);
 		 columnDefs.add(cc4);
          fileDataColumnModel = new ColumnModel<FileData>(columnDefs);
-		 store = new ListStore<FileData>(properties.key());
-		
-		
+		 store = new ListStore<FileData>(properties.key());				
 		 filter.bind(store);
 		 filter.setEmptyText("Search...");
-		 buttons.add(filter);
-		 
-		 
+		 buttons.add(filter);		 		 
 		 view = new ResizeGroupingView<FileData>();
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
@@ -163,7 +176,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 grid.setView(view);
 		 view.groupBy(cc2);
 		 content.add(grid);
-		 sm.bindGrid(grid);
+		 sm.bindGrid(grid);		
 		 QuickTip q =new QuickTip(grid);
 		 q.getToolTipConfig().setTrackMouse(true);
 		 q.getToolTipConfig().setDismissDelay(2000000000);
@@ -223,6 +236,52 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 simple.setHeight(400);
 		 simple.show();
 	}
+	public List<FileData> filterFileData(List <FileData> datalist) {
+		
+		List<FileData> filteredData = new ArrayList<FileData>();
+		for (int i=0; i < datalist.size(); i++) {
+			FileData d = datalist.get(i);
+			if (!d.getType().matches(".*[Ii]nternal.+[Pp]ipeline.+[Ff]iles.*|Unknown.*"))
+				filteredData.add(d);
+		}
+		return filteredData;
+	}
+	public void setLastGroupCollapsed() {
+		 // I used getGroups() source code from GroupingView class as an example
+		 GroupingData<FileData> curGroup = null;
+		 List<GroupingData<FileData>> groups = new ArrayList<GroupingData<FileData>>();
+         for (int i = 0, len = store.size(); i < len; i++) {
+            FileData m = store.get(i);
+            String gvalue = cc2.getValueProvider().getValue(m);
+            System.out.println("Group gvalue: "+gvalue+" "+ m.getName());
+            String s="";
+            if (curGroup==null)
+            	s="Null";
+            else s=curGroup.getValue().toString();
+            if (curGroup == null || !gvalue.equals(curGroup.getValue().toString())) {           
+                System.out.println("In if case Group="+s+" Condition="+!gvalue.equals(s));
+            	//creates a new group with name = gvalue
+                curGroup = new GroupingData<FileData>(gvalue, i);
+                //adds store record to the group
+                curGroup.getItems().add(m);
+                if (groups.contains(curGroup))
+            	  System.out.println("This group is not added: "+curGroup.getValue().toString());
+                //assert !groups.contains(curGroup) <--probably this makes sure that the data in the store are sorted by group column;
+                else { 
+            	  System.out.println("This group is just added: "+curGroup.getValue().toString());
+        	      groups.add(curGroup);
+                }
+                  //System.out.println("Current Group: "+ curGroup.getValue().toString()+ " Collapsed? " + curGroup.isCollapsed());
+             }
+            else {
+            	// curGroup.getItems().add(m);
+            	System.out.println("In else case Group="+s+" Condition="+!gvalue.equals(s));
+             }      
+        }
+        System.out.println("Size of groups: "+groups.size());
+        GroupingData<FileData> lastGroup = groups.get(0); // ? I am not sure index 0 corresponds to the last group
+        lastGroup.setCollapsed(true);       
+	}
 	
 	@UiHandler("organizeLocation")
 	public void groupByLocation(SelectEvent event)
@@ -231,7 +290,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	}
 	public void makeToolTips() {
 		for (FileData d: fileData) {
-			tooltips.put(d.getName(), d.getDescription());
+			tooltips.put(d.getName(), d);
 		}
 	}
 
@@ -251,8 +310,6 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		return false;
 	}
 
-	
-	
 	@Override
 	public boolean isOrWasLayoutRunning() {
 		// TODO Auto-generated method stub

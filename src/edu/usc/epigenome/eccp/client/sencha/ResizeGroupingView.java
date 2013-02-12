@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfo;
@@ -162,6 +164,7 @@ public class ResizeGroupingView<M> extends GroupingView<M>
    	
 		    }
 		  }
+	 
 	 public StoreSortInfo<M> getLastStoreSort() {
 			return lastStoreSort;
 		}
