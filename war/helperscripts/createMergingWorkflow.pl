@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 use File::Basename;
+use POSIX qw( strftime );
 
 $N=1; 
+my $output = getHeader();
 
-print getHeader();
+
 
 
 while(my $line=<> )
@@ -21,24 +23,48 @@ while(my $line=<> )
 	$localDir = $dir;
 	$localDir =~ s/^\/export/\/storage\/hpcc/;
 	
+	#locate the bams
 	my $file = "ERROR: CANT FIND BAM FILE FOR MERGE! tried:\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam $localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam\n$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam";
 	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam";
 	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" ;
-	
-	
-	
-	
-
 	die "$file" if $file =~ /^ERROR/;
+	
+	#convert back to hpcc fs paths and calc symlinks
+	$file =~ s/\/storage\/hpcc/\/export/;
+	my $fileLinkPath = $file;
+	$fileLinkPath =~ s/^.+?flowcells/\.\.\/\.\.\/flowcells/;
+	push @symlinks, $fileLinkPath;
+	#$output .= "#HPCC symlink to $fileLinkPath\n";
+	
 	#print STDERR "$lib: merging in $file\n";
 	$files{$lib} .= "$file,";
 	die "1 to 1 Geneus-TCGA id fail: $samples{$lib} : $lib : $sample\n" if $samples{$lib} && $samples{$lib} ne $sample;
 	$samples{$lib} = "$sample";
 }
 
-$files{$_} =~ s/\,$// for keys %files;
-print getParam($_) for keys %files;
 
+$files{$_} =~ s/\,$// for keys %files;
+$output .= getParam($_) for keys %files;
+
+print $output;
+exit if scalar(keys %files < 1);
+
+#create the workflow run dir
+
+my $yymmdd = strftime("%Y-%m-%d_%H%M", localtime());
+my $mergeDir = "$yymmdd\_merge_" . join("_", keys %samples);
+mkdir "/storage_rw/merges/$mergeDir";
+chdir  "/storage_rw/merges/$mergeDir";
+system("rm /storage_rw/merges/$mergeDir/*");
+system("ln -s $_") for @symlinks;
+open(OUT, ">workFlowParams.txt");
+print OUT $output;
+close OUT;
+print "#WORKFLOW CREATED AT HPCC /export/uec-gs1/laird/shared/production/ga/merges/$mergeDir\n";
+print "#IT HAS NOT BEEN STARTED AUTOMATICALLY, BUT IS READY TO RUN!\n";
+exit;
+
+##################
 sub getParam
 {
 	my $lib = shift @_; 
