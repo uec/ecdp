@@ -44,9 +44,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
-	  String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
-	//String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=";
-	//String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=";
+	     String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
+	 //    String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel_v3?user=";
+	// String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=";
+	 // String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=";
 	/*
 	 * Method to get the md5 hash of the input string takes string as an input
 	 * parameter and returns the md5 hash of the input string
@@ -654,9 +655,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				System.out.println("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
-				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis)/");
+				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges)/");
 				Matcher matcher;
-				Pattern laneNumPattern = Pattern.compile("(s|" + lib.get("flowcell_serial").getValue() + ")_(\\d+)[\\._]+");
+				Pattern laneNumPattern = Pattern.compile("(s|" + lib.get("flowcell_serial").getValue() +")_(\\d+)[\\._]+");
 				Matcher laneNumMatcher;
 
 				while (rs1.next())
@@ -672,22 +673,36 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					{
 
 						file.setName(getFileName(fullPath));
-						file.setFullPath(fullPath);
-						if (getFileName(fullPath).matches(".*NC_001416.*")) file.setType("006. Lambda Control Files");
-						else {
-						       if (type == null) file.setType("Unknown");
-						       else file.setType(type);
-						}
-					
+						file.setFullPath(fullPath);						
 						file.setLocation(fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
 						file.setDownloadLocation(encryptURLEncoded(fullPath));
+						
+						/* Set types and descriptions for files:
+						   Filter out bam/bai from all matched NC_001416 files and assign to "006. Lambda Control Files"
+						   Assign all the rest of NC_001416 files to "008. Intermediate internal pipeline files" 
+						   and set one description for all NC_001416 files
+						*/
+						String fileName = file.getName();
+						fileName = fileName.replaceAll("(\\r|\\n|\\s)", "");
+						if (fileName.matches(".*NC_001416.*")) {
+							if (fileName.matches(".*NC_001416\\.fa(\\.mdups)?\\.bam(\\.bai)?$")) {
+								 file.setType("006. Lambda Control Files");	
+
+							}
+							   else file.setType("008. Intermediate internal pipeline files");
+							   file.setDescription("Lambda control alignments (QC only)");
+						}
+						else {
+							   if (type == null) file.setType("Unknown");
+						       else file.setType(type);						       
+		                       file.setDescription(description);
+						}
 
 						laneNumMatcher = laneNumPattern.matcher(file.getName());
 						if (laneNumMatcher.find())
 							file.setLane(laneNumMatcher.group(2));
 						else
 							file.setLane("0");
-                        file.setDescription(description);
                         
                         if (size != null) 
                              file.setSize(humanReadableByteCount(Long.parseLong(size), true));
