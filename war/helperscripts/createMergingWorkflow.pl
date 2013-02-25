@@ -61,7 +61,10 @@ open(OUT, ">workFlowParams.txt");
 print OUT $output;
 close OUT;
 print "#WORKFLOW CREATED AT HPCC /export/uec-gs1/laird/shared/production/ga/merges/$mergeDir\n";
-print "#IT HAS NOT BEEN STARTED AUTOMATICALLY, BUT IS READY TO RUN!\n";
+print "#IT HAS NOT BEEN STARTED IMMEDIATELY, BUT WILL BE SUBMITTED ACCORDING TO SCHEDULE!\n";
+print "#TO CANCEL, DELETE  /export/uec-gs1/laird/shared/production/ga/merges/$mergeDir SOON\n";
+
+&notify_mail("NEW MERGING WORKFLOW CREATED AT HPCC /export/uec-gs1/laird/shared/production/ga/merges/$mergeDir\n",$output);
 exit;
 
 ##################
@@ -77,4 +80,18 @@ sub getHeader
 {
 	return "ClusterSize = 1\nqueue = laird\nFlowCellName = MERGING\nMinMismatches = 2\nMaqPileupQ = 30\nreferenceLane = 1\nrandomSubset = 300000\n\n";
 
+}
+
+sub notify_mail
+{
+	my ($subject,$body) = @_;
+	open(MAIL, "|/usr/sbin/sendmail -t");
+ 
+	## Mail Header
+	print MAIL "To: ramjan\@usc.edu\n";
+	print MAIL "From: admin\@ECDP\n";
+	print MAIL "Subject: $subject\n\n";
+	## Mail Body
+	print MAIL "$body\n";
+ 	close(MAIL);
 }
