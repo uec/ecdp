@@ -15,7 +15,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing, technician from sequencing_devel.view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
+		String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing, technician from view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
 		ResultSet results = stat.executeQuery(selectQuery);
 		ServletOutputStream myOut = null;
 		try
@@ -56,7 +56,7 @@ try{
 	{
 		String fcell_serial = request.getParameter("fcserial");
 		//Get data wrt to the given flowcell 
-		String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from sequencing_devel.view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
+		String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from view_run_metric where flowcell_serial ='"+fcell_serial + "' group by geneusID_sample, lane order by lane";
 		ResultSet results = stat.executeQuery(selectQuery);
 	
 		ServletOutputStream myOut = null;
@@ -99,7 +99,7 @@ try{
 				
 				if(results.getString("processing").toLowerCase().contains("chip"))
 					workflow = "chipseq";
-				else if(results.getString("processing").toLowerCase().contains("bs"))
+				else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("silfit"))
 					workflow = "bisulfite";
 				else if(results.getString("processing").toLowerCase().contains("rna"))
 					workflow = "rnaseq";
