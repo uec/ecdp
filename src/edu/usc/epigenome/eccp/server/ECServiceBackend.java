@@ -235,7 +235,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			//load a properties file with db info
 			Properties prop = new Properties();
-    		prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
     		
     		
     		Class.forName(prop.getProperty("dbDriver")).newInstance();
@@ -344,7 +344,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			//load a properties file with db info
 			Properties prop = new Properties();
-			prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
 
     		Class.forName(prop.getProperty("dbDriver")).newInstance();
 			// get database details from param file
@@ -626,7 +626,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			//load a properties file with db info
 			Properties prop = new Properties();
-			prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
 
     		Class.forName(prop.getProperty("dbDriver")).newInstance();
 			// get database details from param file
