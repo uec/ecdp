@@ -3,6 +3,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Properties;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,7 +31,6 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.data.FileData;
-
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
@@ -41,17 +41,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 /**
  * The server side implementation of the RPC service.
  */
+
 @SuppressWarnings("serial")
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
-	     String db="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=";
-	 //    String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel_v3?user=";
-	// String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=";
-	 // String db="jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=";
-	/*
-	 * Method to get the md5 hash of the input string takes string as an input
-	 * parameter and returns the md5 hash of the input string
-	 */
+	
 	private static String md5(String text)
 	{
 		MessageDigest md;
@@ -73,16 +67,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return text;
 	}
 
-	/*********************************************************************
-	 * Functions to clear contents of Cache ("OLD" stack panel view)
-	 ********************************************************************* 
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache(java.lang.String)
-	 * function to clear the contents of cache in the /tmp directory
-	 */
+	
 
 	/*
 	 * (non-Javadoc)
@@ -248,15 +233,19 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		HashMap<String, HashMap<String, String>> metrics = new HashMap<String, HashMap<String, String>>();
 		try
 		{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			// database connection code
-			String username = "zack";
-			String password = "LQSadm80";
+			//load a properties file with db info
+			Properties prop = new Properties();
+    		prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
+    		
+    		
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
 
 			// URL to connect to the database
-			String dbURL = db + username + "&password=" + password;
-		//	String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
-			//String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
@@ -353,19 +342,19 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		java.sql.Connection myConnection = null;
 		try
 		{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
 
-			// database connection parameters
-			String username = "zack";
-			String password = "LQSadm80";
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
 
-			// URL for database connection
-			String dbURL = db + username + "&password=" + password;
-		 // String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
-			//String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_devel?user=" + username + "&password=" + password;
-         //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
-			
-			 // create the connection
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
 			
@@ -635,16 +624,18 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		java.sql.Connection myConnection = null;
 		try
 		{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			// database connection code
-			String username = "zack";
-			String password = "LQSadm80";
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(ClassLoader.getSystemClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
 
 			// URL to connect to the database
-			String dbURL = db + username + "&password=" + password;
-			//String dbURL = "jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production?user=" + username + "&password=" + password;
-		    //   String dbURL = "jdbc:mysql://epifire2.epigenome.usc.edu:3306/sequencing_test?user=" + username + "&password=" + password;
-			
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
 			// create the connection
 			myConnection = DriverManager.getConnection(dbURL);
 
