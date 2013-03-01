@@ -15,13 +15,18 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
+import com.sencha.gxt.core.client.XTemplates;
 import com.sencha.gxt.core.client.dom.XElement;
 import com.sencha.gxt.core.client.util.Util;
 import com.sencha.gxt.data.shared.ListStore;
@@ -30,9 +35,14 @@ import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance;
 import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance.GroupHeaderTemplate;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
+import com.sencha.gxt.widget.core.client.container.HtmlLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.Viewport;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
@@ -56,7 +66,11 @@ import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Element;
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.sencha.gxt.widget.core.client.container.AbstractHtmlLayoutContainer.HtmlData;
 public class DownloadGridWidget extends Composite implements HasLayout
 {
 	private static DownloadGridWidgetUiBinder uiBinder = GWT.create(DownloadGridWidgetUiBinder.class);
@@ -69,7 +83,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer vlc;
 	@UiField VerticalLayoutContainer content;
 	@UiField ContentPanel gridPanel;
-	
+	@UiField TextButton help;
 	 StoreFilterField<FileData> filter = new StoreFilterField<FileData>() {
 			@Override
 			protected boolean doSelect(Store<FileData> store, FileData parent, 	FileData item, String filter) 
@@ -77,7 +91,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 				return item.getFullPath().toLowerCase().contains(filter.toLowerCase());					
 			}
 		};
-		
+	HTML video = new HTML("&nbsp&nbspWatch:&nbsp<a target=\"new\" href=\"http://www.youtube.com/watch?v=jPH3YPVc4x4\">\"Downloading a file on hpcc\"</a>",true);
 	String mode = "user";
 	ColumnModel<FileData> fileDataColumnModel;
 	ColumnConfig<FileData, String> cc1,cc2,cc3,cc4,cc5;
@@ -114,6 +128,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		createFileDownloadGrid();
 		sm.setSelectionMode(SelectionMode.MULTI);
 		buttonsHP.add(filter);
+	//	buttonsHP.add(video);		
+	//	help.setVisible(false);
 		populateGrid(fileData);	
 		makeToolTips();
 		Widget w = vlc.getWidget(0);
@@ -236,6 +252,10 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 simple.setHeight(400);
 		 simple.show();
 	}
+	@UiHandler("downloadSelected")
+	public void helpMenu(SelectEvent event) {
+		
+	}
 	public List<FileData> filterFileData(List <FileData> datalist) {
 		
 		List<FileData> filteredData = new ArrayList<FileData>();
@@ -293,7 +313,44 @@ public class DownloadGridWidget extends Composite implements HasLayout
 			tooltips.put(d.getName(), d);
 		}
 	}
+	public interface HtmlLayoutContainerTemplate extends XTemplates {
+	    @XTemplate("<div><div class='cell1'></div><div class='cell2'></div><div class='cell3'></div></div>")
+	    SafeHtml getTemplate();
+	  }
+	@UiHandler ("help")
+	public void showHelp(SelectEvent event) {
 
+		 String html =  "<ul style=\"list-style: disc; margin: 5px 0px 5px 15px\">" +
+		 		        "<li>\"How to download a file on hpcc using lynx browser\"<a target=\"new\" href=\"http://www.youtube.com/watch?v=jPH3YPVc4x4\"> Click here </a></li>"+
+				        "<li>\"Download multiple files from the USC Epigenome Center data portal all at once\"<a target=\"new\" href=\"http://www.youtube.com/watch?v=Qb3qH8lN0P4\"> Click here </a></li>"+
+		          //      "<a target=\"new\" " +
+		 		   //     "href=\"http://www.youtube.com/watch?v=jPH3YPVc4x4\">" +
+		 		  //      "\"Downloading a file on hpcc\"</a></li>" +
+		 		        "</ul>";
+		 SafeHtml shtml = SafeHtmlUtils.fromTrustedString(html);
+		 
+		// TextArea text = new TextArea();
+		 Anchor a = new Anchor();
+		 a.setHTML(shtml);
+		 final Dialog simple = new Dialog();
+		 simple.setHeadingText("FILE DOWNLOAD TUTORIALS");
+		 simple.setPredefinedButtons(PredefinedButton.OK);
+		 simple.setBodyStyleName("pad-text");
+	//	 text.setText("test");
+	//	 SimpleContainer v = new SimpleContainer();
+		 ContentPanel v = new ContentPanel();
+		 v.setHeaderVisible(false);
+		 simple.setHideOnButtonClick(true);
+		 simple.setWidth(600);
+		 simple.setHeight(400);
+		 HtmlLayoutContainerTemplate templates = GWT.create(HtmlLayoutContainerTemplate.class);
+		 HtmlLayoutContainer c = new HtmlLayoutContainer(templates.getTemplate());
+		 c.add(new HTML("<b>YouTube Videos:</b><br>",true), new HtmlData(".cell1"));
+		 c.add(new HTML(html,true), new HtmlData(".cell2"));
+         v.setWidget(c);
+         simple.add(v);
+		 simple.show();		 
+	}
 	@Override
 	public void forceLayout() {
 		// TODO Auto-generated method stub

@@ -246,6 +246,8 @@ a, a:visited, a:hover {
 
 .gwt-Hyperlink {
   cursor: pointer;
+  font-size: small;
+  
 }
 
 .gwt-Image {

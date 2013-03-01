@@ -46,6 +46,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
 	
+	/*
+	 * Method to get the md5 hash of the input string takes string as an input
+	 * parameter and returns the md5 hash of the input string
+	 */
+	
 	private static String md5(String text)
 	{
 		MessageDigest md;
@@ -67,7 +72,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return text;
 	}
 
-	
+	/*********************************************************************
+	 * Functions to clear contents of Cache ("OLD" stack panel view)
+	 ********************************************************************* 
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache(java.lang.String)
+	 * function to clear the contents of cache in the /tmp directory
+	 */
 
 	/*
 	 * (non-Javadoc)

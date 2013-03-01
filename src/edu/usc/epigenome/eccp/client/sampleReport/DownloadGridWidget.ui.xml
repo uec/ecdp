@@ -14,6 +14,7 @@
 										<gxt:button.TextButton ui:field="organizeType" text="Organize by Type" />
 										<gxt:button.TextButton ui:field="organizeLocation" text="Organize by Location" />
 										<gxt:button.TextButton ui:field="downloadSelected" text="Download Selected" /> 
+										<gxt:button.TextButton ui:field="help" text="Help" /> 
 									</g:HorizontalPanel>
 								</gxt:toolbar.ToolBar>
 						</container:child>
