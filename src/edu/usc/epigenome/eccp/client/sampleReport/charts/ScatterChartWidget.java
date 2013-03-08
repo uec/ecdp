@@ -3,9 +3,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.LegendPosition;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.ScatterChart;
@@ -17,11 +18,15 @@ import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.data.XYDataFactory;
 import edu.usc.epigenome.eccp.client.data.XYData;
+import com.google.gwt.visualization.client.CommonChartOptions;
 public class ScatterChartWidget  extends MetricChart
 {
 	MultipleLibraryProperty metric;
 	List<LibraryData> libraries;
 	boolean autoscale = true;
+	String xLabel="";
+	String yLabel="";
+
 	
 	public ScatterChartWidget(MultipleLibraryProperty metric, List<LibraryData> libraries)
 	{
@@ -29,10 +34,11 @@ public class ScatterChartWidget  extends MetricChart
 		this.libraries = libraries;	
 	}
 
+
 	@Override
 	public void show()
 	{
-		show(750,600);		
+		show(750,700);		
 	}
 	
 	@Override
@@ -43,7 +49,7 @@ public class ScatterChartWidget  extends MetricChart
 			final HashMap<Double,ArrayList<Double>> data = new HashMap<Double,ArrayList<Double>>();
 			final ArrayList<String> series = new ArrayList<String>();
 			final ArrayList<String> title = new ArrayList<String>();
-			
+
 			for(int i=0;i<metric.getValueSize();i++)
 				series.add(libraries.get(i).get("sample_name").getValue());
 			
@@ -81,6 +87,8 @@ public class ScatterChartWidget  extends MetricChart
 						}
 						data.get(x).set(i, y/sum);
 					}
+					xLabel = scatter.getXLabel();
+					yLabel = scatter.getYLabel();					
 					
 				}
 				catch(Exception e)
@@ -88,9 +96,9 @@ public class ScatterChartWidget  extends MetricChart
 					Info.display("ERROR", "Could not plot data from library " + i);
 					e.printStackTrace();
 				}
+
 			}
-			
-			
+						
 			VisualizationUtils.loadVisualizationApi(new Runnable(){
 				public void run()
 				{
@@ -111,15 +119,22 @@ public class ScatterChartWidget  extends MetricChart
 							dataMatrix.setValue(i, j+1, data.get(x).get(j));
 						i++;
 					}								
-					
-					Options options = Options.create();
-					options.setTitle(title.get(0));
+
+					CommonChartOptions options = Options.create();
+					//Temporary fix for GetBindepth output
+					if (title.get(0).contains("percentiles"))
+						options.setTitle("Coverage percentiles");
+					else options.setTitle(title.get(0));
 					options.setWidth(width - 150);
 					options.setHeight(height - 50);
+					options.setTitleY(yLabel);
+					options.setTitleX(xLabel);
+		     		options.setAxisFontSize(14);
+		     	//	options.set("slantedText", getSlantedX(options.cast()));
+		        	options.setLegend(LegendPosition.BOTTOM);
 					if(!autoscale)
-						options.setMin(0.0d);
-					ScatterChart motion = new ScatterChart(dataMatrix, options);
-					
+                      options.setMin(0.0d);
+					ScatterChart motion = new ScatterChart(dataMatrix, (ScatterChart.Options)options);
 					
 					//show the plot
 					showDialog(metric.getName(),motion,width,height);
@@ -129,8 +144,13 @@ public class ScatterChartWidget  extends MetricChart
 		{
 			Info.display("Error","You can only plot numeric data");
 		}		
-		
 	}
+	// this native method and  the line options.set("slantedText", getSlantedX(options.cast())); was supposed to change axes titles' font size,
+	// but the browser just displays titles surrounded by  html tags <font> and </font>. So it didn't work. 
+	public final native String getSlantedX(JavaScriptObject options) /*-{
+	       options.titleX = options.titleX.fontsize("6");
+	       return options.titleX;
+	}-*/;
 
 
 
