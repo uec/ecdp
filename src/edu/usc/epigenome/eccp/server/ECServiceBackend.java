@@ -657,7 +657,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (myConnection != null)
 			{
 				Statement st1 = myConnection.createStatement();
-				String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
+			//	String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
+				String selectFiles = "select f.file_fullpath, f.file_size, IFNULL(t.id_category,0) as category, c.name, IFNULL(t.description,\"No Description\") as description from file f left outer join file_type t on f.file_fullpath RLIKE t.file_match_regex left outer join category c on t.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();				
 				System.out.println("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 

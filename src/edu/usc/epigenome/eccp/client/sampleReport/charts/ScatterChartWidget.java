@@ -130,7 +130,7 @@ public class ScatterChartWidget  extends MetricChart
 					options.setTitleY(yLabel);
 					options.setTitleX(xLabel);
 		     		options.setAxisFontSize(14);
-		     	//	options.set("slantedText", getSlantedX(options.cast()));
+		     	//	options.set("smallText", getSmallText(options.cast()));
 		        	options.setLegend(LegendPosition.BOTTOM);
 					if(!autoscale)
                       options.setMin(0.0d);
@@ -147,7 +147,7 @@ public class ScatterChartWidget  extends MetricChart
 	}
 	// this native method and  the line options.set("slantedText", getSlantedX(options.cast())); was supposed to change axes titles' font size,
 	// but the browser just displays titles surrounded by  html tags <font> and </font>. So it didn't work. 
-	public final native String getSlantedX(JavaScriptObject options) /*-{
+	public final native String getSmallText(JavaScriptObject options) /*-{
 	       options.titleX = options.titleX.fontsize("6");
 	       return options.titleX;
 	}-*/;
