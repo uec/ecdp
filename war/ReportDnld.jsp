@@ -82,16 +82,16 @@ try{
 				if(results.getString("protocol").contains("Paired"))
 				{
 					if(results.getString("barcode").contains("NO BARCODE"))
-						myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_sequence.txt,s_" + lane + "_2_sequence.txt");
+						myOut.println("Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R2_001.fastq.gz");
 					else
-						myOut.println("Sample."+ i + ".Input = s_" + lane + "_1_" + barcode +"_sequence.txt,s_" + lane + "_2_" + barcode + "_sequence.txt");
+						myOut.println("Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R2_001.fastq.gz");
 				}
 				else if(results.getString("protocol").contains("Single"))
 				{
 					if(results.getString("barcode").contains("NO BARCODE"))
-						myOut.println("Sample."+ i + ".Input = s_" + lane + "_sequence.txt");
+						myOut.println("Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz");
 					else
-						myOut.println("Sample."+ i + ".Input = s_" + lane + "_" + barcode + "_sequence.txt");
+						myOut.println("Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz");
 				}
 				
 				String workflow = "unaligned";
@@ -102,7 +102,7 @@ try{
 				else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("silfit"))
 					workflow = "bisulfite";
 				else if(results.getString("processing").toLowerCase().contains("rna"))
-					workflow = "rnaseq";
+					workflow = "rnaseqv2";
 				else if(results.getString("processing").toLowerCase().contains("genom") || results.getString("processing").toLowerCase().contains("regul"))
 					workflow = "regular";
 				
