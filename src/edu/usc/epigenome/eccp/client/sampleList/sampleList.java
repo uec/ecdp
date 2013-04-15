@@ -336,7 +336,7 @@ public class sampleList extends Composite implements HasLayout
 							    }
 						        if (menuItem.getText().equals("QC metrics to spreadsheet")) {
 						            MetricGridWidget metric = new MetricGridWidget(result);
-						            metric.setUsageMode("admin");
+						            metric.setUsageMode("user");
 						            metric.showCSV(new SelectEvent());						            						      
 						         }
 						        

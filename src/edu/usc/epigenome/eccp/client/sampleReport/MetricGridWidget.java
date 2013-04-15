@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -28,6 +26,8 @@ import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
+import com.sencha.gxt.data.shared.event.StoreFilterEvent;
+import com.sencha.gxt.data.shared.event.StoreFilterEvent.StoreFilterHandler;
 import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
@@ -91,6 +91,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	List<LibraryData> data;
 	ResizeGroupingView<MultipleLibraryProperty> viewPointer;
 	Grid<MultipleLibraryProperty> gridPointer;
+	ListStore<MultipleLibraryProperty> store=new ListStore<MultipleLibraryProperty>(properties.key());
     
 	
 	//handle live filtering of metrics, match multiple properties against filter txt
@@ -102,19 +103,20 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			boolean match = false;
 			boolean prettyMatch = false;
 			
-			for(String token : filter.split("\\s"))
-			{
-				if(item.getPrettyName() != null)
-					prettyMatch = item.getPrettyName().toLowerCase().contains(token.toLowerCase());
-				
-				match = match || prettyMatch ||	item.getName().toLowerCase().contains(token.toLowerCase());
-			}
-			return match;					
+			
+			
+				for(String token : filter.split("\\s"))
+				{
+					if(item.getPrettyName() != null)
+						prettyMatch = item.getPrettyName().toLowerCase().contains(token.toLowerCase());
+					
+					match = match || prettyMatch ||	item.getName().toLowerCase().contains(token.toLowerCase());
+				   
+				}
+				return match;	
 		}
-	};
 	
-
-	
+	    };
 
 	private static final LibraryPropertyModel properties = GWT.create(LibraryPropertyModel.class);
 
@@ -122,6 +124,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		initWidget(uiBinder.createAndBindUi(this));
 		//	createGridColumns();
 		buttons.add(filter);
+		
 	}
 	
 	public MetricGridWidget(List<LibraryData> data) 
@@ -140,6 +143,22 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	    	viewButton.getMenu().getWidget(2).setVisible(false);
 	    makeToolTips();
 		mergeData();
+		filter.bind(store);
+		store.addStoreFilterHandler(new StoreFilterHandler<MultipleLibraryProperty>() {
+
+			@Override
+			public void onFilter(StoreFilterEvent<MultipleLibraryProperty> event) {
+				// TODO Auto-generated method stub
+			//	System.out.println("Here in filter handler");
+				 if (store.size() == 0) {
+					 if (usageMode.equals("user")) {
+					     setUsageMode("admin");
+					     setHeadingText("Metrics - Advanced View");
+					 }
+					 
+			}				
+			}});
+		
 		currentLibraryData=getUsageModeData(); 
 		drawTable();
 	}
@@ -177,7 +196,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	//creates the table based upon the currently selected libraries. when new libraries are drag-n-dropped into the table, add them and redraw
 	public void drawTable() 
 	{
-		filter.clear();
+	//	 filter.clear();
+		// store.clear();
 		//SET UP COLUMNS
 		 List<ColumnConfig<MultipleLibraryProperty, ?>> columnDefs = new ArrayList<ColumnConfig<MultipleLibraryProperty, ?>>();
 		 ColumnConfig<MultipleLibraryProperty, String> cc1 = new ColumnConfig<MultipleLibraryProperty, String>(properties.prettyName(), 250, "Metric");
@@ -227,7 +247,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 }		 
 		 
 		 ColumnModel<MultipleLibraryProperty> colModel = new ColumnModel<MultipleLibraryProperty>(columnDefs);
-		 final ListStore<MultipleLibraryProperty> store = new ListStore<MultipleLibraryProperty>(properties.key());
 		 ResizeGroupingView<MultipleLibraryProperty> view = new ResizeGroupingView<MultipleLibraryProperty>();
 		//relpaced with our own grouping view that better does resizing of windows
 		// GroupingView<MultipleLibraryProperty> view = new GroupingView<MultipleLibraryProperty>();
@@ -242,26 +261,22 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 view.collapseAllGroups();
 		 view.groupBy(cc2);
 		 viewPointer=view;
-		 
 		 final	Grid<MultipleLibraryProperty> grid = new Grid<MultipleLibraryProperty>(store, colModel);
 		 grid.setHeight(Window.getClientHeight() - 110);
-		 gridPointer = grid;
+		 gridPointer = grid;		 
 	//	 grid.setWidth(Window.getClientWidth() - 600);
 		 gridPointer.setView(viewPointer);
 		 gridPointer.setAllowTextSelection(true);
 		 content.add(gridPointer);				
-		 filter.bind(store);		 
 		 @SuppressWarnings("unused")
 		 QuickTip q =new QuickTip(gridPointer); // Add ToolTips to the grid cells in column cc1
 		 q.getToolTipConfig().setTrackMouse(true);
 		 q.getToolTipConfig().setDismissDelay(2000000000);
 		 
-		 
 		// ToolTipConfig ttc= new ToolTipConfig();
 		// q.setToolTipConfig(ttc);
 		// q.getElement().getStyle().setBackgroundColor("background-color: red");
 		 store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
-
 		 //Handle Drag and drop of libraries from the samplelist to the main metric table
 		 DropTarget target = new DropTarget(gridPointer)
 		 {
@@ -517,6 +532,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			@Override
 			public void onSelection(SelectionEvent<Item> event) {						
 				 MenuItem item = (MenuItem) event.getSelectedItem();
+				     filter.setText("");
 				 if (item.getText().equals("Summary Metrics")) {
 					 usageMode="user";
 					 setHeadingText("Metrics - Summary View");
@@ -559,11 +575,11 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	}
 	public void setUsageMode(String mode) {
 		usageMode=mode;
-		currentLibraryData=getUsageModeData(); 
+    	currentLibraryData=getUsageModeData(); 	
 		ListStore<MultipleLibraryProperty> store = gridPointer.getStore();
 		store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		
-	}
+	}	
 }
 	
 
