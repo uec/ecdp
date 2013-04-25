@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -544,6 +545,10 @@ public class sampleList extends Composite implements HasLayout
 				 simple.show();
 			}});
 		 
+	}
+	@UiHandler("hideMerged")
+	public void onChange(ChangeEvent event) {
+		
 	}
 
 	@Override

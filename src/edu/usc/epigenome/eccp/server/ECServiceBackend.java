@@ -417,7 +417,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 			where += "0=0";
 
-			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing, \n" +
+			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing, protocol, \n" +
 					"If(" +
 					"	ISNULL(RunParam_RunID), " +
 					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
@@ -563,12 +563,23 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				 //extract LibType data from database column "processing"
 				 LibraryProperty libType = d.get("processing");
 				 String libTypeValue = d.get("processing").getValue();
-				 if (libTypeValue !=null ) {
-			    	  String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
-			    	  libType.setValue(libTypeValue.replaceAll(pattern, "$2"));
-			    	  
+				 if (libTypeValue!=null) {
+			    	 // String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
+			    	 // libType.setValue(libTypeValue.replaceAll(pattern, "$2"));					
+					 String value = libTypeValue.split(",")[0];
+					 
+					 if (value.matches(".*BS-seq.*"))   value="bisulfite";
+					 if (value.matches(".*ChIP-seq.*")) value="chipseq";
+					 if (value.matches(".*RNA-seq.*"))  value="rnaseq";
+					 if (value.matches(".*genomic.*"))  value="genomic";
+					 
+					 if (d.get("protocol").getValue().matches(".*merged.*")) 
+						 libType.setValue(value+" merged");
+					 else libType.setValue(value);
 				 }
-				 else libType.setValue("Unknown");
+				 else {
+					    libType.setValue("Unknown");
+				 }
 				 
 				 if(queryParams.getGetFiles())
 					 d.setFiles(getFilesforLibrary(d));

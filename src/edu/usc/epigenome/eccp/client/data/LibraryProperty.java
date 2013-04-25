@@ -18,6 +18,7 @@ public class LibraryProperty implements Serializable
 	String source;
 	String usage;
 	
+	
 	public String getKey()
 	{
 		return name;
@@ -98,7 +99,5 @@ public class LibraryProperty implements Serializable
 	{
 		this.sortOrder = sortOrder;
 	}
-
-	
 	
 }

@@ -26,7 +26,8 @@
 					<gxt:button.TextButton ui:field="byLibType" text="By LibType" />
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
-					<gxt:button.TextButton ui:field="share" text="Share Search Results" />					
+					<gxt:button.TextButton ui:field="share" text="Share Search Results" />	
+					<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" /> 			
 				</gxt:toolbar.ToolBar>
 			</container:child>
 			<container:child layoutData='{contentData}'>
