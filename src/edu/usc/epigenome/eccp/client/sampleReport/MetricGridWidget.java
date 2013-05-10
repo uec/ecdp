@@ -8,10 +8,8 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
+
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -20,10 +18,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
-import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.data.shared.event.StoreFilterEvent;
@@ -55,7 +51,6 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
-import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
 import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.data.LibraryPropertyModel;
@@ -183,6 +178,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				m.setSource(p.getSource());
 				m.setUsage(p.getUsage());
 				m.setPrettyName(p.getPrettyName());
+				m.setValidation(p.getValidation());
 				while(m.getValueSize() < i)
 					m.addValue("");
 				m.addValue(p.getValue());
@@ -232,17 +228,38 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 for(int i = 0 ; i < mergedLibraryData.get("flowcell_serial").getValueSize(); i++)
 		 {
 			 ColumnConfig<MultipleLibraryProperty, String> cc = new ColumnConfig<MultipleLibraryProperty, String>(MultipleLibraryPropertyModelFactory.getValueProvider(i), 220, mergedLibraryData.get("sample_name").getValue(i));
-			 cc.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
+			 cc.setCell(new AbstractCell<String>() {
+					@Override
+					public void render(Context context,String value, SafeHtmlBuilder sb) 
+					{
+						if(value == null)
+							sb.appendHtmlConstant("N/A");
+						else if(value.equals("0"))
+							sb.appendHtmlConstant("N/A");
+						else if(value.contains("JSON"))
+							sb.appendHtmlConstant("Multi-dimensional data, click for chart");
+						else
+							sb.appendHtmlConstant(value);
+						    	  
+						try
 						{
-						      public SafeHtml render(String object) 
-						      {  
-						    	  if(object.equals("0"))
-						    		  return SafeHtmlUtils.fromString("N/A");
-						    	  if(object.contains("JSON"))
-						    	  	  return SafeHtmlUtils.fromString("Multi-dimensional data, click for chart");
-						    	  return SafeHtmlUtils.fromString(object);		        
+				    		  MultipleLibraryProperty m = store.get(context.getIndex());
+				    		  String formula = m.getValidation();
+				    		  formula = formula.replace("x",value); 
+				    		  String eval = evalQC(formula + " ? 'Pass' : 'Fail' "); 
+				    		  if(eval.contains("Fail"))
+				    			  sb.appendHtmlConstant("<span style=\"color:red\" qtip=\"qc warning: value is not in expected range: " + formula.replace("&", " ").replace("|", " " ) + " is not true.\"><img align=\"bottom\" src=\"images/warning-small.jpg\"></span>");
+						}
+				    	catch(Exception e)
+						{
+						    		  //we're here because there is no qc formula, or given qc formula was bad syntax
+						    		  //e.printStackTrace();
+						}
+						    	  
+						    	  
+						    	  		        
 						      }
-						}));
+						});
 			 columnDefs.add(cc);			 
 		 }		 
 		 
@@ -580,6 +597,12 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		
 	}	
+	
+	public static native String evalQC(String arg) /*-{
+    eval("var myVar = " + arg + ";");
+    return myVar;
+}-*/;
+	
 }
 	
 

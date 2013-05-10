@@ -17,6 +17,8 @@ public class LibraryProperty implements Serializable
 	String sortOrder;
 	String source;
 	String usage;
+	String validation;
+	
 	
 	
 	public String getKey()
@@ -98,6 +100,14 @@ public class LibraryProperty implements Serializable
 	public void setSortOrder(String sortOrder)
 	{
 		this.sortOrder = sortOrder;
+	}
+	public String getValidation()
+	{
+		return validation;
+	}
+	public void setValidation(String validation)
+	{
+		this.validation = validation;
 	}
 	
 }

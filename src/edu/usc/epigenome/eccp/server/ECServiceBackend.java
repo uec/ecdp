@@ -270,8 +270,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			String selectQuery = "Select \n" + "	m.metric as metric, \n" + "	m.isNumeric as isNumeric, \n" + "	m.sort_order as sort_order,\n"
 					+ "	IF(ISNULL(m.description),\"No Description\",m.description) as description,\n"
 					+ "	IF(ISNULL(m.pretty_name),m.metric,m.pretty_name) as pretty_name,\n" + "	m.usage_enum as usage_enum,\n"
-					+ "	IF(ISNULL(c.name),\"Unknown\",c.name) as category,  \n" + "	IF(ISNULL(f.parser),\"Unknown\",f.parser) as parser\n" + "from \n"
-					+ "metric m left join category c on m.id_category = c.id left join file_type f on f.id = id_file_type\n" + " order by metric ";
+					+ "	IF(ISNULL(c.name),\"Unknown\",c.name) as category,  \n" + "	IF(ISNULL(f.parser),\"Unknown\",f.parser) as parser, "
+					+ " m.qc_formula as qc_formula " 
+					+ " from metric m left join category c on m.id_category = c.id left join file_type f on f.id = id_file_type\n" + " order by metric ";
 			ResultSet results = stat.executeQuery(selectQuery);
 
 			while (results.next())
@@ -510,6 +511,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						 	 p.setSource(qcTypes.get(p.getName()).get("parser"));
 						 	//usage
 						 	 p.setUsage(qcTypes.get(p.getName()).get("usage_enum"));
+						 	 //validation
+						 	p.setValidation(qcTypes.get(p.getName()).get("qc_formula"));
 					 	 }
 					 	 else
 					 	 {
