@@ -254,13 +254,10 @@ public class MetricGridWidget extends Composite implements HasLayout{
 						{
 						    		  //we're here because there is no qc formula, or given qc formula was bad syntax
 						    		  //e.printStackTrace();
-						}
-						    	  
-						    	  
-						    	  		        
-						      }
-						});
-			 columnDefs.add(cc);			 
+						}   	  
+					}
+			});
+			columnDefs.add(cc);			 
 		 }		 
 		 
 		 ColumnModel<MultipleLibraryProperty> colModel = new ColumnModel<MultipleLibraryProperty>(columnDefs);
