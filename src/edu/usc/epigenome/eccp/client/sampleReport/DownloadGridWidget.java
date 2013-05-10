@@ -320,20 +320,27 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	@UiHandler ("help")
 	public void showHelp(SelectEvent event) {
 
-		 String html =  "<ul style=\"list-style: disc; margin: 5px 0px 5px 15px\">" +
+		 String html = "<h3>YouTube videos</h3>"+
+				   //     "<ul style=\"list-style: disc; margin: 5px 0px 5px 15px\">" +
+				        "<ul>" +
 		 		        "<li>\"How to download a file on hpcc using lynx browser\"<a target=\"new\" href=\"http://www.youtube.com/watch?v=jPH3YPVc4x4\"> Click here </a></li>"+
 				        "<li>\"Download multiple files from the USC Epigenome Center data portal all at once\"<a target=\"new\" href=\"http://www.youtube.com/watch?v=Qb3qH8lN0P4\"> Click here </a></li>"+
+		 		   //     "<li>ECDP User Manual (pdf)<a target=\"new\" href=\"https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnx1c2NlY3dpa2l8Z3g6MWZlNDBhN2JkNzczNTYxNg\">Click here</a></li>"+
 		          //      "<a target=\"new\" " +
 		 		   //     "href=\"http://www.youtube.com/watch?v=jPH3YPVc4x4\">" +
 		 		  //      "\"Downloading a file on hpcc\"</a></li>" +
-		 		        "</ul>";
+		 		        "</ul>"+
+		 		       "<h3>ECDP User Manual</h3>"+
+		 		        "<ul>"+
+		 		       "<li>PDF (August 2012) <a target=\"new\" href=\"https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnx1c2NlY3dpa2l8Z3g6MWZlNDBhN2JkNzczNTYxNg\">Click here</a></li>"+
+				       "</ul>";
 		 SafeHtml shtml = SafeHtmlUtils.fromTrustedString(html);
 		 
 		// TextArea text = new TextArea();
 		 Anchor a = new Anchor();
 		 a.setHTML(shtml);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("FILE DOWNLOAD TUTORIALS");
+		 simple.setHeadingText("TUTORIALS");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 	//	 text.setText("test");
@@ -345,8 +352,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 simple.setHeight(400);
 		 HtmlLayoutContainerTemplate templates = GWT.create(HtmlLayoutContainerTemplate.class);
 		 HtmlLayoutContainer c = new HtmlLayoutContainer(templates.getTemplate());
-		 c.add(new HTML("<b>YouTube Videos:</b><br>",true), new HtmlData(".cell1"));
-		 c.add(new HTML(html,true), new HtmlData(".cell2"));
+		 c.add(new HTML(html,true), new HtmlData(".cell1"));
+	//	 c.add(new HTML(html,true), new HtmlData(".cell2"));
          v.setWidget(c);
          simple.add(v);
 		 simple.show();		 
