@@ -59,6 +59,7 @@ import edu.usc.epigenome.eccp.client.data.MultipleLibraryPropertyModelFactory;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChartWidget;
+import edu.usc.epigenome.eccp.client.sampleReport.charts.MotionChartWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.ScatterChartWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
@@ -513,6 +514,11 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		{
 			ScatterChartWidget s = new ScatterChartWidget(metric,libraries);
 			s.show();
+		}
+		else if(metric.getAllValues().contains("JSON") && metric.getAllValues().contains("Motion Plot"))
+		{
+			MotionChartWidget w = new MotionChartWidget(metric.getValue(0).replace("JSON Motion Plot ", ""));
+			w.show();
 		}
 		else
 		{
