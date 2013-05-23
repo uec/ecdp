@@ -382,7 +382,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			//filter based upon user ldap group!
 			HttpServletRequest request = this.getThreadLocalRequest();
-			if (request.getUserPrincipal() != null)
+			if (request != null && request.getUserPrincipal() != null)
 			{
 				// debug for user role checking
 				if (request.isUserInRole("ECCPWebAdmin"))
