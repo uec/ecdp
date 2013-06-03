@@ -249,7 +249,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				    		  formula = formula.replace("x",value.replace(",","")); 
 				    		  String eval = evalQC(formula + " ? 'Pass' : 'Fail' "); 
 				    		  if(eval.contains("Fail"))
-				    			  sb.appendHtmlConstant("<span style=\"color:red\" qtip=\"qc warning: value is not in expected range: " + formula.replace("&&", "AND").replace("||", "OR" ).replace("&", "AND").replace("|", "OR" ) + " is not true.\"><img align=\"bottom\" src=\"images/warning-small.png\"></span>");
+				    			  sb.appendHtmlConstant("<span style=\"color:red\" qtip=\"qc warning: value is not in expected range: " + formula.replace("&&", "AND").replace("||", "OR" ).replace("&", "AND").replace("|", "OR" ) + " is not true.\"><img align=\"bottom\" src=\"images/warning-small.gif\"></span>");
 						}
 				    	catch(Exception e)
 						{
