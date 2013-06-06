@@ -30,12 +30,15 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.XTemplates;
+import com.sencha.gxt.core.client.XTemplates.XTemplate;
 import com.sencha.gxt.core.client.util.Format;
 import com.sencha.gxt.core.client.util.KeyNav;
 import com.sencha.gxt.data.shared.ListStore;
@@ -48,9 +51,12 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
+import com.sencha.gxt.widget.core.client.button.CellButtonBase;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.HtmlLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
@@ -100,6 +106,7 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
+	@UiField Anchor userManual;
 	
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
@@ -131,7 +138,10 @@ public class sampleList extends Composite implements HasLayout
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 	    createGrid();
-	    gridPanel.addTool(filter);
+	    gridPanel.addTool(filter);	   
+	    String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\"><img src=\"images/book_open_small.png\" title=\"User Manual\"</a>";	
+	    SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
+	    userManual.setHTML(shtml);
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 )
@@ -550,7 +560,7 @@ public class sampleList extends Composite implements HasLayout
 	public void onChange(ChangeEvent event) {
 		
 	}
-
+	
 	@Override
 	public void forceLayout() {
 		// TODO Auto-generated method stub

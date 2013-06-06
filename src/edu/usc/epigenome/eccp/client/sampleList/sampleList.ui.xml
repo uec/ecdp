@@ -13,7 +13,9 @@
   			  </ui:with>
   	<container:VerticalLayoutContainer ui:field="vlc">
  	<container:child >
- 	<gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center"/>
+ 	         <gxt:ContentPanel ui:field="gridPanel" headingText="USC Epigenome Center">       
+ 	         </gxt:ContentPanel>
+	
  	</container:child>
  	
 		
@@ -27,6 +29,8 @@
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 					<gxt:button.TextButton ui:field="share" text="Share Search Results" />	
+					<gxt:toolbar.SeparatorToolItem />
+					<g:Anchor ui:field="userManual"/>
 					<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" /> 			
 				</gxt:toolbar.ToolBar>
 			</container:child>
