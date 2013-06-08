@@ -809,4 +809,191 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return gson.toJson(getLibraries(queryParams));
 	}
 
+	//get the workflow params or illumina casava params for a flowcell
+	@Override
+	public String getParams(String flowcell, String type)
+	{
+		if(type.contains("lumina"))
+			return getIlluminaParams(flowcell);
+		else
+			return getWorkflowParams(flowcell);
+	}
+	
+	private String getIlluminaParams(String flowcell_serial)
+	{
+		String paramText = "";
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			if (myConnection != null)
+			{
+				
+				String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing, technician from view_run_metric where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(selectQuery);
+				int cols = results.getMetaData().getColumnCount();
+
+				paramText += "FCID" + "," + "Lane" + "," + "SampleID" + "," + "SampleRef" + "," + "Index"  + "," + "Description" + "," + "Control" + "," +"Recipe" + "," + "Operator\n";
+				while(results.next())
+				{
+					for(int i=1;i<=cols;i++)
+					{
+						if(i == 8)
+							paramText +="Unknown";
+						else
+							paramText += results.getString(i);
+						paramText += ",";
+					}
+					paramText += "\n";
+				}
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return paramText;
+	}
+	
+	private String getWorkflowParams(String  flowcell_serial)
+	{
+		String paramText = "";
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			if (myConnection != null)
+			{
+				
+				String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from view_run_metric where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(selectQuery);
+			
+								
+				int i=0;
+			
+				paramText += "ClusterSize = 1" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + flowcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000\n";
+				while(results.next())
+				{
+					paramText += "\n";
+					i++;
+					paramText += "#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + " of " + results.getString("organism") +")\n";
+					paramText += "Sample."+ i + ".SampleID = " + results.getString("geneusID_sample") + "\n";
+					String lane = results.getString("lane");
+					String barcode = results.getString("barcode");
+					paramText += "Sample."+ i + ".Lane = " + lane + "\n";
+					
+					if(results.getString("protocol").contains("Paired"))
+					{
+						if(results.getString("barcode").contains("NO BARCODE"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R2_001.fastq.gz\n";
+						else
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R2_001.fastq.gz\n";
+					}
+					else if(results.getString("protocol").contains("Single"))
+					{
+						if(results.getString("barcode").contains("NO BARCODE"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz\n";
+						else
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz\n";
+					}
+					
+					String workflow = "unaligned";
+					String genome = "/home/uec-00/shared/production/genomes/unaligned/unaligned.fa";
+					
+					if(results.getString("processing").toLowerCase().contains("chip"))
+						workflow = "chipseq";
+					else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("silfit"))
+						workflow = "bisulfite";
+					else if(results.getString("processing").toLowerCase().contains("rna"))
+						workflow = "rnaseqv2";
+					else if(results.getString("processing").toLowerCase().contains("genom") || results.getString("processing").toLowerCase().contains("regul"))
+						workflow = "regular";
+					
+					if(results.getString("organism").toLowerCase().contains("mus"))
+						genome = "/home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa";
+					else if(results.getString("organism").toLowerCase().contains("phi"))
+						genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+					else if(results.getString("organism").toLowerCase().contains("phi"))
+						genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+					else if(results.getString("organism").toLowerCase().contains("rabidop"))
+						genome = "/home/uec-00/shared/production/genomes/arabidopsis/tair8.pluscontam.fa";
+					else if(results.getString("organism").toLowerCase().contains("gallus"))
+						genome = "/home/uec-00/shared/production/genomes/chicken/Gallus_gallus.WASHUC2.68.dna.toplevel.fa";
+					//handle human
+					else if(results.getString("organism").toLowerCase().contains("homo") || results.getString("organism").toLowerCase().contains("human"))
+					{
+						if(results.getString("processing").toLowerCase().contains("rna") || results.getString("processing").toLowerCase().contains("chip") )
+							genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
+						else
+							genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";
+					}
+					
+					//handle rnaseq genomes
+					if(results.getString("processing").toLowerCase().contains("rna"))
+						genome = genome.substring(0, genome.length() - 3);
+					
+					paramText += "Sample."+ i + ".Workflow = " + workflow + "\n";
+					paramText += "Sample."+ i + ".Reference = " + genome + "\n";
+				}
+				paramText += "\n";			
+			
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return paramText;
+	}
+
+	
+
 }

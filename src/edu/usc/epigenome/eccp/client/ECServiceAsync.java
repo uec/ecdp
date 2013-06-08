@@ -23,4 +23,6 @@ public interface ECServiceAsync
 	void createMergeWorkflow(List<LibraryData> libs, AsyncCallback<String> callback);
 
 	void getLibrariesJSON(LibraryDataQuery queryParams, AsyncCallback<String> callback);
+
+	void getParams(String flowcell, String type, AsyncCallback<String> callback);
 }
