@@ -810,16 +810,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	}
 
 	//get the workflow params or illumina casava params for a flowcell
-	@Override
-	public String getParams(String flowcell, String type)
-	{
-		if(type.contains("lumina"))
-			return getIlluminaParams(flowcell);
-		else
-			return getWorkflowParams(flowcell);
-	}
 	
-	private String getIlluminaParams(String flowcell_serial)
+	public String getIlluminaParams(String flowcell_serial)
 	{
 		String paramText = "";
 		java.sql.Connection myConnection = null;
@@ -879,7 +871,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return paramText;
 	}
 	
-	private String getWorkflowParams(String  flowcell_serial)
+	public String getWorkflowParams(String  flowcell_serial)
 	{
 		String paramText = "";
 		java.sql.Connection myConnection = null;

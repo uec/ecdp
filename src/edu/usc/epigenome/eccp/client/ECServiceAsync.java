@@ -24,5 +24,7 @@ public interface ECServiceAsync
 
 	void getLibrariesJSON(LibraryDataQuery queryParams, AsyncCallback<String> callback);
 
-	void getParams(String flowcell, String type, AsyncCallback<String> callback);
+	void getIlluminaParams(String flowcell, AsyncCallback<String> callback);
+
+	void getWorkflowParams(String flowcell, AsyncCallback<String> callback);
 }

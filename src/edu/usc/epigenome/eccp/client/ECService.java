@@ -22,5 +22,6 @@ public interface ECService extends RemoteService
 	//Get the csv files for generating file list for plots
 	String getCSVFromDisk(String filePath) throws IllegalArgumentException;
 	String createMergeWorkflow(List<LibraryData> libs);
-	String getParams(String flowcell,String type);
+	String getIlluminaParams(String flowcell);
+	String getWorkflowParams(String flowcell);
 }
