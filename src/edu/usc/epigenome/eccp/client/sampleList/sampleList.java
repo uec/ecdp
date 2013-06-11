@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
@@ -53,11 +51,7 @@ import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.CellButtonBase;
 import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
-import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.HtmlLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
@@ -107,7 +101,7 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
 	@UiField Anchor userManual;
-	
+		
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
@@ -131,21 +125,17 @@ public class sampleList extends Composite implements HasLayout
 	MenuItem menuItem;
 	Comparator<String>  dateComparator;
 
-	
-
 	@UiConstructor
 	public sampleList() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 	    createGrid();
+	    setUserManualLink();
 	    gridPanel.addTool(filter);	   
-	    String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\"><img src=\"images/book_open_small.png\" title=\"User Manual\"</a>";	
-	    SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
-	    userManual.setHTML(shtml);
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 )
-	    	share.hide();
+	    	share.hide();	    
 	    
 	    if(Window.Location.getQueryString().contains("GODMODE"))
 	    	godmode();
@@ -156,18 +146,7 @@ public class sampleList extends Composite implements HasLayout
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 90, "Flowcell");
-		 flowcellCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
-		 {
-		      public SafeHtml render(String object) 
-		      {  
-		    	  //only show param links if admin (ie no query string)
-		    	  if(Window.Location.getQueryString().length() < 1 )
-		    		  return SafeHtmlUtils.fromTrustedString(object + " <a target=\"new\" href=\"/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep1\"" +"title=\"Illumina parameters\""+"> (i)</a> " +
-		    			  "<a target=\"new\" href=\"/gareports/ReportDnld.jsp?fcserial=" + object + "&report=rep2\"" +"title=\"Pipeline parameters\""+"> (p)</a>");
-		    	  else
-		    		  return SafeHtmlUtils.fromTrustedString(object);
-		      }
-		 }));
+		
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
 		 
 		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
@@ -185,18 +164,7 @@ public class sampleList extends Composite implements HasLayout
 		}));
 		 
 		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
-		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing"), 30, "LibType");
-		/* libTypeCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
-	     {
-			 public SafeHtml render(String object) 
-		      {  
-		    	  String type = new String(object);
-		    	  String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
-		    	  type = type.replaceAll(pattern, "$2");
-				return SafeHtmlUtils.fromString(type);
-		    	 	        
-		      }			 
-	     }));*/
+		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing"), 30, "LibType");		
 		 libTypeCol.setWidth(80);
 		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
 		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
@@ -231,13 +199,9 @@ public class sampleList extends Composite implements HasLayout
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
 		 view.groupBy(dateCol);
-
-		 
-		 
+		 		 
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 grid.setView(view);
-	//	 ArrayList<GroupingData<?>> groups = new ArrayList<GroupingData<?>>();
-	//	 ArrayList<String> concatColumn = new ArrayList<String>();
 		 
 		 new GridDragSource<LibraryData>(grid);		
 		 
@@ -318,6 +282,7 @@ public class sampleList extends Composite implements HasLayout
 		 // Add sorting by date column to the grid
          sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
          grid.getStore().addSortInfo(sortByDate);
+
 	}
 	
 	public void getContextData(final LibraryData library) {
@@ -372,6 +337,7 @@ public class sampleList extends Composite implements HasLayout
 					    
 				}}});		
 	}
+	
 	public void contextMenu() {
 		     Menu contextMenu= new Menu();
 	         final MenuItem openQCGrid = new MenuItem();
@@ -413,7 +379,72 @@ public class sampleList extends Composite implements HasLayout
 						getContextData(library);
 												 					
 					}});
+	         final MenuItem illuminaParam = new MenuItem();
+		     illuminaParam.setText("Get Illumina parameters");
+	         contextMenu.add(illuminaParam);
+	         illuminaParam.addSelectionHandler(new SelectionHandler<Item>(){
+
+					@Override
+					public void onSelection(SelectionEvent<Item> event) {
+						LibraryData library = grid.getSelectionModel().getSelectedItem();
+						String flowcell=library.get("flowcell_serial").getValue();
+
+						menuItem = illuminaParam;
+						
+						myServer.getIlluminaParams(flowcell, new AsyncCallback<String>(){
+
+							@Override
+							public void onFailure(Throwable caught) {
+								Info.display("Error","Failed to get Illumina parameters");									
+							}
+							@Override
+							public void onSuccess(String result) {
+								showParamDialog(result, "Illumina parameters");								
+							}							
+						});												 					
+					}});
+	        
+	         final MenuItem workflowParam = new MenuItem();
+	         workflowParam.setText("Get workflow parameters");
+	         contextMenu.add(workflowParam);
+	         workflowParam.addSelectionHandler(new SelectionHandler<Item>(){
+
+					@Override
+					public void onSelection(SelectionEvent<Item> event) {
+						LibraryData library = grid.getSelectionModel().getSelectedItem();
+						menuItem = workflowParam;
+						String flowcell=library.get("flowcell_serial").getValue();
+						myServer.getWorkflowParams(flowcell, new AsyncCallback<String>(){
+
+							@Override
+							public void onFailure(Throwable caught) {
+								Info.display("Error","Failed to get workflow parameters");									
+							}
+							@Override
+							public void onSuccess(String result) {
+								showParamDialog(result, "Workflow parameters");								
+							}							
+						});												 					
+					}});
+	         // hide parameter files from regular users
+	         if(Window.Location.getQueryString().length() > 0 ) {
+	        	 workflowParam.hide();
+	        	 illuminaParam.hide();
+	         }
 	         
+	}
+	public void showParamDialog(String textToDisplay, String heading){
+		 Dialog paramWindow = new Dialog();
+		 paramWindow.setHeadingText(heading);
+		 paramWindow.setPredefinedButtons(PredefinedButton.OK);
+		 paramWindow.setBodyStyleName("pad-text");
+		 TextArea text = new TextArea();
+		 text.setText(textToDisplay);
+		 paramWindow.add(text);
+		 paramWindow.setHideOnButtonClick(true);
+		 paramWindow.setWidth(700);
+		 paramWindow.setHeight(500);
+		 paramWindow.show();
 	}
 	
 	public void populateGrid(ArrayList<LibraryData> data)
@@ -559,6 +590,11 @@ public class sampleList extends Composite implements HasLayout
 	@UiHandler("hideMerged")
 	public void onChange(ChangeEvent event) {
 		
+	}
+	public void setUserManualLink() {
+		 String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/ecdp/documentation/ecdp-user-manual/\"><img src=\"images/book_open_small.png\" title=\"User Manual\"</a>";	
+		 SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
+		 userManual.setHTML(shtml);		
 	}
 	
 	@Override
