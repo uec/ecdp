@@ -237,25 +237,22 @@ public class MetricGridWidget extends Composite implements HasLayout{
 							sb.appendHtmlConstant("N/A");
 						else if(value.equals("0"))
 							sb.appendHtmlConstant("N/A");
-						else if(value.contains("JSON"))
+						else if(value.length() > 100 && value.substring(1, 99 ).contains("JSON"))
 							sb.appendHtmlConstant("Multi-dimensional data, click for chart");
 						else
 							sb.appendHtmlConstant(value);
 						    	  
-						try
-						{
-				    		  MultipleLibraryProperty m = store.get(context.getIndex());
-				    		  String formula = m.getValidation();
+
+						 MultipleLibraryProperty m = store.get(context.getIndex()); 
+						 String formula = m.getValidation();
+						  if(formula != null && formula.length() > 3)
+						  {
 				    		  formula = formula.replace("x",value.replace(",","")); 
 				    		  String eval = evalQC(formula + " ? 'Pass' : 'Fail' "); 
 				    		  if(eval.contains("Fail"))
 				    			  sb.appendHtmlConstant("<span style=\"color:red\" qtip=\"qc warning: value is not in expected range: " + formula.replace("&&", "AND").replace("||", "OR" ).replace("&", "AND").replace("|", "OR" ) + " is not true.\"><img align=\"bottom\" src=\"images/warning-small.gif\"></span>");
-						}
-				    	catch(Exception e)
-						{
-						    		  //we're here because there is no qc formula, or given qc formula was bad syntax
-						    		  //e.printStackTrace();
-						}   	  
+						  }
+						
 					}
 			});
 			columnDefs.add(cc);			 
