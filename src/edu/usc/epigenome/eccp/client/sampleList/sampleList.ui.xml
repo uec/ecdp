@@ -19,8 +19,8 @@
  	</container:child>
  	
 		
-			<container:child layoutData='{toolBarRowData}'>
-				<gxt:toolbar.ToolBar >
+			<container:child  layoutData='{toolBarRowData}'>
+				<gxt:toolbar.ToolBar ui:field="toolbar">
 					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
 					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
 					<gxt:button.TextButton ui:field="byProject" text="By Project" />
@@ -28,10 +28,10 @@
 					<gxt:button.TextButton ui:field="byLibType" text="By LibType" />
 					<gxt:button.TextButton ui:field="expand" text="Expand All" />
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
-					<gxt:button.TextButton ui:field="share" text="Share Search Results" />	
-					<gxt:toolbar.SeparatorToolItem />
-					<g:Anchor ui:field="userManual"/>
-					<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" /> 			
+					<gxt:button.TextButton ui:field="share" text="Share Search Results" />
+				    <gxt:toolbar.SeparatorToolItem />	
+				    <gxt:button.TextButton ui:field="userManual" />
+				    <!--<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" />--> 		
 				</gxt:toolbar.ToolBar>
 			</container:child>
 			<container:child layoutData='{contentData}'>

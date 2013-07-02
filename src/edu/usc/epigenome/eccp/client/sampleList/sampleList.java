@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -56,6 +57,7 @@ import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
+import com.sencha.gxt.widget.core.client.event.OverflowEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
@@ -73,6 +75,7 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
@@ -100,7 +103,9 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
-	@UiField Anchor userManual;
+	@UiField ToolBar toolbar;
+	@UiField TextButton userManual;
+	//@UiField Anchor userManual;
 		
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
@@ -133,9 +138,12 @@ public class sampleList extends Composite implements HasLayout
 	    setUserManualLink();
 	    gridPanel.addTool(filter);	   
 	    filter.setEmptyText("Search...");
+	  //  toolbar.setEnableOverflow(false);
 	    //hide share button when already in a shared search 
-	    if(Window.Location.getQueryString().length() > 0 )
-	    	share.hide();	    
+	    if(Window.Location.getQueryString().length() > 0 ) {
+	    	toolbar.remove(share);
+	    	toolbar.remove(userManual);
+	    }
 	    
 	    if(Window.Location.getQueryString().contains("GODMODE"))
 	    	godmode();
@@ -587,20 +595,23 @@ public class sampleList extends Composite implements HasLayout
 			}});
 		 
 	}
-	@UiHandler("hideMerged")
+	/*@UiHandler("hideMerged")
 	public void onChange(ChangeEvent event) {
-		
+		setVisible(false);
+	}*/
+	@UiHandler("userManual")
+	public void onClick(SelectEvent event) {
+		//setUserManualLink();
 	}
 	public void setUserManualLink() {
-		 String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/ecdp/documentation/ecdp-user-manual/\"><img src=\"images/book_open_small.png\" title=\"User Manual\"</a>";	
-		 SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
-		 userManual.setHTML(shtml);		
+	    String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\"><img src=\"images/book_open_small.png\" title=\"User Manual\"alt=\"User Manual\"</a>";	
+		SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
+		userManual.setHTML(shtml);		
 	}
 	
 	@Override
 	public void forceLayout() {
 		// TODO Auto-generated method stub
-
 		vlc.forceLayout();
 		gridPanel.forceLayout();
 		content.forceLayout();
@@ -617,7 +628,6 @@ public class sampleList extends Composite implements HasLayout
 	public boolean isOrWasLayoutRunning() {
 		return false;
 	}
-
 	
 }
 	

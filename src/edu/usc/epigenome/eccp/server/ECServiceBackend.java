@@ -934,7 +934,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					
 					if(results.getString("processing").toLowerCase().contains("chip"))
 						workflow = "chipseq";
-					else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("silfit"))
+					else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("sulfit"))
 						workflow = "bisulfite";
 					else if(results.getString("processing").toLowerCase().contains("rna"))
 						workflow = "rnaseqv2";
