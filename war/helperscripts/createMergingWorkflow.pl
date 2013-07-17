@@ -4,7 +4,7 @@ use POSIX qw( strftime );
 
 $N=1; 
 my $output = getHeader();
-
+my $libCount;
 
 
 
@@ -19,6 +19,9 @@ while(my $line=<> )
 	my $lib = $3;
 	#print STDERR "1:$flowcell 2:$lane 3:$lib dir:$dir\n";
 	next if !$lib;
+	$libCount = $lib if !$libCount; 
+	print "ERROR, you cannot merge differing samples (downstream tools such as GATK/BISSNP will not work correctly)" if $lib ne $libCount;
+	die "ERROR, you cannot merge differing samples (downstream tools such as GATK/BISSNP will not work correctly)" if $lib ne $libCount;
 	
 	$localDir = $dir;
 	$localDir =~ s/^\/export/\/storage\/hpcc/;
