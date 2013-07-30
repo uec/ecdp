@@ -30,7 +30,6 @@
 					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
 					<gxt:button.TextButton ui:field="share" text="Share Search Results" />
 				    <gxt:toolbar.SeparatorToolItem />	
-				    <gxt:button.TextButton ui:field="userManual" />
 				    <!--<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" />--> 		
 				</gxt:toolbar.ToolBar>
 			</container:child>

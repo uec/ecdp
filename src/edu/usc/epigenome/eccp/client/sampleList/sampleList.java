@@ -5,8 +5,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.cell.client.ButtonCellBase.DefaultAppearance.Resources;
+import com.google.gwt.cell.client.TextButtonCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
@@ -19,6 +22,8 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -34,6 +39,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.cell.core.client.ButtonCell.ButtonCellAppearance;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.XTemplates;
@@ -46,6 +52,8 @@ import com.sencha.gxt.data.shared.SortInfoBean;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
+import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellResources;
+import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellStyle;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
@@ -89,11 +97,12 @@ import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
+
+
 public class sampleList extends Composite implements HasLayout
 {
 
 	private static sampleListUiBinder uiBinder = GWT.create(sampleListUiBinder.class);
-
 	interface sampleListUiBinder extends UiBinder<Widget, sampleList>{}
 
 	
@@ -104,8 +113,7 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
 	@UiField ToolBar toolbar;
-	@UiField TextButton userManual;
-	//@UiField Anchor userManual;
+	TextButton userManual = new TextButton("HELP");
 		
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
@@ -135,16 +143,16 @@ public class sampleList extends Composite implements HasLayout
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 	    createGrid();
-	    setUserManualLink();
+	  //  setUserManualLink();
+	    setUserManualButton();
 	    gridPanel.addTool(filter);	   
 	    filter.setEmptyText("Search...");
-	  //  toolbar.setEnableOverflow(false);
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 ) {
-	    	toolbar.remove(share);
-	    	toolbar.remove(userManual);
+	    	  toolbar.remove(share);
+	    	  toolbar.remove(userManual);
 	    }
-	    
+	  
 	    if(Window.Location.getQueryString().contains("GODMODE"))
 	    	godmode();
 	    
@@ -599,17 +607,23 @@ public class sampleList extends Composite implements HasLayout
 	public void onChange(ChangeEvent event) {
 		setVisible(false);
 	}*/
-	@UiHandler("userManual")
-	public void onClick(SelectEvent event) {
-		//setUserManualLink();
-	}
 	public void setUserManualLink() {
-	    String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\"><img src=\"images/book_open_small.png\" title=\"User Manual\"alt=\"User Manual\"</a>";	
-		SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
+	   // String link="<a target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\"><img src=\"images/book_open_small.png\" title=\"User Manual\"alt=\"User Manual\"</a>";	
+	    String link="<a style=\"color:red; text-decoration:none\" target=\"new\" href=\"https://sites.google.com/site/uscecwiki/home/Natalia-personal-page/ecdp-user-manual-1\">Help</a>";
+	    SafeHtml shtml = SafeHtmlUtils.fromTrustedString(link);
 		userManual.setHTML(shtml);		
 	}
-	
-	@Override
+	public void setUserManualButton(){
+	    userManual.setStyleName("help-Button");
+	   // System.out.println("Style="+userManual.getStyleName());
+	    userManual.addSelectHandler(new SelectHandler() {
+
+			@Override
+			public void onSelect(SelectEvent event) {
+				Window.open("https://sites.google.com/site/uscecwiki/ecdp/documentation/ecdp-user-manual", "_blank", "");				
+			}});
+	    toolbar.add(userManual);
+	}
 	public void forceLayout() {
 		// TODO Auto-generated method stub
 		vlc.forceLayout();
