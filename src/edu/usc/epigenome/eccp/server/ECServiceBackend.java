@@ -942,7 +942,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						workflow = "regular";
 					
 					if(results.getString("organism").toLowerCase().contains("mus"))
-						genome = "/home/uec-00/shared/production/genomes/mm9_unmasked/mm9_unmasked.fa";
+						genome = "/home/uec-00/shared/production/genomes/mm10/mm10.fa";
 					else if(results.getString("organism").toLowerCase().contains("phi"))
 						genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
 					else if(results.getString("organism").toLowerCase().contains("phi"))
