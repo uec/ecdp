@@ -46,11 +46,14 @@ import com.sencha.gxt.core.client.XTemplates;
 import com.sencha.gxt.core.client.XTemplates.XTemplate;
 import com.sencha.gxt.core.client.util.Format;
 import com.sencha.gxt.core.client.util.KeyNav;
+import com.sencha.gxt.data.client.loader.RpcProxy;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfoBean;
 import com.sencha.gxt.data.shared.Store;
+import com.sencha.gxt.data.shared.Store.StoreFilter;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
 import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellResources;
 import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellStyle;
@@ -72,6 +75,8 @@ import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent.RowDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.event.TriggerClickEvent;
+import com.sencha.gxt.widget.core.client.event.TriggerClickEvent.TriggerClickHandler;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
 import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -95,6 +100,7 @@ import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
+import edu.usc.epigenome.eccp.client.sencha.QueryPagingLoadConfig;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 
@@ -118,8 +124,8 @@ public class sampleList extends Composite implements HasLayout
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
 	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
 		@Override
-		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {
-				return 
+		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {	
+			    return 
 						item.get("project").getValue().toLowerCase().contains(filter.toLowerCase()) || 
 						item.get("sample_name").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
 						item.get("flowcell_serial").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
@@ -133,6 +139,7 @@ public class sampleList extends Composite implements HasLayout
 	ColumnModel<LibraryData> columnModel;
 	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,libTypeCol;
 	ListStore<LibraryData> store;
+	ArrayList<LibraryData> data= new ArrayList<LibraryData>();
 	Grid<LibraryData> grid;
 	StoreSortInfo<LibraryData> sortByDate;
 	MenuItem menuItem;
@@ -150,15 +157,51 @@ public class sampleList extends Composite implements HasLayout
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 ) {
 	    	  toolbar.remove(share);
-	    	  toolbar.remove(userManual);
+	    	//  toolbar.remove(userManual);
 	    }
-	  
+
+	    filter.addKeyDownHandler(new KeyDownHandler(){
+
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				
+		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+		        	System.out.println("Here in key down");
+		        	store.replaceAll(data);
+		        	String text = filter.getText();
+		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
+		        	for (int i=0; i < store.size(); i++) {
+		        		LibraryData item = store.get(i);
+		        		if (item.get("project").getValue().toLowerCase().contains(text.toLowerCase()) || 
+						item.get("sample_name").getValue().toLowerCase().contains(text.toLowerCase()) ||  
+						item.get("flowcell_serial").getValue().toLowerCase().contains(text.toLowerCase()) ||  
+						item.get("analysis_id").getValue().toLowerCase().contains(text.toLowerCase()) ||
+						item.get("geneusID_sample").getValue().toLowerCase().contains(text.toLowerCase()))
+		        		tmp.add(item);
+		        	}
+
+		        	store.replaceAll(tmp);
+		        	tmp.clear();
+		        }	
+			}	    	
+	    });
+	    filter.addTriggerClickHandler(new TriggerClickHandler(){
+
+			@Override
+			public void onTriggerClick(TriggerClickEvent event) {
+				store.replaceAll(data);
+				filter.setEmptyText("Search...");
+				System.out.println("Reset clicked");
+			}
+	    	
+	    });
 	    if(Window.Location.getQueryString().contains("GODMODE"))
 	    	godmode();
 	    
 	}
 	
 	public void createGrid() {
+		
 		//SET UP COLUMNS
 		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 90, "Flowcell");
@@ -207,6 +250,7 @@ public class sampleList extends Composite implements HasLayout
 		 columnDefs.add(laneCol);
 		 columnDefs.add(dateCol);
 		 columnDefs.add(runCol);
+		 	 
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
@@ -274,7 +318,7 @@ public class sampleList extends Composite implements HasLayout
 		});
          
          contextMenu();
-		 filter.bind(store);
+		// filter.bind(store);
 		 content.add(grid);
 		 LibraryDataQuery query = new LibraryDataQuery();
 		 query.setIsSummaryOnly(true);
@@ -294,6 +338,7 @@ public class sampleList extends Composite implements HasLayout
 				if(result.size() < 1)
 					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
 				populateGrid(result);
+				data = result;
 			}});
 		 // Add sorting by date column to the grid
          sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
