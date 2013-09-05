@@ -100,7 +100,6 @@ import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
-
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 
@@ -139,7 +138,7 @@ public class sampleList extends Composite implements HasLayout
 	ColumnModel<LibraryData> columnModel;
 	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,libTypeCol;
 	ListStore<LibraryData> store;
-	ArrayList<LibraryData> data= new ArrayList<LibraryData>();
+	ArrayList<LibraryData> completeData= new ArrayList<LibraryData>();
 	Grid<LibraryData> grid;
 	StoreSortInfo<LibraryData> sortByDate;
 	MenuItem menuItem;
@@ -166,27 +165,31 @@ public class sampleList extends Composite implements HasLayout
 			public void onKeyDown(KeyDownEvent event) {
 				
 		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	store.setEnableFilters(true);
-		        	store.removeFilters();
-		        	final String text = filter.getText().toLowerCase();
-		        	store.addFilter(new StoreFilter<LibraryData>(){
-						@Override
-						public boolean select(Store<LibraryData> store, LibraryData parent, LibraryData item)
-						{
-							return 
-									item.get("project").getValue().toLowerCase().contains(text) || 
-									item.get("sample_name").getValue().toLowerCase().contains(text) ||  
-									item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
-									item.get("analysis_id").getValue().toLowerCase().contains(text) ||
-									item.get("geneusID_sample").getValue().toLowerCase().contains(text);
-						}});
+		        	System.out.println("Here in key down");
+		        	
+		        	String text = filter.getText().toLowerCase();
+		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
+		        	for (LibraryData item : completeData) {
+		        		if (item.get("project").getValue().toLowerCase().contains(text) || 
+						item.get("sample_name").getValue().toLowerCase().contains(text) ||  
+						item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
+						item.get("analysis_id").getValue().toLowerCase().contains(text) ||
+						item.get("geneusID_sample").getValue().toLowerCase().contains(text))
+		        		tmp.add(item);
+		        	}
+
+		        	store.replaceAll(tmp);
+		        	tmp.clear();
 		        }	
 			}	    	
 	    });
 	    filter.addTriggerClickHandler(new TriggerClickHandler(){
+
 			@Override
 			public void onTriggerClick(TriggerClickEvent event) {
-				store.removeFilters();
+				store.replaceAll(completeData);
+				filter.setEmptyText("Search...");
+				System.out.println("Reset clicked");
 			}
 	    	
 	    });
@@ -332,8 +335,12 @@ public class sampleList extends Composite implements HasLayout
 			{
 				if(result.size() < 1)
 					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
-				populateGrid(result);
-				data = result;
+				completeData = result;
+				ArrayList<LibraryData> partialData = new ArrayList<LibraryData>();
+				for(int i = 0; i < 2000 && i < result.size(); i++)
+					partialData.add(result.get(i));
+				populateGrid(partialData);
+				
 			}});
 		 // Add sorting by date column to the grid
          sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
@@ -503,9 +510,9 @@ public class sampleList extends Composite implements HasLayout
 		 paramWindow.show();
 	}
 	
-	public void populateGrid(ArrayList<LibraryData> data)
+	public void populateGrid(ArrayList<LibraryData> thisdata)
 	{
-		store.replaceAll(data);
+		store.replaceAll(thisdata);
 		view.collapseAllGroups();
 		Info.display("Notice", "Library List Loaded");		
 		

@@ -434,7 +434,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
-			String selectQuery = "select" + columns + "from view_run_metric " + where;
+			String selectQuery = "select" + columns + "from view_run_metric " + where + " ORDER BY RunParam_RunID DESC";
 			System.out.println("The query that is executed is " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
