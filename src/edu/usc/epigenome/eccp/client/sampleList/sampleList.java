@@ -100,7 +100,7 @@ import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
-import edu.usc.epigenome.eccp.client.sencha.QueryPagingLoadConfig;
+
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
 
 
@@ -166,32 +166,27 @@ public class sampleList extends Composite implements HasLayout
 			public void onKeyDown(KeyDownEvent event) {
 				
 		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	System.out.println("Here in key down");
-		        	store.replaceAll(data);
-		        	String text = filter.getText();
-		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
-		        	for (int i=0; i < store.size(); i++) {
-		        		LibraryData item = store.get(i);
-		        		if (item.get("project").getValue().toLowerCase().contains(text.toLowerCase()) || 
-						item.get("sample_name").getValue().toLowerCase().contains(text.toLowerCase()) ||  
-						item.get("flowcell_serial").getValue().toLowerCase().contains(text.toLowerCase()) ||  
-						item.get("analysis_id").getValue().toLowerCase().contains(text.toLowerCase()) ||
-						item.get("geneusID_sample").getValue().toLowerCase().contains(text.toLowerCase()))
-		        		tmp.add(item);
-		        	}
-
-		        	store.replaceAll(tmp);
-		        	tmp.clear();
+		        	store.setEnableFilters(true);
+		        	store.removeFilters();
+		        	final String text = filter.getText().toLowerCase();
+		        	store.addFilter(new StoreFilter<LibraryData>(){
+						@Override
+						public boolean select(Store<LibraryData> store, LibraryData parent, LibraryData item)
+						{
+							return 
+									item.get("project").getValue().toLowerCase().contains(text) || 
+									item.get("sample_name").getValue().toLowerCase().contains(text) ||  
+									item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
+									item.get("analysis_id").getValue().toLowerCase().contains(text) ||
+									item.get("geneusID_sample").getValue().toLowerCase().contains(text);
+						}});
 		        }	
 			}	    	
 	    });
 	    filter.addTriggerClickHandler(new TriggerClickHandler(){
-
 			@Override
 			public void onTriggerClick(TriggerClickEvent event) {
-				store.replaceAll(data);
-				filter.setEmptyText("Search...");
-				System.out.println("Reset clicked");
+				store.removeFilters();
 			}
 	    	
 	    });
