@@ -24,4 +24,5 @@ public interface ECService extends RemoteService
 	String createMergeWorkflow(List<LibraryData> libs);
 	String getIlluminaParams(String flowcell);
 	String getWorkflowParams(String flowcell);
+	String logWriter(String text);
 }

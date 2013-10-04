@@ -151,8 +151,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 					     setUsageMode("admin");
 					     setHeadingText("Metrics - Advanced View");
 					 }
-					 
-			}				
+			     
+			}	
+				 logToServer("MetricSearch:" +filter.getText());	
 			}});
 		
 		currentLibraryData=getUsageModeData(); 
@@ -377,6 +378,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		}
 		DownloadGridWidget download = new DownloadGridWidget(files);
 		ECCPEventBus.EVENT_BUS.fireEvent(new ShowGlobalTabEvent(download,"files: " +  libraries.get(0).get("sample_name").getValue() + (libraries.size() > 1 ? (" + " + (libraries.size() -1)) + " other libs" : "")));
+		logToServer("DownloadFile");
 	}
 	
 	//display the current table as a tab-delim textbox for pasting in excel
@@ -442,6 +444,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 simple.setWidth(700);
 		 simple.setHeight(500);
 		 simple.show();
+		 logToServer("toSpreadSheet");
 	}	
 
 	@UiHandler("mergeLibs")
@@ -557,10 +560,12 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				 else if(item.getText().equals("Advanced Metrics")) {
 					 usageMode="admin"; 
 					 setHeadingText("Metrics - Advanced View");
+					 logToServer("AdvancedView");
 				 }
 				 else if(item.getText().equals("Unused Metrics")) {
 					 usageMode="other";
 					 setHeadingText("Metrics - Unused Metrics View");
+					 logToServer("UnusedView");
 				 }
 				 currentLibraryData=getUsageModeData(); 
 				 content.remove(0);
@@ -596,7 +601,28 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		ListStore<MultipleLibraryProperty> store = gridPointer.getStore();
 		store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		
-	}	
+	}
+    public void logToServer(String text) {
+
+         if (!Window.Location.getHref().matches(".*beta.*")) {
+    	 text = "MetricGrid:"+ text;   	 
+    	 myServer.logWriter(text, new AsyncCallback<String>(){
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					// TODO Auto-generated method stub
+					
+				}
+				 
+			 });
+         }
+    }
 	
 	public static native String evalQC(String arg) /*-{
     eval("var myVar = " + arg + ";");

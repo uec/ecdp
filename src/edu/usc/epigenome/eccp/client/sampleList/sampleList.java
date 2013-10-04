@@ -2,28 +2,13 @@ package edu.usc.epigenome.eccp.client.sampleList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-
-import com.google.gwt.cell.client.ButtonCellBase.DefaultAppearance.Resources;
-import com.google.gwt.cell.client.TextButtonCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ContextMenuEvent;
-import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.EventHandler;
-import com.google.gwt.resources.client.ClientBundle;
-import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
@@ -31,46 +16,26 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.cell.core.client.ButtonCell.ButtonCellAppearance;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
-import com.sencha.gxt.core.client.ValueProvider;
-import com.sencha.gxt.core.client.XTemplates;
-import com.sencha.gxt.core.client.XTemplates.XTemplate;
 import com.sencha.gxt.core.client.util.Format;
-import com.sencha.gxt.core.client.util.KeyNav;
-import com.sencha.gxt.data.client.loader.RpcProxy;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
-import com.sencha.gxt.data.shared.SortInfoBean;
 import com.sencha.gxt.data.shared.Store;
-import com.sencha.gxt.data.shared.Store.StoreFilter;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
-import com.sencha.gxt.data.shared.loader.PagingLoadResult;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
-import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellResources;
-import com.sencha.gxt.theme.base.client.button.ButtonCellDefaultAppearance.ButtonCellStyle;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
-import com.sencha.gxt.widget.core.client.button.CellButtonBase;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
-import com.sencha.gxt.widget.core.client.event.OverflowEvent;
-import com.sencha.gxt.widget.core.client.event.RowClickEvent;
-import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent.RowDoubleClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -82,9 +47,9 @@ import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GroupingView;
-import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
+import com.sencha.gxt.widget.core.client.info.DefaultInfoConfig;
 import com.sencha.gxt.widget.core.client.info.Info;
+
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
@@ -95,7 +60,6 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
-import edu.usc.epigenome.eccp.client.data.MultipleLibraryProperty;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
@@ -165,7 +129,7 @@ public class sampleList extends Composite implements HasLayout
 			public void onKeyDown(KeyDownEvent event) {
 				
 		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	System.out.println("Here in key down");
+		        	//System.out.println("Here in key down");
 		        	
 		        	String text = filter.getText().toLowerCase();
 		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
@@ -180,6 +144,7 @@ public class sampleList extends Composite implements HasLayout
 
 		        	store.replaceAll(tmp);
 		        	tmp.clear();
+		        	logToServer("SampleSearch:"+text); 
 		        }	
 			}	    	
 	    });
@@ -189,7 +154,8 @@ public class sampleList extends Composite implements HasLayout
 			public void onTriggerClick(TriggerClickEvent event) {
 				store.replaceAll(completeData);
 				filter.setEmptyText("Search...");
-				System.out.println("Reset clicked");
+			//	System.out.println("Reset clicked");
+				logToServer("SearchReset"); 
 			}
 	    	
 	    });
@@ -270,6 +236,7 @@ public class sampleList extends Composite implements HasLayout
 			public void onRowDoubleClick(RowDoubleClickEvent event)
 			{
 				// final Boolean b = event.getEvent().getShiftKey();
+				    
 				 LibraryData summarizedLibrary = store.get(event.getRowIndex());
 				 LibraryDataQuery query = new LibraryDataQuery();
 				 query.setIsSummaryOnly(false);
@@ -340,6 +307,9 @@ public class sampleList extends Composite implements HasLayout
 				for(int i = 0; i < 2000 && i < result.size(); i++)
 					partialData.add(result.get(i));
 				populateGrid(partialData);
+				Info info = new Info();
+				info.setPosition(100,100); // setting the position doesn't work
+				info.show(new DefaultInfoConfig("Notice", "First 2000 records are loaded"));
 				
 			}});
 		 // Add sorting by date column to the grid
@@ -398,7 +368,8 @@ public class sampleList extends Composite implements HasLayout
 		              });
 		             box.show();
 					    
-				}}});		
+				}}});
+		   logToServer("ContextMenu"); 
 	}
 	
 	public void contextMenu() {
@@ -493,8 +464,7 @@ public class sampleList extends Composite implements HasLayout
 	         if(Window.Location.getQueryString().length() > 0 ) {
 	        	 workflowParam.hide();
 	        	 illuminaParam.hide();
-	         }
-	         
+	         }     
 	}
 	public void showParamDialog(String textToDisplay, String heading){
 		 Dialog paramWindow = new Dialog();
@@ -514,7 +484,7 @@ public class sampleList extends Composite implements HasLayout
 	{
 		store.replaceAll(thisdata);
 		view.collapseAllGroups();
-		Info.display("Notice", "Library List Loaded");		
+	//	Info.display("Notice", "Library List Loaded");		
 		
 	}
 	
@@ -667,7 +637,8 @@ public class sampleList extends Composite implements HasLayout
 
 			@Override
 			public void onSelect(SelectEvent event) {
-				Window.open("https://sites.google.com/site/uscecwiki/ecdp/documentation/ecdp-user-manual", "_blank", "");				
+				Window.open("https://sites.google.com/site/uscecwiki/ecdp/documentation/ecdp-user-manual", "_blank", "");
+                logToServer("UserManual");
 			}});
 	    toolbar.add(userManual);
 	}
@@ -689,6 +660,26 @@ public class sampleList extends Composite implements HasLayout
 	public boolean isOrWasLayoutRunning() {
 		return false;
 	}
+	public void logToServer(String text) {
+		if (!Window.Location.getHref().matches(".*beta.*")) {
+		text = "SampleList:"+ text;
+   	    myServer.logWriter(text, new AsyncCallback<String>(){
+ 
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					// TODO Auto-generated method stub
+					
+				}
+				 
+			 });
+		}
+   }
 	
 }
 	

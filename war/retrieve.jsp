@@ -12,7 +12,9 @@
 <%
 	// you  can get your base and parent from the database
 	String encFileName = request.getParameter("resource");
-	
+    // make a timestamp
+    java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("MM/dd/yy H:mm:ss");
+    String timestamp = formatter.format(new java.util.Date())+" ";
 
 	try
 	{
@@ -25,7 +27,7 @@
 		
 		if (request.getUserPrincipal() != null)
 		{
-			System.err.println(request.getUserPrincipal().getName() + " downloading " + filePath);
+			System.err.println(timestamp + request.getUserPrincipal().getName() + " downloading " + filePath);
 		}
 
 		if (!filePath.startsWith("/storage/"))
@@ -53,13 +55,13 @@
 				/* dump output stream */
 				BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
 				if ((inputPath = is.readLine()) != null)
-					System.err.println("symlinks traced with perl fork: " + inputPath);
+					System.err.println(timestamp + "symlinks traced with perl fork: " + inputPath);
 				System.out.flush();
 				filePath = inputPath;
 
 			} catch (Exception e)
 			{
-				System.out.println("error executing perl smylinks finder, using original path:" + filePath);
+				System.out.println(timestamp +"error executing perl smylinks finder, using original path:" + filePath);
 				e.printStackTrace();
 			}
 
@@ -100,13 +102,13 @@
 				response.setHeader("Content-Length", Long.toString(myfile.length()));
 
 			//read from the file; write to the ServletOutputStream
-			System.err.println("Streaming file: " + filePath);
+			System.err.println(timestamp + "Streaming file: " + filePath);
 			while ((readBytes = buf.read()) != -1)
 				myOut.write(readBytes);
 
 		} catch (IOException ioe)
 		{
-			out.println("Unauthorized File Request");
+			out.println(timestamp + "Unauthorized File Request");
 			throw new ServletException(ioe.getMessage());
 		} finally
 		{
@@ -118,7 +120,8 @@
 		}
 	} catch (Exception e)
 	{
-		out.println("Unauthorized File Request");
+		out.println(timestamp + "Unauthorized File Request");
 		e.printStackTrace();
 	}
+	
 %>
