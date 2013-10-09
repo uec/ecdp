@@ -3,6 +3,7 @@ package edu.usc.epigenome.eccp.client.sampleList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -21,7 +22,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
-import com.sencha.gxt.core.client.util.Format;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
@@ -49,7 +49,6 @@ import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.info.DefaultInfoConfig;
 import com.sencha.gxt.widget.core.client.info.Info;
-
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
@@ -144,7 +143,7 @@ public class sampleList extends Composite implements HasLayout
 
 		        	store.replaceAll(tmp);
 		        	tmp.clear();
-		        	logToServer("SampleSearch:"+text); 
+		        	logToServer("Search:"+text); 
 		        }	
 			}	    	
 	    });
@@ -269,7 +268,7 @@ public class sampleList extends Composite implements HasLayout
 					              @Override
 					                 public void onHide(HideEvent event) {
 					                   Dialog btn = (Dialog) event.getSource();
-					                   String msg = Format.substitute("The '{0}' button was pressed", btn.getHideButton().getText());					          
+					                   //String msg = Format.substitute("The '{0}' button was pressed", btn.getHideButton().getText());					          
 					                   if (btn.getHideButton().getText().equals("Yes")) {
 					            	  // Info.display("MessageBox", msg);
 					                	   Window.Location.reload();
@@ -491,7 +490,7 @@ public class sampleList extends Composite implements HasLayout
 	public void godmode()
 	{
 		 final TextArea text = new TextArea();
-		  final Dialog simple = new Dialog();
+		 final Dialog simple = new Dialog();
 		 simple.setHeadingText("SELECT * from view_run_metric WHERE");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
@@ -500,6 +499,7 @@ public class sampleList extends Composite implements HasLayout
 		 simple.setWidth(600);
 		 simple.setHeight(200);
 		 simple.show();
+		 
 		 TextButton ok = simple.getButtonById(PredefinedButton.OK.name());
 		 final ArrayList<Boolean> showOnce= new ArrayList<Boolean>();
 		 ok.addSelectHandler(new SelectHandler(){
@@ -660,26 +660,19 @@ public class sampleList extends Composite implements HasLayout
 	public boolean isOrWasLayoutRunning() {
 		return false;
 	}
-	public void logToServer(String text) {
-		if (!Window.Location.getHref().matches(".*beta.*")) {
-		text = "SampleList:"+ text;
-   	    myServer.logWriter(text, new AsyncCallback<String>(){
- 
-				@Override
-				public void onFailure(Throwable caught) {
-					// TODO Auto-generated method stub
-					
-				}
+	
+    public void logToServer(String text) 
+    {
+    	 myServer.logWriter("SampleList: " + text, new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) { }
 
-				@Override
-				public void onSuccess(String result) {
-					// TODO Auto-generated method stub
-					
-				}
-				 
-			 });
-		}
-   }
+			@Override
+			public void onSuccess(String result) {
+				//do nothing
+			}
+		 });
+    }	
 	
 }
 	

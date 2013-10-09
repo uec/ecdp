@@ -27,6 +27,5 @@ public interface ECServiceAsync
 	void getIlluminaParams(String flowcell, AsyncCallback<String> callback);
 
 	void getWorkflowParams(String flowcell, AsyncCallback<String> callback);
-	
 	void logWriter(String text, AsyncCallback<String> callback);
 }

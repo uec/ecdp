@@ -153,7 +153,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 					 }
 			     
 			}	
-				 logToServer("MetricSearch:" +filter.getText());	
+				 logToServer("Search:" +filter.getText());	
 			}});
 		
 		currentLibraryData=getUsageModeData(); 
@@ -281,7 +281,6 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 gridPointer.setView(viewPointer);
 		 gridPointer.setAllowTextSelection(true);
 		 content.add(gridPointer);				
-		 @SuppressWarnings("unused")
 		 QuickTip q =new QuickTip(gridPointer); // Add ToolTips to the grid cells in column cc1
 		 q.getToolTipConfig().setTrackMouse(true);
 		 q.getToolTipConfig().setDismissDelay(2000000000);
@@ -602,26 +601,17 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		store.replaceAll(new ArrayList<MultipleLibraryProperty>(currentLibraryData.values()));
 		
 	}
-    public void logToServer(String text) {
+    public void logToServer(String text) 
+    {
+    	 myServer.logWriter("MetricGrid: " + text, new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) { }
 
-         if (!Window.Location.getHref().matches(".*beta.*")) {
-    	 text = "MetricGrid:"+ text;   	 
-    	 myServer.logWriter(text, new AsyncCallback<String>(){
-
-				@Override
-				public void onFailure(Throwable caught) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void onSuccess(String result) {
-					// TODO Auto-generated method stub
-					
-				}
-				 
-			 });
-         }
+			@Override
+			public void onSuccess(String result) {
+				//do nothing
+			}
+		 });
     }
 	
 	public static native String evalQC(String arg) /*-{

@@ -15,7 +15,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -108,14 +107,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
 			// Get string of the decoded byte arrays
 			fcellAfterDecrypt = new String(fcellBytes);
-			System.out.println(getTimestamp()+"Word AfterDecrypt is " + fcellAfterDecrypt);
+			logWriter("Word AfterDecrypt is " + fcellAfterDecrypt);
 			String tempFcell = fcellAfterDecrypt.substring(0, fcellAfterDecrypt.length() - 32);
-			System.out.println(getTimestamp()+"trimmed  tempFcell is " + tempFcell);
+			logWriter("trimmed  tempFcell is " + tempFcell);
 
 			// Check the decrypted value with the md5 value
 			if (md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length() - 32, fcellAfterDecrypt.length())))
 			{
-				System.out.println(getTimestamp()+"post md5   tempFcell is " + tempFcell);
+				logWriter("post md5   tempFcell is " + tempFcell);
 				return tempFcell;
 			}
 
@@ -387,15 +386,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			{
 				// debug for user role checking
 				if (request.isUserInRole("ECCPWebAdmin"))
-					System.out.println(getTimestamp()+"ECCPWebAdmin:" + request.getUserPrincipal().getName());
+					logWriter("ECCPWebAdmin group");
 				if (request.isUserInRole("solexaWebData"))
-					System.out.println(getTimestamp()+"solexaWebData:" + request.getUserPrincipal().getName());
+					logWriter("solexaWebData group");
 				
-				System.out.println(getTimestamp()+"User:" + request.getUserPrincipal().getName());
-				System.out.println(getTimestamp()+"Query:" + request.getQueryString());
-				System.out.println(getTimestamp()+"URI:" + request.getRequestURL());
-				System.out.println(getTimestamp()+"map size:" + request.getParameterMap().size());
-				System.out.println(getTimestamp()+"ref:" + request.getHeader("referer"));
+				logWriter("Query:" + request.getQueryString());
+				logWriter("URI:" + request.getRequestURL());
+				logWriter("map size:" + request.getParameterMap().size());
+				logWriter("ref:" + request.getHeader("referer"));
 				
 				URL url = new URL(request.getHeader("referer"));
 				MultiMap<String> params = new MultiMap<String>();
@@ -412,7 +410,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 						contents += "  " + decryptTextMD5(params.getString("q"));
 					if(contents.length() < 3)
 						contents = "NOTHINGBUTGARBAGE";
-					System.out.println(getTimestamp()+"URL PARAM DEC: " + contents);
+					logWriter("URL PARAM DEC: " + contents);
 					where += "MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
 				}
 			}
@@ -436,7 +434,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
 			String selectQuery = "select" + columns + "from view_run_metric " + where + " ORDER BY RunParam_RunID DESC";
-			System.out.println(getTimestamp()+"The query that is executed is " + selectQuery);
+			logWriter("The query that is executed is " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
 			// NumberFormat formatter = new DecimalFormat("##.##");
@@ -674,7 +672,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				Statement st1 = myConnection.createStatement();
 			//	String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
 				String selectFiles = "select f.file_fullpath, f.file_size, IFNULL(t.id_category,0) as category, c.name, IFNULL(t.description,\"No Description\") as description from file f left outer join file_type t on f.file_fullpath RLIKE t.file_match_regex left outer join category c on t.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();				
-				System.out.println(getTimestamp()+"The query that is executed is " + selectFiles);
+				logWriter("The query that is executed is " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
 				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges)/");
@@ -990,19 +988,28 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	public String getTimestamp() {
         java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("MM/dd/yy H:mm:ss");
         java.util.Date currentDate= new java.util.Date();
-		return formatter.format(currentDate)+" ";
+		return formatter.format(currentDate);
 		
 	}
-	public String logWriter(String text) {
-		   HttpServletRequest request = this.getThreadLocalRequest();
-			if (request != null && request.getUserPrincipal() != null)
-			{
-		      String username=request.getUserPrincipal().getName();
-		      System.out.println(getTimestamp()+"User:"+username+" clicked "+text);
-			}
-			else System.out.println(getTimestamp()+"User clicked "+text);
-			
-		    return null;
+	public String logWriter(String text) 
+	{
+		String userID = "unknown";
+		String site = "unknown";
+		HttpServletRequest request = this.getThreadLocalRequest();
+		if (request != null && request.getUserPrincipal() != null)
+			userID=request.getUserPrincipal().getName();
+		if (request != null && request.getRequestURI() != null)
+		{
+			if(request.getRequestURI().contains("beta"))
+				site="ecdp-beta";
+			else if(request.getRequestURI().contains("ecdp"))
+				site="ecdp";
+			else if(request.getRequestURI().contains("garepo"))
+				site="gareports";
+		}
+		      
+		System.out.println(getTimestamp() + " " +  "User:" + userID + " Site:" + site + "\t" + text);
+		return null; //return null since gwt asyncs need a return val
 	}
 
 }
