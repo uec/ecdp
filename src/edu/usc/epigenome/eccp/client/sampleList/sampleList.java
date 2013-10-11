@@ -308,7 +308,8 @@ public class sampleList extends Composite implements HasLayout
 				populateGrid(partialData);
 				Info info = new Info();
 				info.setPosition(100,100); // setting the position doesn't work
-				info.show(new DefaultInfoConfig("Notice", "First 2000 records are loaded"));
+				if(result.size() > 2000)
+					info.show(new DefaultInfoConfig("Notice", "2000 of " + result.size() + "  records are displayed, use search box to see all"));
 				
 			}});
 		 // Add sorting by date column to the grid

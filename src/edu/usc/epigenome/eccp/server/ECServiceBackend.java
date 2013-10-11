@@ -1002,7 +1002,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		{
 			if(request.getRequestURI().contains("beta"))
 				site="ecdp-beta";
-			else if(request.getRequestURI().contains("ecdp"))
+			else if(request.getRequestURI().contains("alpha"))
+				site="ecdp-alpha";
+			else if(request.getRequestURI().contains("eccp"))
 				site="ecdp";
 			else if(request.getRequestURI().contains("garepo"))
 				site="gareports";
