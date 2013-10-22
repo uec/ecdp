@@ -995,6 +995,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	{
 		String userID = "unknown";
 		String site = "unknown";
+		String ip = "unknown";
 		HttpServletRequest request = this.getThreadLocalRequest();
 		if (request != null && request.getUserPrincipal() != null)
 			userID=request.getUserPrincipal().getName();
@@ -1009,8 +1010,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			else if(request.getRequestURI().contains("garepo"))
 				site="gareports";
 		}
+		if(request != null && request.getRemoteAddr() != null)
+			ip =  request.getRemoteAddr();
 		      
-		System.out.println(getTimestamp() + " " +  "User:" + userID + " Site:" + site + "\t" + text);
+		System.out.println(getTimestamp() + " " +  "User:" + userID +"@" + ip + " Site:" + site + "\t" + text);
 		return null; //return null since gwt asyncs need a return val
 	}
 
