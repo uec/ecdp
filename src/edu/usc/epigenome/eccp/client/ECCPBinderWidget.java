@@ -9,12 +9,14 @@ import com.google.gwt.user.client.Window;
 //import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 //import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 //import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.info.Info;
+
 import edu.usc.epigenome.eccp.client.sampleList.sampleList;
 import edu.usc.epigenome.eccp.client.tab.TabbedReport;
 
@@ -50,9 +52,12 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	    westData.setCollapsible(true);
 	    westData.setCollapseHidden(true);
 	    westData.setCollapseMini(true);
+	    
     
 	    west = new SimpleContainer();
+
 	    center = new SimpleContainer();
+	    
 	    west.addResizeHandler(new ResizeHandler() {
 
 			@Override
@@ -70,15 +75,17 @@ public class ECCPBinderWidget extends BorderLayoutContainer{
 	    
 	    west.setBorders(true);
 	//    west.setPixelSize(500, 500);
+	    
+	    
 	    setWestWidget(west,westData);
 	    sample = new sampleList();
 	    west.add(sample);
-	  //  BorderLayoutData centerData = new BorderLayoutData();
 
 	    MarginData centerData = new MarginData();
 	    centerData.setMargins(new Margins(5));
+
+	    
 	    center.add(new TabbedReport());
-	//    center.add(new TabbedReportTest());
 	    setCenterWidget(center,centerData);
 	    
 

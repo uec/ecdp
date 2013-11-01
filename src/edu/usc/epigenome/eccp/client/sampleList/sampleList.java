@@ -632,7 +632,8 @@ public class sampleList extends Composite implements HasLayout
 		userManual.setHTML(shtml);		
 	}
 	public void setUserManualButton(){
-	    userManual.setStyleName("help-Button");
+	   // userManual.setStyleName("help-Button");
+	    userManual.getElement().getStyle().setColor("orangered");	
 	   // System.out.println("Style="+userManual.getStyleName());
 	    userManual.addSelectHandler(new SelectHandler() {
 

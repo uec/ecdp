@@ -2,37 +2,30 @@ package edu.usc.epigenome.eccp.client.tab;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.HasResizeHandlers;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-//import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
-import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.container.CardLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
-import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.Viewport;
-import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
-
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEventHandler;
-import edu.usc.epigenome.eccp.client.sampleReport.MetricGridWidget;
+
 
 
 public class TabbedReport extends Composite implements HasLayout
@@ -61,7 +54,8 @@ public class TabbedReport extends Composite implements HasLayout
 		    
 		tabPanel.addSelectionHandler(handler);
 		tabPanel.setTabScroll(true);
-			
+		setAnnounceTab();
+
 		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()  
 
 		{
@@ -133,6 +127,17 @@ public class TabbedReport extends Composite implements HasLayout
 	public boolean isOrWasLayoutRunning() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+    
+	public void setAnnounceTab() {
+		TabItemConfig config = new TabItemConfig();
+		config.setText("Announcements");
+		config.setClosable(true);
+		ContentPanel c = new ContentPanel();
+		Image im = new Image("images/workshop_ad.png");
+		c.add(im);
+		tabPanel.add(c, config);
+		
 	}
 
 	
