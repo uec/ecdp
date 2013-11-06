@@ -136,7 +136,10 @@ public class TabbedReport extends Composite implements HasLayout
 		ContentPanel c = new ContentPanel();
 		Image im = new Image("images/workshop_ad.png");
 		c.add(im);
-		tabPanel.add(c, config);
+		c.setResize(false);
+		Viewport v = new Viewport();
+		v.add(c);
+		tabPanel.add(v, config);
 		
 	}
 
