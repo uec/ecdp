@@ -1,22 +1,23 @@
-On your Mac:
+#!/bin/bash
+# On your Mac:
+#
+# in eclipse:
+#	right click on project, google->GWT compile
 
-in eclipse:
-	right click on project, google->GWT compile
-
-in shell	
+# in shell	
 rm eccpgxt.zip
 zip -r eccpgxt.zip war
-scp eccpgxt.zip natalia@webapp.epigenome.usc.edu:/tmp
+scp eccpgxt.zip zack@webapp.epigenome.usc.edu:/tmp
 
 
-On webapp.epigenome.usc.edu:
-sudo su
-/root/replace.sh
-vi will open for  /opt/tomcat6/webapps/ECCPBinder/WEB-INF/web.xml
-remove "<--" and "-->" around <security-constraints>
-esc :wq
+# On webapp.epigenome.usc.edu:
+# sudo su
+# /root/replace.sh
+# vi will open for  /opt/tomcat6/webapps/ECCPBinder/WEB-INF/web.xml
+# remove "<--" and "-->" around <security-constraints>
+# esc :wq
 
-will pause for 10 seconds, verify website is offline, then verify that it is back online.
+# will pause for 10 seconds, verify website is offline, then verify that it is back online.
 
 
 
