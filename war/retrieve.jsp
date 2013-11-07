@@ -7,18 +7,18 @@
 <%@ page import="javax.crypto.Cipher"%>
 <%@ page import="javax.crypto.spec.SecretKeySpec"%>
 <%@ page import="sun.misc.BASE64Decoder"%>
+<%@ page import="edu.usc.epigenome.eccp.server.ECServiceBackend"%>
 
 
 <%
 	// you  can get your base and parent from the database
 	String encFileName = request.getParameter("resource");
-    // make a timestamp
-    java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("MM/dd/yy H:mm:ss");
-    String timestamp = formatter.format(new java.util.Date())+" ";
+	
 
 	try
 	{
 		//Decode the text using cipher
+		ECServiceBackend backend = new ECServiceBackend();
 		SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
 		Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 		desCipher.init(Cipher.DECRYPT_MODE, keySpec, desCipher.getParameters());
@@ -27,7 +27,7 @@
 		
 		if (request.getUserPrincipal() != null)
 		{
-			System.err.println(timestamp + request.getUserPrincipal().getName() + " downloading " + filePath);
+			backend.logWriter(request,"starting download: " + filePath);
 		}
 
 		if (!filePath.startsWith("/storage/"))
@@ -55,13 +55,13 @@
 				/* dump output stream */
 				BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
 				if ((inputPath = is.readLine()) != null)
-					System.err.println(timestamp + "symlinks traced with perl fork: " + inputPath);
+					backend.logWriter(request,"download symlink traced to: " + inputPath);
 				System.out.flush();
 				filePath = inputPath;
 
 			} catch (Exception e)
 			{
-				System.out.println(timestamp +"error executing perl smylinks finder, using original path:" + filePath);
+				backend.logWriter(request,"error executing perl smylinks finder, using original path:" + filePath);
 				e.printStackTrace();
 			}
 
@@ -102,13 +102,17 @@
 				response.setHeader("Content-Length", Long.toString(myfile.length()));
 
 			//read from the file; write to the ServletOutputStream
-			System.err.println(timestamp + "Streaming file: " + filePath);
+			backend.logWriter(request,"Started sending bytes of file: " + filePath);
 			while ((readBytes = buf.read()) != -1)
 				myOut.write(readBytes);
+			if (request.getUserPrincipal() != null)
+			{
+				backend.logWriter(request,"finished sending file: " + filePath);
+			}
 
 		} catch (IOException ioe)
 		{
-			out.println(timestamp + "Unauthorized File Request");
+			out.println("Unauthorized File Request");
 			throw new ServletException(ioe.getMessage());
 		} finally
 		{
@@ -120,8 +124,7 @@
 		}
 	} catch (Exception e)
 	{
-		out.println(timestamp + "Unauthorized File Request");
+		out.println("Unauthorized File Request");
 		e.printStackTrace();
 	}
-	
 %>

@@ -165,7 +165,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"http://webapp.epigenome.usc.edu/ECCPBinder/retrieve.jsp?resource=" + object + " \">download</a>");
+		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"retrieve.jsp?resource=" + object + " \">download</a>");
 		      }
 		}));
 		 cc5 = new ColumnConfig<FileData, String>(properties.size(), 50, "Size");

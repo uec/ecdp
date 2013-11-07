@@ -991,12 +991,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		return formatter.format(currentDate);
 		
 	}
-	public String logWriter(String text) 
+	
+	public String logWriter(HttpServletRequest request, String text) 
 	{
 		String userID = "unknown";
 		String site = "unknown";
 		String ip = "unknown";
-		HttpServletRequest request = this.getThreadLocalRequest();
 		if (request != null && request.getUserPrincipal() != null)
 			userID=request.getUserPrincipal().getName();
 		if (request != null && request.getRequestURI() != null)
@@ -1014,6 +1014,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			ip =  request.getRemoteAddr();
 		      
 		System.out.println(getTimestamp() + " " +  "User:" + userID +"@" + ip + " Site:" + site + "\t" + text);
+		return null; //return null since gwt asyncs need a return val
+	}
+	
+	public String logWriter(String text) 
+	{
+		this.logWriter(this.getThreadLocalRequest(), text);
 		return null; //return null since gwt asyncs need a return val
 	}
 
