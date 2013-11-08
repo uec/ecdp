@@ -300,6 +300,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
 		        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
 		        {
+		        	logToServer("Libraries Dragged and Dropped to Metrics: " +  summarizedLibrary.get("flowcell_serial").getValue() + ":" + summarizedLibrary.get("geneusID_sample").getValue());
 					 LibraryDataQuery query = new LibraryDataQuery();
 					 query.setIsSummaryOnly(false);
 					 query.setGetFiles(true);
@@ -449,6 +450,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	@UiHandler("mergeLibs")
 	public void createMerge(SelectEvent event)
 	{
+		logToServer("Merging Workflow");
 		myServer.createMergeWorkflow(libraries, new AsyncCallback<String>(){
 
 			@Override
@@ -509,6 +511,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	//create a plot of a clicked library metric
 	public void plot(final MultipleLibraryProperty metric)
 	{
+		logToServer("Plotting Chart of  " + metric.getName());
 		if(metric.getAllValues().contains("JSON") && metric.getAllValues().contains("Scatter Plot"))
 		{
 			ScatterChartWidget s = new ScatterChartWidget(metric,libraries);

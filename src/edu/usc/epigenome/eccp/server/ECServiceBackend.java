@@ -107,9 +107,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
 			// Get string of the decoded byte arrays
 			fcellAfterDecrypt = new String(fcellBytes);
-			logWriter("Word AfterDecrypt is " + fcellAfterDecrypt);
 			String tempFcell = fcellAfterDecrypt.substring(0, fcellAfterDecrypt.length() - 32);
-			logWriter("trimmed  tempFcell is " + tempFcell);
+			logWriter("Word AfterDecrypt is " + fcellAfterDecrypt + "  Trimmed  tempFcell is " + tempFcell);
 
 			// Check the decrypted value with the md5 value
 			if (md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length() - 32, fcellAfterDecrypt.length())))
@@ -390,10 +389,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				if (request.isUserInRole("solexaWebData"))
 					logWriter("solexaWebData group");
 				
-				logWriter("Query:" + request.getQueryString());
-				logWriter("URI:" + request.getRequestURL());
-				logWriter("map size:" + request.getParameterMap().size());
-				logWriter("ref:" + request.getHeader("referer"));
+				//logWriter("Query:" + request.getQueryString());
+				logWriter("URI:" + request.getRequestURL() + "  REF:" + request.getHeader("referer") );
+				//logWriter("map size:" + request.getParameterMap().size());
+				//logWriter("ref:" + request.getHeader("referer"));
 				
 				URL url = new URL(request.getHeader("referer"));
 				MultiMap<String> params = new MultiMap<String>();
@@ -434,7 +433,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
 			String selectQuery = "select" + columns + "from view_run_metric " + where + " ORDER BY RunParam_RunID DESC";
-			logWriter("The query that is executed is " + selectQuery);
+			logWriter("SQL Query: " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
 			// NumberFormat formatter = new DecimalFormat("##.##");
@@ -672,7 +671,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				Statement st1 = myConnection.createStatement();
 			//	String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
 				String selectFiles = "select f.file_fullpath, f.file_size, IFNULL(t.id_category,0) as category, c.name, IFNULL(t.description,\"No Description\") as description from file f left outer join file_type t on f.file_fullpath RLIKE t.file_match_regex left outer join category c on t.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();				
-				logWriter("The query that is executed is " + selectFiles);
+				logWriter("SQL Query: " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
 				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges)/");
