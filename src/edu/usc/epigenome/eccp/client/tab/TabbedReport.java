@@ -54,7 +54,7 @@ public class TabbedReport extends Composite implements HasLayout
 		    
 		tabPanel.addSelectionHandler(handler);
 		tabPanel.setTabScroll(true);
-		setAnnounceTab();
+		//setAnnounceTab();
 
 		ECCPEventBus.EVENT_BUS.addHandler(ShowGlobalTabEvent.TYPE, new ShowGlobalTabEventHandler()  
 

@@ -726,7 +726,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
                         if (size != null) 
                              file.setSize(humanReadableByteCount(Long.parseLong(size), true));
                         else file.setSize("N/A");
-						files.add(file);
+                        boolean fileDuplicate=false;
+                        
+                        for (FileData f: files) {
+                        	if (file.getFullPath().equals(f.getFullPath()))
+                        		fileDuplicate=true;
+                        }
+						if (!fileDuplicate) files.add(file);
+						
 					}
 				}
 				rs1.close();
