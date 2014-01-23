@@ -544,35 +544,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				 	d.put(p.getName(), p);				 	  
 				 	  
 				 }
-				 // create a new metric "mapped_reads_max" from Picard metrics "pf_reads_aligned_pair" and "pf_reads_aligned_unpaired"
-				 double paired=0;
-				 double unpaired=0;
-				 String category = "Unknown";
-				 
-				 if (d.get("pf_reads_aligned_pair") !=null) {
-				    //System.out.println(d.get("pf_reads_aligned_pair").getValue());
-				    paired = Double.parseDouble(d.get("pf_reads_aligned_pair").getValue().replaceAll(",",""));
-				    category = d.get("pf_reads_aligned_pair").getCategory();
-				  
-				 }
-				 if (d.get("pf_reads_aligned_unpaired") !=null) {
-					//System.out.println(d.get("pf_reads_aligned_unpaired").getValue());
-					unpaired = Double.parseDouble(d.get("pf_reads_aligned_unpaired").getValue().replaceAll(",",""));
-					category = d.get("pf_reads_aligned_unpaired").getCategory();
-					
-				 }
-				 
-				 LibraryProperty mr = new LibraryProperty();
-			     mr.setName("mapped_reads_max");
-			     mr.setPrettyName("Mapped Reads");
-                 mr.setSource("Unknown");
-			     mr.setValue(itgr.format((long) Math.max(paired, unpaired)) +"");
-			     mr.setCategory(category);
-			     mr.setUsage("4");
-			     mr.setKey("mapped_reads_max");
-			     mr.setDescription("1 or more mappings");
-			     d.put(mr.getName(), mr);
-				 
+								 
 				 LibraryProperty date = d.get("Date_Sequenced");
 				 String val = d.get("Date_Sequenced").getValue();
 				 if (val !=null) {
