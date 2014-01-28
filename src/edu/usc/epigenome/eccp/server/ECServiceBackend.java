@@ -420,6 +420,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			where += "0=0";
 
 			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing, protocol, \n" +
+					//ZR 140125 all this date formatting sql can go to the view
 					"If(" +
 					"	ISNULL(RunParam_RunID), " +
 					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
@@ -524,7 +525,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 		 		 p.setCategory(qcTypes.get("sample_name").get("category"));
 					 		 		 p.setUsage(qcTypes.get("sample_name").get("usage_enum"));
 					 		 	 }
-					 		 	 else  { 
+					 		 	 else  {
+					 		 		//ZR 140125 if there are always defaults, why not set them in the constructor 
 					 		 		 //category
 					 		 		 p.setCategory("Unknown");
 									 //usage
@@ -545,6 +547,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				 	  
 				 }
 								 
+				//ZR 140125 fixing the date can can be moved to the sql view
 				 LibraryProperty date = d.get("Date_Sequenced");
 				 String val = d.get("Date_Sequenced").getValue();
 				 if (val !=null) {
@@ -565,6 +568,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					    }
 					 else date.setValue("No Date Entered");
 				 }
+				 
+				 //ZR 140125 fixing the processing type can me moved to the sql view
+				 
 				 //extract LibType data from database column "processing"
 				 LibraryProperty libType = d.get("processing");
 				 String libTypeValue = d.get("processing").getValue();
