@@ -419,24 +419,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			
 			where += "0=0";
 
-			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing, protocol, \n" +
-					//ZR 140125 all this date formatting sql can go to the view
-					"If(" +
-					"	ISNULL(RunParam_RunID), " +
-					"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
-					"	STR_TO_DATE(concat(\"20\",substring(RunParam_RunID,1,2),\",\",substring(RunParam_RunID,3,2),\",\",substring(RunParam_RunID,5,2)),'%Y,%m,%e')) " +
-					"as Date_Sequenced "
-				: " * ,"+
-				"If(" +
-				"	ISNULL(RunParam_RunID), " +
-				"	STR_TO_DATE(concat(substring(Date_Sequenced,1,6),\",\",substring(Date_Sequenced,7,5)),'%M %d,%Y'), " +
-				"	STR_TO_DATE(concat(\"20\",substring(RunParam_RunID,1,2),\",\",substring(RunParam_RunID,3,2),\",\",substring(RunParam_RunID,5,2)),'%Y,%m,%e')) " +
-				"as Date_Sequenced_temp ";
+			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted " : " * ";				
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
-			String selectQuery = "select" + columns + "from view_run_metric " + where + " ORDER BY RunParam_RunID DESC";
+			String selectQuery = "select" + columns + "from main_lib_view " + where + " ORDER BY RunParam_RunID DESC";
 			logWriter("SQL Query: " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
@@ -518,80 +506,25 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					 	 }
 					 	 else
 					 	 {
-					 		 	// this is for showing geneusID_sample in "Summary View". 
-					 		    // the category and usage are set to be the same as for sample_name/library metric
-					 		    if (p.getName().equals("geneusID_sample")) {
-					 		 		 p.setPrettyName("LIMS id");
-					 		 		 p.setCategory(qcTypes.get("sample_name").get("category"));
-					 		 		 p.setUsage(qcTypes.get("sample_name").get("usage_enum"));
-					 		 	 }
-					 		 	 else  {
-					 		 		//ZR 140125 if there are always defaults, why not set them in the constructor 
-					 		 		 //category
-					 		 		 p.setCategory("Unknown");
-									 //usage
-								 	 p.setUsage("0");
-									 //pretty_name
-								 	 p.setPrettyName(p.getName());
-					 		 	 }
-							 	     //sort_order
-							 	     p.setSortOrder("100000");
-							 	     //desc
-							 	     p.setDescription("No Description");
-							 	     //parser
-							 	     p.setSource("Unknown");
-
+			 		 		//ZR 140125 if there are always defaults, why not set them in the constructor 
+			 		 		 //category
+			 		 		 p.setCategory("Unknown");
+							 //usage
+						 	 p.setUsage("0");
+							 //pretty_name
+						 	 p.setPrettyName(p.getName());
+			 		 	     //sort_order
+					 	     p.setSortOrder("100000");
+					 	     //desc
+					 	     p.setDescription("No Description");
+					 	     //parser
+					 	     p.setSource("Unknown");
 					 	 }
 				 	}
 				 	d.put(p.getName(), p);				 	  
 				 	  
 				 }
 								 
-				//ZR 140125 fixing the date can can be moved to the sql view
-				 LibraryProperty date = d.get("Date_Sequenced");
-				 String val = d.get("Date_Sequenced").getValue();
-				 if (val !=null) {
-				    if (d.containsKey("Date_Sequenced_temp")) {					
-					    String newDate = d.get("Date_Sequenced_temp").getValue();
-					    date.setValue(newDate);
-					    d.remove("Date_Sequenced_temp");
-				    }
-				 }
-				 else {
-					 if (d.containsKey("Date_Sequenced_temp")) {					
-						 String newDate = d.get("Date_Sequenced_temp").getValue();
-						    if (newDate!=null) {
-						          date.setValue(newDate);
-						          d.remove("Date_Sequenced_temp");
-						    }
-						    else date.setValue("No Date Entered");
-					    }
-					 else date.setValue("No Date Entered");
-				 }
-				 
-				 //ZR 140125 fixing the processing type can me moved to the sql view
-				 
-				 //extract LibType data from database column "processing"
-				 LibraryProperty libType = d.get("processing");
-				 String libTypeValue = d.get("processing").getValue();
-				 if (libTypeValue!=null) {
-			    	 // String pattern = "(L\\d+\\s+)(.*)(\\s+processing.*)";
-			    	 // libType.setValue(libTypeValue.replaceAll(pattern, "$2"));					
-					 String value = libTypeValue.split(",")[0];
-					 
-					 if (value.matches(".*BS-seq.*"))   value="bisulfite";
-					 if (value.matches(".*ChIP-seq.*")) value="chipseq";
-					 if (value.matches(".*RNA-seq.*"))  value="rnaseq";
-					 if (value.matches(".*genomic.*"))  value="genomic";
-					 
-					 if (d.get("protocol").getValue().matches(".*merged.*")) 
-						 libType.setValue(value+" merged");
-					 else libType.setValue(value);
-				 }
-				 else {
-					    libType.setValue("Unknown");
-				 }
-				 
 				 if(queryParams.getGetFiles())
 					 d.setFiles(getFilesforLibrary(d));
 				 data.add(d);
@@ -851,7 +784,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (myConnection != null)
 			{
 				
-				String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing, technician from view_run_metric where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing_formatted, technician from main_lib_view where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
 				Statement stat = myConnection.createStatement();
 				ResultSet results = stat.executeQuery(selectQuery);
 				int cols = results.getMetaData().getColumnCount();
@@ -911,7 +844,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (myConnection != null)
 			{
 				
-				String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing, protocol, organism from view_run_metric where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing_formatted, protocol, organism from main_lib_view where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
 				Statement stat = myConnection.createStatement();
 				ResultSet results = stat.executeQuery(selectQuery);
 			
@@ -947,13 +880,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					String workflow = "unaligned";
 					String genome = "/home/uec-00/shared/production/genomes/unaligned/unaligned.fa";
 					
-					if(results.getString("processing").toLowerCase().contains("chip"))
+					if(results.getString("processing_formatted").toLowerCase().contains("chip"))
 						workflow = "chipseq";
-					else if(results.getString("processing").toLowerCase().contains("bs") || results.getString("processing").toLowerCase().contains("sulfit"))
+					else if(results.getString("processing_formatted").toLowerCase().contains("bs") || results.getString("processing_formatted").toLowerCase().contains("sulfit"))
 						workflow = "bisulfite";
-					else if(results.getString("processing").toLowerCase().contains("rna"))
+					else if(results.getString("processing_formatted").toLowerCase().contains("rna"))
 						workflow = "rnaseqv2";
-					else if(results.getString("processing").toLowerCase().contains("genom") || results.getString("processing").toLowerCase().contains("regul"))
+					else if(results.getString("processing_formatted").toLowerCase().contains("genom") || results.getString("processing_formatted").toLowerCase().contains("regul"))
 						workflow = "regular";
 					
 					if(results.getString("organism").toLowerCase().contains("mus"))
@@ -969,14 +902,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					//handle human
 					else if(results.getString("organism").toLowerCase().contains("homo") || results.getString("organism").toLowerCase().contains("human"))
 					{
-						if(results.getString("processing").toLowerCase().contains("rna") || results.getString("processing").toLowerCase().contains("chip") )
+						if(results.getString("processing_formatted").toLowerCase().contains("rna") || results.getString("processing_formatted").toLowerCase().contains("chip") )
 							genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
 						else
 							genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";
 					}
 					
 					//handle rnaseq genomes
-					if(results.getString("processing").toLowerCase().contains("rna"))
+					if(results.getString("processing_formatted").toLowerCase().contains("rna"))
 						genome = genome.substring(0, genome.length() - 3);
 					
 					paramText += "Sample."+ i + ".Workflow = " + workflow + "\n";
