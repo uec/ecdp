@@ -17,4 +17,12 @@ public class LibraryData extends HashMap<String,LibraryProperty>
 	{
 		this.files = files;
 	}
+	public String print() {
+		
+		String p="";
+		for (String s: this.keySet() ){
+			p = p + s+":" + this.get(s).getValue()+"\t";
+		}
+		return p;
+	}
 }

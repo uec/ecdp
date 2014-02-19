@@ -133,21 +133,21 @@ public class sampleList extends Composite implements HasLayout
 		        	String text = filter.getText().toLowerCase();
 		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
 		        	for (LibraryData item : completeData) {
+		        		//item.get("project").setValue(null);
 		        		try {
 		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
 		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
 		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
 		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
 		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text))
-		        				tmp.add(item);
+		        				continue;
 		        		} 
-		        		catch (Exception e) {
+		        		catch (NullPointerException e) {
 		        			
-		        			logToServer("Search:" +text+ " Exception: "+ e.getMessage()+ " when searching for samples, skipping to the next sample");
-		        			
+		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.print());
 		        		}
 		        		finally {
-		        		//	System.out.println("Skipping to the next LibraryData item");
+		        			tmp.add(item);
 		        		}
 		        	}
 
