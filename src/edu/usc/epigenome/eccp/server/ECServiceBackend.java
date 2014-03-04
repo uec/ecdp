@@ -617,7 +617,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				logWriter("SQL Query: " + selectFiles);
 				ResultSet rs1 = st1.executeQuery(selectFiles);
 
-				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges)/");
+				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges|external_analysis)/");
 				Matcher matcher;
 				Pattern laneNumPattern = Pattern.compile("(s|" + lib.get("flowcell_serial").getValue() +")_(\\d+)[\\._]+");
 				Matcher laneNumMatcher;
