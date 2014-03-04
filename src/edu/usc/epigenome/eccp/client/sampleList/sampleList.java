@@ -133,21 +133,17 @@ public class sampleList extends Composite implements HasLayout
 		        	String text = filter.getText().toLowerCase();
 		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
 		        	for (LibraryData item : completeData) {
-		        		//item.get("project").setValue(null);
 		        		try {
 		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
 		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
 		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
 		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
 		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text))
-		        				continue;
+		        				tmp.add(item);
 		        		} 
 		        		catch (NullPointerException e) {
 		        			
-		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.print());
-		        		}
-		        		finally {
-		        			tmp.add(item);
+		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.toString());
 		        		}
 		        	}
 
@@ -314,13 +310,13 @@ public class sampleList extends Composite implements HasLayout
 					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
 				completeData = result;
 				ArrayList<LibraryData> partialData = new ArrayList<LibraryData>();
-				for(int i = 0; i < 2000 && i < result.size(); i++)
+				for(int i = 0; i < 1200 && i < result.size(); i++)
 					partialData.add(result.get(i));
 				populateGrid(partialData);
 				Info info = new Info();
 				info.setPosition(100,100); // setting the position doesn't work
-				if(result.size() > 2000)
-					info.show(new DefaultInfoConfig("Notice", "2000 of " + result.size() + "  records are displayed, use search box to see all"));
+				if(result.size() > 1200)
+					info.show(new DefaultInfoConfig("Notice", "1200 of " + result.size() + "  records are displayed, use search box to see all"));
 				
 			}});
 		 // Add sorting by date column to the grid
