@@ -1,0 +1,10 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
+			 xmlns:tabs="urn:import:com.sencha.gxt.widget.core.client" 
+			 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+			 xmlns:e="urn:import:edu.usc.epigenome.eccp.client.sampleReport">
+		
+	<tabs:TabPanel ui:field="tabPanel"/>  	
+ 
+</ui:UiBinder> 

@@ -1,1046 +1,58 @@
 package edu.usc.epigenome.eccp.server;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Properties;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.servlet.http.HttpServletRequest;
+
+import org.eclipse.jetty.util.MultiMap;
+import org.eclipse.jetty.util.UrlEncoded;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import edu.usc.epigenome.eccp.client.ECService;
-import edu.usc.epigenome.eccp.client.data.FlowcellData;
-import edu.usc.epigenome.eccp.client.data.MethylationData;
+import edu.usc.epigenome.eccp.client.data.FileData;
+import edu.usc.epigenome.eccp.client.data.LibraryData;
+import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 
+import com.google.gson.Gson;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
 
 /**
  * The server side implementation of the RPC service.
  */
+
 @SuppressWarnings("serial")
 public class ECServiceBackend extends RemoteServiceServlet implements ECService
 {
-
-	public ArrayList<FlowcellData> getFlowcellsAll() throws IllegalArgumentException
-	{
-		ArrayList<FlowcellData> flowcellsFS = getFlowcellsFromFS();
-		ArrayList<FlowcellData> flowcellsGeneus = getFlowcellsFromGeneus();
-		ArrayList<FlowcellData> flowcellsAll = new ArrayList<FlowcellData>();
-		HashMap<String,Boolean> fcFound = new HashMap<String,Boolean>();
-		
-		for(FlowcellData g : flowcellsGeneus)
-		{
-			flowcellsAll.add(g);
-			fcFound.put(g.getFlowcellProperty("serial"),true);			
-		}
-		for(FlowcellData g : flowcellsFS)
-		{
-			if(!fcFound.containsKey(g.getFlowcellProperty("serial")) && g.getFlowcellProperty("status").contains("run complete"))
-			{
-				fcFound.put(g.getFlowcellProperty("serial"),true);
-				flowcellsAll.add(g);
-			}
-		}
-		for(FlowcellData g : flowcellsFS)
-		{
-			if(!fcFound.containsKey(g.getFlowcellProperty("serial")))		
-			{
-				fcFound.put(g.getFlowcellProperty("serial"),true);
-				flowcellsAll.add(g);
-			}
-		}
-		
-		Collections.sort(flowcellsAll, new Comparator<FlowcellData>()
-		{
-			public int compare(FlowcellData o2, FlowcellData o1)
-			{
-				return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-			}
-		});
-		
-		return flowcellsAll;
-		
-	}
 	
-	public ArrayList<FlowcellData> getFlowcellsFromGeneusFiles() throws IllegalArgumentException
-	{
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		try
-		{
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/flowcell.pl"};
-			Process execQc = Runtime.getRuntime().exec(qcCommand);
-			InputStream inputStream = execQc.getInputStream();
-			
-			Document document = db.parse(inputStream);
-			NodeList flowcellNodeList = document.getElementsByTagName("flowcell");
-			for(int i = 0; i < flowcellNodeList.getLength(); i++)
-			{
-				Node flowcellNode = flowcellNodeList.item(i);
-				FlowcellData flowcell = new FlowcellData();
-				for(int j = 0; j < flowcellNode.getAttributes().getLength(); j++)
-				{
-					flowcell.flowcellProperties.put(flowcellNode.getAttributes().item(j).getNodeName(), flowcellNode.getAttributes().item(j).getNodeValue());
-				}
-				flowcell.flowcellProperties.put("status", "in geneus");
-				
-				NodeList sampleNodeList =flowcellNode.getChildNodes();
-				for(int j = 0; j < sampleNodeList.getLength(); j++)
-				{
-					Node sampleNode = sampleNodeList.item(j);
-					HashMap<String,String> sampleData = new HashMap<String,String>();
-					for(int k = 0; k < sampleNode.getAttributes().getLength(); k++)
-					{
-						sampleData.put(sampleNode.getAttributes().item(k).getNodeName(), sampleNode.getAttributes().item(k).getNodeValue());
-					}
-					flowcell.lane.put(Integer.parseInt(sampleNode.getAttributes().getNamedItem("lane").getNodeValue()), sampleData);					
-				}
-				
-				flowcells.add(flowcell);
-			}
-			inputStream.close();			
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Collections.sort(flowcells, new Comparator<FlowcellData>()
-		{
-			public int compare(FlowcellData o2, FlowcellData o1)
-			{
-				return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-			}
-		});
-		return flowcells;
-		
-	}
 	/*
-	 * Get flowcells from Geneus information from the database
+	 * Method to get the md5 hash of the input string takes string as an input
+	 * parameter and returns the md5 hash of the input string
 	 */
-	public ArrayList<FlowcellData> getFlowcellsFromGeneus() throws IllegalArgumentException
-	{
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		java.sql.Connection myConnection = null;
-		DataSource ds = null;
-		try
-		{
-			//Class.forName("com.mysql.jdbc.Driver").newInstance(); 
-			Context initCtx = new InitialContext();
-			Context ctx = (Context)initCtx.lookup("java:/comp/env");
-
-			if(ctx == null)
-				throw new Exception("Context is null");
-			
-			ds = (DataSource)ctx.lookup("jdbc/sequencing");
-			
-			if(ds != null)
-				myConnection  = ds.getConnection();
-			
-				if(myConnection != null)
-				{
-					Statement stat = myConnection.createStatement();
-					//Get all the distinct geneusId's 
-					String selectQuery ="select distinct(geneusID_run) from sequencing.view_run_metric";
-					ResultSet results = stat.executeQuery(selectQuery);
-				
-					//Iterate over the resultset consisting of GeneusID(limsid)
-				  if(results.next())
-				  {
-				   do
-					 {
-						FlowcellData flowcell = new FlowcellData();
-						String lims_id = results.getString("geneusId_run");
-						Statement st1 = myConnection.createStatement();
-						//for each geneusid get the flowcell serial no, protocol, technician, the date and the control lane 
-						String innSelect = "select distinct flowcell_serial, protocol, technician, Date_Sequenced, ControlLane from sequencing.view_run_metric where geneusID_run ='"+lims_id + "' group by geneusId_run";            
-						ResultSet rs = st1.executeQuery(innSelect);
-						//Iterate over the resultset and add the flowcellproperties for each of the flowcells
-						while(rs.next())
-						{
-							flowcell.flowcellProperties.put("serial", rs.getString("flowcell_serial"));
-							flowcell.flowcellProperties.put("limsID", lims_id);
-							flowcell.flowcellProperties.put("technician", rs.getString("technician").replace("å", ""));
-							  
-							if(rs.getString("Date_Sequenced") == null || rs.getString("Date_Sequenced").equals(""))
-								flowcell.flowcellProperties.put("date", "Unknown");
-							else
-							{
-								Date d = new Date(rs.getString("Date_Sequenced"));
-								flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
-							}
-			   
-							flowcell.flowcellProperties.put("protocol", rs.getString("protocol"));
-							flowcell.flowcellProperties.put("status","in geneus");
-							flowcell.flowcellProperties.put("control", rs.getString("ControlLane"));
-						}
-						rs.close();
-						st1.close();
-						
-						//Select distinct lanes for each of the flowcells
-						Statement statLane = myConnection.createStatement();
-						String LaneProp ="select distinct(lane) from sequencing.view_run_metric where geneusID_run ='"+lims_id+"'";
-						ResultSet RsProp = statLane.executeQuery(LaneProp);	
-						//Iterate over the lane numbers 
-						while(RsProp.next())
-						{
-							int lane_no =  RsProp.getInt("lane");
-							HashMap<String,String> sampleData = new HashMap<String,String>();
-							Statement cellprop = myConnection.createStatement();
-							//for each lane of a flowcell get the processing, sample_name, organism and project associated with it.
-							String st2 ="select processing, sample_name, geneusID_sample, organism, project from sequencing.view_run_metric where geneusID_run ='"+lims_id+"' and lane ="+ lane_no;
-							ResultSet Prop = cellprop.executeQuery(st2);
-							
-							//Iterate over the information and populate the lane information
-							while(Prop.next())
-							{
-								sampleData.put("processing", Prop.getString("processing"));
-								String sample_name = Prop.getString("sample_name");
-								String sampleID = Prop.getString("geneusID_sample");
-								String organism = Prop.getString("organism");
-								if(sampleData.containsKey("name"))
-								{
-									String tempName = sampleData.get("name");
-									if(!(tempName.contains(sample_name)))
-										sampleData.put("name", sampleData.get("name").concat("+").concat(sample_name));
-								}
-								else
-									sampleData.put("name", sample_name);
-								
-								if(sampleData.containsKey("organism"))
-								{
-									String tempOrg = sampleData.get("organism");
-									if(!(tempOrg.contains(organism)))
-										sampleData.put("organism", sampleData.get("organism").concat("+").concat(organism));
-								}
-								else
-									sampleData.put("organism", Prop.getString("organism"));
-								
-								if(sampleData.containsKey("sampleID"))
-								{
-									String tempSampleID = sampleData.get("sampleID");
-									if(!(tempSampleID.contains(sampleID)))
-										sampleData.put("sampleID", sampleData.get("sampleID").concat("+").concat(sampleID));
-								}
-								else
-									sampleData.put("sampleID", sampleID);
-								
-							    	sampleData.put("project", Prop.getString("project"));
-							}
-							Prop.close();
-							cellprop.close();
-							flowcell.lane.put(lane_no, sampleData);	
-					   }
-						RsProp.close();
-						statLane.close();
-						//add each of the flowcell to the arraylist
-						flowcells.add(flowcell);
-					
-					}while(results.next());
-			    
-				   results.close();
-				   stat.close();
-				 }
-				  else
-			   		{
-					  System.out.println("In the else clause for FLOWCELLS");
-					  flowcells = getFlowcellsFromGeneusFiles();
-			   		}
-			  }
-			 else
-			 {
-				System.out.println("In the else clause for FLOWCELLS");
-				 flowcells = getFlowcellsFromGeneusFiles();
-			 }
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try {
-				myConnection.close();
-			 } catch (SQLException e) {
-				e.printStackTrace();
-			 }
-		}
-		return flowcells;	
-	}
-	
-	@SuppressWarnings("deprecation")
-	public ArrayList<FlowcellData> getFlowcellsFromFS() throws IllegalArgumentException
-	{
-		File[] dirs = {new File("/storage/hsc/gastorage1/slxa/incoming"),new File("/storage/hsc/gastorage2/slxa/incoming")};
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		
-		FilenameFilter filter = new FilenameFilter()
-		{
-			public boolean accept(File dir, String name)
-			{
-				return ((name.toUpperCase().contains("AAXX") || name.toUpperCase().contains("ABXX")) && !name.contains(".")); 
-			}
-		};
-		
-		for(File dir : dirs)
-		{
-			System.out.println(dir.getPath());	
-		  try
-		  {
-			 for (File run : dir.listFiles(filter))
-			 {
-				System.out.println(run.getPath());
-				FlowcellData flowcell = new FlowcellData();
-				try
-				{
-					Pattern serialPattern = Pattern.compile("(\\w{5}A[AB]XX)");
-					Matcher serialMatcher = serialPattern.matcher(run.getName());
-					if(run.isDirectory() && serialMatcher.find())
-					{
-						System.out.println(serialMatcher.group(1));
-						flowcell.flowcellProperties.put("serial", serialMatcher.group(1));
-						Date d = new Date(run.lastModified());
-						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
-						flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
-						flowcell.flowcellProperties.put("status", "run incomplete or in progress");
-						for(String fileName : run.list())
-						{
-							if(fileName.toLowerCase().contains("run.completed"))
-							{
-								flowcell.flowcellProperties.put("status", "run complete");
-							}
-						}
-						flowcells.add(flowcell);
-					}
-				}
-				catch (Exception e)
-				{
-					System.out.println(e.getMessage());					
-				}
-			}
-			 
-		  }catch (Exception exp) {
-			  System.out.println(exp.getMessage());
-		}
-	  }
-		Collections.sort(flowcells, new Comparator<FlowcellData>()
-				{
-					public int compare(FlowcellData o2, FlowcellData o1)
-					{
-						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-					}
-				});
-		return flowcells;
-	}
-
-	public ArrayList<FlowcellData> getFlowcellsIncomplete() throws IllegalArgumentException
-	{
-		ArrayList<FlowcellData> flowcellsAll = getFlowcellsAll();
-		ArrayList<FlowcellData> flowcellsIncomplete = new ArrayList<FlowcellData>();
-		for(FlowcellData f : flowcellsAll)
-		{
-			if(f.getFlowcellProperty("status").contains("incomplete"))
-				flowcellsIncomplete.add(f);
-		}
-		
-		Collections.sort(flowcellsIncomplete, new Comparator<FlowcellData>()
-				{
-					public int compare(FlowcellData o2, FlowcellData o1)
-					{
-						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-					}
-				});
-		return flowcellsIncomplete;
-	}
-	
-	public FlowcellData getQCforFlowcellFiles(String serial) throws IllegalArgumentException
-	{
-		FlowcellData flowcell = new FlowcellData();
-		try
-		{
-			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/report.pl", serial,"qc"};
-			Process execQc = Runtime.getRuntime().exec(qcCommand);
-			InputStream inputStream = execQc.getInputStream();
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(inputStream);
-		
-			NodeList qcReportListNodes = document.getElementsByTagName("qcreport");
-			for(int i = 0; i < qcReportListNodes.getLength(); i++)
-			{				
-				LinkedHashMap<Integer,LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
-				Node qcReportNode = qcReportListNodes.item(i);
-				String location = qcReportNode.getAttributes().getNamedItem("path").getNodeValue();
-				NodeList qcLaneListNodes = qcReportNode.getChildNodes();
-				for(int j = 0; j < qcLaneListNodes.getLength(); j++)
-				{
-					Node qcEntry = qcLaneListNodes.item(j);
-					NodeList qcLanePropertyListNodes = qcEntry.getChildNodes();
-					LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
-					for(int k = 0; k < qcLanePropertyListNodes.getLength(); k++)
-					{
-						Node qcProperty = qcLanePropertyListNodes.item(k);
-						qcProperties.put(qcProperty.getNodeName(), qcProperty.getFirstChild().getNodeValue());
-						System.out.println(qcProperty.getNodeName() + " " + qcProperty.getFirstChild().getNodeValue());
-					}				
-					qcReport.put(Integer.parseInt(qcProperties.get("laneNum")), qcProperties);					
-				}
-				flowcell.laneQC.put(location, qcReport);				
-				
-			}
-			inputStream.close();			
-		}
-		catch (Exception e)
-		{
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-		}
-		return flowcell;
-	}
-	
-	public FlowcellData getQCforFlowcell(String serial) throws IllegalArgumentException
-	{
-		FlowcellData flowcell = new FlowcellData();
-		java.sql.Connection myConnection = null;
-		try
-		{
-			Context initContext = new InitialContext();
-			Context envContext = (Context)initContext.lookup("java:/comp/env");
-			DataSource ds = (DataSource)envContext.lookup("jdbc/sequencing");
-			
-			if(envContext == null)
-				throw new Exception("Error: NO Context");
-			
-			if(ds == null)
-				throw new Exception("Error: No DataSource");
-			
-			if(ds != null)
-				myConnection = ds.getConnection();
-			
-			if(myConnection != null)
-			{
-				//create statement handle for executing queries
-				Statement stat = myConnection.createStatement();
-				//get the distinct analysis_id's for the given flowcell
-				String selectQuery ="select distinct(analysis_id) from sequencing.view_run_metric where flowcell_serial = '"+serial + "' and Date_Sequenced !='NULL' and analysis_id not REGEXP '^\\/storage.+(analysis)' order by analysis_id";
-				ResultSet results = stat.executeQuery(selectQuery);
-			
-				//Iterate over the result set
-				if(results.next())
-				{
-					do	
-					{
-						String analysis_id = results.getString("analysis_id");
-						//System.out.println("analysis_id is " + analysis_id);
-						Statement st1 = myConnection.createStatement();
-						//for each analysis_id get the QC information from the database
-						String innSelect = "select  * from sequencing.view_run_metric where analysis_id ='" +  analysis_id + "'and Date_Sequenced !='NULL' group by lane";
-						ResultSet rs = st1.executeQuery(innSelect);
-						ResultSetMetaData rsMetaData = rs.getMetaData();
-				
-						LinkedHashMap<Integer,LinkedHashMap<String,String>> qcReport = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
-						while(rs.next())
-						{
-							LinkedHashMap<String,String> qcProperties = new LinkedHashMap<String,String>();
-							qcProperties.put("lane", rs.getString("lane"));
-							qcProperties.put("geneusID_sample", rs.getString("geneusID_sample"));
-							for(int i = 5; i<=rsMetaData.getColumnCount();i++)
-							{
-								if(rsMetaData.getColumnTypeName(i).equals("VARCHAR"))
-								{
-									if(rs.getString(i) == null || rs.getString(i).equals(""))
-										qcProperties.put(rsMetaData.getColumnName(i),"NA");
-									else
-										qcProperties.put(rsMetaData.getColumnName(i), rs.getString(i));
-								}
-								else
-								{
-									if(rs.getString(i) == null || rs.getString(i).equals(""))
-										qcProperties.put(rsMetaData.getColumnName(i),"0");
-									else
-										qcProperties.put(rsMetaData.getColumnName(i),NoFormat(rs.getString(i)));
-								}
-							}
-							qcReport.put(rs.getInt("lane"), qcProperties);
-						}
-						rs.close();
-						st1.close();
-						//add the qcReport LinkedHashmap to the flowcell laneQC	
-						flowcell.laneQC.put(analysis_id, qcReport);
-					}while(results.next());
-					results.close();
-					stat.close();
-				}
-				else
-				{
-					System.out.println("In the else clause for QC");
-					flowcell = getQCforFlowcellFiles(serial);
-				}
-			}
-			else
-			{
-				System.out.println("In the else clause for QC");
-				flowcell = getQCforFlowcellFiles(serial);
-			}
-	  }catch( Exception E ){ 
-		 System.out.println( E.getMessage());	
-	  	}			
-	  	finally
-	  	{
-	  		try
-	  		{
-			myConnection.close();
-	  		}
-	  		catch (SQLException e) 
-	  		{
-	  			e.printStackTrace();
-	  		}
-	  	}
-	    return flowcell;
-   }
-	
-	
-	public FlowcellData getFilesforFlowcellOld(String serial) throws IllegalArgumentException
-	{
-		FlowcellData flowcell = new FlowcellData();
-		try
-		{
-			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/report.pl", serial};
-			Process execQc = Runtime.getRuntime().exec(qcCommand);
-			InputStream inputStream = execQc.getInputStream();
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db;
-			
-			db = dbf.newDocumentBuilder();
-			//URL url = new URL("http://www.epigenome.usc.edu/gareports/report.php?flowcell=" + serial + "&xmlfiles");
-			//InputStream inputStream = url.openStream();
-			Document document = db.parse(inputStream);
-			NodeList qcFileList = document.getElementsByTagName("file");
-			for(int i = 0; i < qcFileList.getLength(); i++)
-			{
-				Node qcFile = qcFileList.item(i);
-				LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();				
-				for(int j = 0; j < qcFile.getAttributes().getLength(); j++)
-				{
-					qcFileProperties.put(qcFile.getAttributes().item(j).getNodeName(), qcFile.getAttributes().item(j).getNodeValue());
-				}
-				Pattern laneNumPattern = Pattern.compile("s_(\\d+)[\\._]+");
-				Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
-				qcFileProperties.put("encfullpath",  encryptURLEncoded(qcFileProperties.get("fullpath")));
-				if(laneNumMatcher.find())
-					qcFileProperties.put("lane", laneNumMatcher.group(1));
-				else
-					qcFileProperties.put("lane", "0");
-				flowcell.fileList.add(qcFileProperties);
-			}
-			inputStream.close();			
-		}
-		catch (Exception e)
-		{
-						e.printStackTrace();
-		}
-		return flowcell;
-	}
-	
-	
-	public FlowcellData getFilesforFlowcell(String serial) throws IllegalArgumentException
-	{
-		FlowcellData flowcell = new FlowcellData();
-		java.sql.Connection myConnection = null;
-		try
-		{
-			Context initContext = new InitialContext();
-			Context envContext = (Context)initContext.lookup("java:/comp/env");
-			DataSource ds = (DataSource)envContext.lookup("jdbc/sequencing");
-			
-			if(envContext == null)
-				throw new Exception("Error:NO Context");
-			
-			if(ds == null)
-				throw new Exception("Error: No DataSource");
-			
-			if(ds != null)
-				myConnection = ds.getConnection();
-			
-			if(myConnection != null)
-			{
-				//create statement handle for executing queries
-				Statement stat = myConnection.createStatement();
-				//get the distinct analysis_id's for the given flowcell
-				String selectQuery ="select file_fullpath from sequencing.flowcell_file where flowcell_serial = '"+serial + "'";
-				ResultSet results = stat.executeQuery(selectQuery);
-			
-				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|runs|gastorage[1|2])/");
-				Matcher matcher;
-				Pattern laneNumPattern = Pattern.compile("(s|"+serial+")_(\\d+)[\\._]+");
-				Matcher laneNumMatcher;
-				//Iterate over the result set
-				if(results.next())
-				{
-					do	
-						{
-							String fullPath = results.getString("file_fullpath");
-							LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();	
-							matcher = pattern.matcher(fullPath);
-						
-							if(matcher.find())
-							{
-								qcFileProperties.put("base", getFileName(fullPath));
-								qcFileProperties.put("fullpath", fullPath);
-								qcFileProperties.put("type", "unknown");
-								qcFileProperties.put("label", fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
-								qcFileProperties.put("encfullpath", encryptURLEncoded(fullPath));
-							
-								laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
-								if(laneNumMatcher.find())
-										qcFileProperties.put("lane", laneNumMatcher.group(2));
-								else
-										qcFileProperties.put("lane", "0");
-							
-								flowcell.fileList.add(qcFileProperties);
-							}
-						
-						}while(results.next());
-						results.close();
-						stat.close();
-				}
-				else
-				{
-					System.out.println("In the else clause for files");
-					flowcell = getFilesforFlowcellOld(serial);
-				}
-			}
-			else
-			{
-				System.out.println("In the else clause for files");
-				flowcell = getFilesforFlowcellOld(serial);
-			}
-	 }catch (Exception e) {
-				e.printStackTrace();
-		}
-	 finally{
-		 try {
-			myConnection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	 }
-		return flowcell;
- }
-	
-	public String getFileName(String fullPath)
-	{
-		int sep = fullPath.lastIndexOf('/');
-		return fullPath.substring(sep+1,fullPath.length());
-	}
-	
-	
-	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
-	{
-		if(!(filePath.contains("Count") && filePath.endsWith(".csv") || filePath.endsWith("Metrics.txt")))
-			return "security failed, blocked by ECCP access controls";
-		
-		byte[] buffer = new byte[(int) new File(filePath).length()];
-	    BufferedInputStream f = null;
-	    try {
-	        try { f = new BufferedInputStream(new FileInputStream(filePath));} 
-	        catch (FileNotFoundException e) {e.printStackTrace(); }
-	        try { f.read(buffer);} 
-	        catch (IOException e) { e.printStackTrace();}
-	    } 
-	    finally  {
-	        if (f != null) 
-	        	try { f.close(); } 
-	        	catch (IOException ignored) { }
-	    }
-	    return new String(buffer);
-	}
-	
-	public ArrayList<FlowcellData> getFlowcellsComplete() throws IllegalArgumentException
-	{
-		ArrayList<FlowcellData> flowcellsAll = getFlowcellsAll();
-		ArrayList<FlowcellData> flowcellsComplete = new ArrayList<FlowcellData>();
-		for(FlowcellData f : flowcellsAll)
-		{
-			if(!(f.getFlowcellProperty("status").contains("incomplete")))
-				flowcellsComplete.add(f);
-		}
-		Collections.sort(flowcellsComplete, new Comparator<FlowcellData>()
-				{
-					public int compare(FlowcellData o2, FlowcellData o1)
-					{
-						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-					}
-				});
-		return flowcellsComplete;
-	}
-	
-	
-	
-	@SuppressWarnings("deprecation")
-	public ArrayList<FlowcellData> getAnalysisFromFS() throws IllegalArgumentException
-	{
-		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/ga/analysis")};
-		ArrayList<FlowcellData> flowcells = new ArrayList<FlowcellData>();
-		
-		for(File dir : dirs)
-		{
-			System.out.println(dir.getPath());
-			for (File run : dir.listFiles())
-			{
-				System.out.println(run.getPath());
-				FlowcellData flowcell = new FlowcellData();
-				try
-				{
-					if(run.isDirectory())
-					{
-			 			flowcell.flowcellProperties.put("serial", run.getName());
-						Date d = new Date(run.lastModified());
-						flowcell.flowcellProperties.put("date", (1900 + d.getYear())  + "-" + String.format("%02d",d.getMonth() + 1) + "-" + String.format("%02d",d.getDate()));
-			 			flowcell.flowcellProperties.put("limsID", "N/A (" + run.getName() + ")");
-						flowcells.add(flowcell);
-					}
-				}
-				catch (Exception e)
-				{
-					System.out.println(e.getMessage());					
-				}
-			}
-			
-		}
-		Collections.sort(flowcells, new Comparator<FlowcellData>()
-				{
-					public int compare(FlowcellData o2, FlowcellData o1)
-					{
-						return o1.getFlowcellProperty("date").compareTo(o2.getFlowcellProperty("date"));
-					}
-				});
-		return flowcells;
-	}
-	
-	public ArrayList<FlowcellData> getFlowcellsByKeyword(String flowcellQuery, String laneQuery)
-	{
-		ArrayList<FlowcellData> flowcells = getFlowcellsAll();
-		ArrayList<FlowcellData> matchedFlowcells = new ArrayList<FlowcellData>();
-		
-		for(FlowcellData flowcell : flowcells)
-		{
-			if(flowcell.flowcellContains(flowcellQuery))
-			{
-				if(flowcell.filterLanesThatContain(laneQuery))
-				{
-					matchedFlowcells.add(flowcell);
-				}
-			}
-		}
-		
-		return matchedFlowcells;
-	}
-	
-	public ArrayList<String> decryptKeyword(String fcellData, String laneData)
-	{
-		ArrayList<String> decryptedContents = new ArrayList<String>();
-		String fcellAfterDecrypt = null;
-		String laneAfterDecrypt = null;
-		try
-		{
-			//Decode the text using cipher
-			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
-			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-			desCipher.init(Cipher.DECRYPT_MODE,keySpec,desCipher.getParameters());
-			
-			byte[] laneEncodedBytes = new BASE64Decoder().decodeBuffer(laneData);
-			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(fcellData);
-			byte[] laneBytes = desCipher.doFinal(laneEncodedBytes);
-			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
-			laneAfterDecrypt = new String(laneBytes);
-			fcellAfterDecrypt = new String(fcellBytes);
-			String tempLane = laneAfterDecrypt.substring(0, laneAfterDecrypt.length()-32);
-			String tempFcell = fcellAfterDecrypt.substring(0,fcellAfterDecrypt.length()-32);
-			
-			if(md5(tempLane).equals(laneAfterDecrypt.substring(laneAfterDecrypt.length()-32, laneAfterDecrypt.length())) && 
-					md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length()-32, fcellAfterDecrypt.length())))
-			{
-				decryptedContents.add(tempFcell);
-				decryptedContents.add(tempLane);
-				return decryptedContents;
-			}
-			
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		decryptedContents.add(fcellData);
-		decryptedContents.add(laneData);
-		return decryptedContents;
-	}
-	
-	/* METHODS FOR Methylation data retrieval
-	 * (non-Javadoc)
-	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
-	 */
-	
-	
-	public ArrayList<MethylationData> getMethFromGeneus() throws IllegalArgumentException
-	{
-		ArrayList<MethylationData> flowcells = new ArrayList<MethylationData>();
-		try
-		{
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			String[] qcCommand = {"/opt/tomcat6/webapps/ECCP/helperscripts/beadchip.pl"};
-			Process execQc = Runtime.getRuntime().exec(qcCommand);
-			InputStream inputStream = execQc.getInputStream();
-			
-			Document document = db.parse(inputStream);
-			NodeList flowcellNodeList = document.getElementsByTagName("flowcell");
-			for(int i = 0; i < flowcellNodeList.getLength(); i++)
-			{
-				Node flowcellNode = flowcellNodeList.item(i);
-				MethylationData flowcell = new MethylationData();
-				for(int j = 0; j < flowcellNode.getAttributes().getLength(); j++)
-				{
-					flowcell.flowcellProperties.put(flowcellNode.getAttributes().item(j).getNodeName(), flowcellNode.getAttributes().item(j).getNodeValue());
-				}
-				flowcell.flowcellProperties.put("status", "in geneus");
-				
-				NodeList sampleNodeList =flowcellNode.getChildNodes();
-				for(int j = 0; j < sampleNodeList.getLength(); j++)
-				{
-					Node sampleNode = sampleNodeList.item(j);
-					HashMap<String,String> sampleData = new HashMap<String,String>();
-					for(int k = 0; k < sampleNode.getAttributes().getLength(); k++)
-					{
-						sampleData.put(sampleNode.getAttributes().item(k).getNodeName(), sampleNode.getAttributes().item(k).getNodeValue());
-					}
-					flowcell.lane.put((int) sampleNode.getAttributes().getNamedItem("lane").getNodeValue().charAt(0), sampleData);					
-				}
-				
-				flowcells.add(flowcell);
-			}
-			inputStream.close();			
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Collections.sort(flowcells, new Comparator<FlowcellData>()
-		{
-			public int compare(FlowcellData o2, FlowcellData o1)
-			{
-				return o1.getFlowcellProperty("serial").compareTo(o2.getFlowcellProperty("serial"));
-			}
-		});
-		return flowcells;
-		
-	}
-	
-	public MethylationData getFilesForMeth(final String serial) throws IllegalArgumentException
-	{
-		File[] dirs = {new File("/storage/hpcc/uec-02/shared/production/methylation/meth27k"),new File("/storage/hpcc/uec-02/shared/production/methylation/meth450k")};
-		ArrayList<LinkedHashMap<String, String>> fileList = new ArrayList<LinkedHashMap<String, String>>() ;
-		MethylationData flowcell = new MethylationData();
-		FilenameFilter filter = new FilenameFilter()
-		{
-			public boolean accept(File dir, String name)
-			{
-				return (name.contains(serial) && !name.contains(".")); 
-			}
-		};
-		
-		for(File topDir : dirs)
-			for(File IntermediateDir : topDir.listFiles())
-				for(File dataDir : IntermediateDir.listFiles(filter))
-				{
-					
-					try
-					{
-						if(dataDir.isDirectory())
-						{
-							for(File dataFile : dataDir.listFiles())
-							{
-								LinkedHashMap<String,String> qcFileProperties = new LinkedHashMap<String,String>();
-								qcFileProperties.put("base", dataFile.getName());
-								qcFileProperties.put("fullpath", dataFile.getAbsolutePath());
-								qcFileProperties.put("encfullpath",  encryptURLEncoded(dataFile.getAbsolutePath()));
-								qcFileProperties.put("dir", "/" + topDir.getName() + "/" + IntermediateDir.getName() + "/" + dataDir.getName());
-								qcFileProperties.put("label", IntermediateDir.getName() + "/" + dataDir.getName());
-								qcFileProperties.put("type", "unknown");
-								Pattern laneNumPattern = Pattern.compile("_(\\d+)[\\._]+");
-								Matcher laneNumMatcher = laneNumPattern.matcher(qcFileProperties.get("base"));
-								if(laneNumMatcher.find())
-									qcFileProperties.put("lane", laneNumMatcher.group(1));
-								else
-									qcFileProperties.put("lane", "0");
-								fileList.add(qcFileProperties);
-							}
-						}
-					}
-					catch (Exception e)
-					{
-						System.out.println(e.getMessage());					
-					}
-					
-				}
-		flowcell.fileList = fileList;
-		return flowcell;
-	}
-	
-	public MethylationData getQCforMeth(String serial) throws IllegalArgumentException
-	{
-		MethylationData flowcell = new MethylationData();
-		try
-		{
-			for (HashMap<String,String> file : getFilesForMeth(serial).fileList)
-			{
-				if(file.get("base").contentEquals("Metrics.txt"))
-				{
-					//LinkedHashMap<String,LinkedHashMap<Integer,LinkedHashMap<String,String>>> laneQC;
-					LinkedHashMap<Integer,LinkedHashMap<String,String>> row = new LinkedHashMap<Integer,LinkedHashMap<String,String>>();
-					String contentsRaw = getCSVFromDisk(file.get("fullpath"));
-					String[] contentLines = contentsRaw.split("\\n");
-					String[] headers = contentLines[0].split("\\t");
-					for(int i = 1; i < contentLines.length; i++)
-					{
-						String[] rowRaw = contentLines[i].split("\\t");
-						LinkedHashMap<String,String> entry = new LinkedHashMap<String,String>();
-						for(int j = 0; j < rowRaw.length; j++)
-						{
-							entry.put(headers[j], rowRaw[j]);
-						}
-						row.put(i, entry);						
-					}
-					flowcell.laneQC.put(file.get("fullpath"), row);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-		}
-		return flowcell;
-	}
-	
-	/* System Administration Methods
-	 * (non-Javadoc)
-	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache()
-	 */
-	
-	public String clearCache(String cachefile)
-	{
-		String[] cachefiles = {"/tmp/genFileCache", "/tmp/genURLcache"};
-		for(String f : cachefiles)
-			if(cachefile.contentEquals(f))
-				new File(f).delete();
-		
-		return "cache cleared";
-	}
-	
-	public String[] qstat(String queue) throws IllegalArgumentException
-	{
-		ArrayList<String> arr = new ArrayList<String>();
-		arr.add("Job ID^Job Name^User^State^Submit Time^queue");
-		try
-		{
-			String line;
-			Process p = Runtime.getRuntime().exec("/usr/bin/zstatremote");
-			
-			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = input.readLine()) != null)
-			{
-				if(line.contains("^"+ queue +"^"))
-					arr.add(line);
-				else if(queue.contains("all"))
-					arr.add(line);
-			}
-			input.close();
-		} catch (Exception err)
-		{
-			err.printStackTrace();
-		}		
-		return (String[])arr.toArray(new String[arr.size()]);
-	}
-
-	private String encryptString(String srcText)
-	{		
-		try
-		{
-			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
-			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-			desCipher.init(Cipher.ENCRYPT_MODE,keySpec);
-			byte[] byteDataToEncrypt = srcText.getBytes();
-			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt); 
-			String strCipherText = new BASE64Encoder().encode(byteCipherText);
-			return strCipherText;
-		}		
-		catch (Exception e)
-		{			
-			e.printStackTrace();
-		}
-		return srcText;
-	}
-	
-	public ArrayList<String> getEncryptedData(String globalText, String laneText)
-	{
-		try
-		{
-			ArrayList<String> retCipher = new ArrayList<String>();
-			String mdGlobal = md5(globalText);
-			String mdLane = md5(laneText);
-			String tempGlobal = globalText.concat(mdGlobal);
-			String tempLane = laneText.concat(mdLane);
-			retCipher.add(encryptURLEncoded(tempGlobal));
-			retCipher.add(encryptURLEncoded(tempLane));
-			return retCipher;
-		}		
-		catch (Exception e)
-		{			
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public String encryptURLEncoded(String srcText) throws IllegalArgumentException
-	{
-		return java.net.URLEncoder.encode(encryptString(srcText));
-	}
 	
 	private static String md5(String text)
 	{
@@ -1048,43 +60,916 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		try
 		{
 			md = MessageDigest.getInstance("MD5");
-			
-	        md.update(text.getBytes());
-	 
-	        byte byteData[] = md.digest();
-	 
-	        //convert the byte to hex format method 1
-	        StringBuffer sb = new StringBuffer();
-	        for (int i = 0; i < byteData.length; i++) 
-	        	sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-	        return sb.toString();
-		} 
-		catch (NoSuchAlgorithmException e)
+			md.update(text.getBytes());
+			byte byteData[] = md.digest();
+
+			// convert the byte to hex format method
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < byteData.length; i++)
+				sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return text;		
+		return text;
 	}
+
+	/*********************************************************************
+	 * Functions to clear contents of Cache ("OLD" stack panel view)
+	 ********************************************************************* 
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.usc.epigenome.eccp.client.ECService#clearCache(java.lang.String)
+	 * function to clear the contents of cache in the /tmp directory
+	 */
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.usc.epigenome.eccp.client.ECService#decryptKeyword(java.lang.String,
+	 * java.lang.String) Method to decrypt the string parameters passed to the
+	 * function.
+	 */
+	public String decryptTextMD5(String encWord)
+	{
+		String fcellAfterDecrypt = null;
+		try
+		{
+			
+			// Decode the text using cipher
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.DECRYPT_MODE, keySpec, desCipher.getParameters());
+
+			// Get the byte array using the BASE64Decoder
+			byte[] fcellEncodedBytes = new BASE64Decoder().decodeBuffer(encWord);
+			byte[] fcellBytes = desCipher.doFinal(fcellEncodedBytes);
+			// Get string of the decoded byte arrays
+			fcellAfterDecrypt = new String(fcellBytes);
+			String tempFcell = fcellAfterDecrypt.substring(0, fcellAfterDecrypt.length() - 32);
+			logWriter("Word AfterDecrypt is " + fcellAfterDecrypt + "  Trimmed  tempFcell is " + tempFcell);
+
+			// Check the decrypted value with the md5 value
+			if (md5(tempFcell).equals(fcellAfterDecrypt.substring(fcellAfterDecrypt.length() - 32, fcellAfterDecrypt.length())))
+			{
+				logWriter("post md5   tempFcell is " + tempFcell);
+				return tempFcell;
+			}
+
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		// Else add the original string into the decryptedContents array
+		
+		return "NOTHINGBUTGARBAGE";
+	}
+
 	
-	NumberFormat formatter = NumberFormat.getInstance();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.usc.epigenome.eccp.client.ECService#encryptURLEncoded(java.lang.String
+	 * ) URLEncode the md5 and AES encrypted string
+	 */
+	@SuppressWarnings("deprecation")
+	public String encryptURLEncoded(String srcText) throws IllegalArgumentException
+	{
+		return java.net.URLEncoder.encode(encryptString(srcText));
+	}
+
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.usc.epigenome.eccp.client.ECService#getCSVFromDisk(java.lang.String)
+	 * Function to read data points from the given file to display plots
+	 */
+	public String getCSVFromDisk(String filePath) throws IllegalArgumentException
+	{
+		if (!(filePath.contains("Count") && filePath.endsWith(".csv") || filePath.endsWith("Metrics.txt")))
+			return "security failed, blocked by ECCP access controls";
+
+		byte[] buffer = new byte[(int) new File(filePath).length()];
+		BufferedInputStream f = null;
+		try
+		{
+			try
+			{
+				f = new BufferedInputStream(new FileInputStream(filePath));
+			} catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			try
+			{
+				f.read(buffer);
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		} finally
+		{
+			if (f != null)
+				try
+				{
+					f.close();
+				} catch (IOException ignored)
+				{
+				}
+		}
+		return new String(buffer);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.usc.epigenome.eccp.client.ECService#getEncryptedData(java.lang.String
+	 * , java.lang.String) remote method to md5 and then encrypt and url encode
+	 * the input. returns an ArrayList of the encrypted data.
+	 */
+	public ArrayList<String> getEncryptedData(String globalText) throws IllegalArgumentException
+	{
+		try
+		{
+			ArrayList<String> retCipher = new ArrayList<String>();
+			String mdGlobal = md5(globalText);
+			// String mdLane = md5(laneText);
+			String tempGlobal = globalText.concat(mdGlobal);
+			// String tempLane = laneText.concat(mdLane);
+			retCipher.add(encryptURLEncoded(tempGlobal));
+			// retCipher.add(encryptURLEncoded(tempLane));
+			return retCipher;
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/*
+	 * Function to get the name of file from the given full file path
+	 */
+	public String getFileName(String fullPath)
+	{
+		int sep = fullPath.lastIndexOf('/');
+		return fullPath.substring(sep + 1, fullPath.length());
+	}
+
+	/*********************************************************************
+	 * Utility Functions
+	 ********************************************************************* 
+	 */
+
+	/*
+	 * Get file path without the filename
+	 */
+	public String getFilePath(String fullPath)
+	{
+		int sep = fullPath.lastIndexOf('/');
+		return fullPath.substring(0, sep);
+	}
+
+	/*
+	 * Get files for the flowcell specific view Takes the flowcell as the input
+	 * parameter and returns the files for the particular flowcell
+	 */
+
+	// Returns details from the QC table.
+	public HashMap<String, HashMap<String, String>> getQCTypes()
+	{
+		java.sql.Connection myConnection = null;
+		HashMap<String, HashMap<String, String>> metrics = new HashMap<String, HashMap<String, String>>();
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+    		
+    		
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			// create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			// get the distinct analysis_id's for the given flowcell,
+			// sample_name and lane number
+			String selectQuery = "Select \n" + "	m.metric as metric, \n" + "	m.isNumeric as isNumeric, \n" + "	m.sort_order as sort_order,\n"
+					+ "	IF(ISNULL(m.description),\"No Description\",m.description) as description,\n"
+					+ "	IF(ISNULL(m.pretty_name),m.metric,m.pretty_name) as pretty_name,\n" + "	m.usage_enum as usage_enum,\n"
+					+ "	IF(ISNULL(c.name),\"Unknown\",c.name) as category,  \n" + "	IF(ISNULL(f.parser),\"Unknown\",f.parser) as parser, "
+					+ " m.qc_formula as qc_formula " 
+					+ " from metric m left join category c on m.id_category = c.id left join file_type f on f.id = id_file_type\n" + " order by metric ";
+			ResultSet results = stat.executeQuery(selectQuery);
+
+			while (results.next())
+			{
+				HashMap<String, String> value = new HashMap<String, String>();
+				for (int i = 1; i <= results.getMetaData().getColumnCount(); i++)
+				{
+					value.put(results.getMetaData().getColumnName(i), results.getString(i));
+
+					// System.out.println("Found isNumeric column in metrics table ");
+				}
+
+				metrics.put(results.getString("metric"), value);
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return metrics;
+	}
+
+	/*********************************************************************
+	 * Extra Functions
+	 ********************************************************************* 
+	 */
+
 	public String NoFormat(String temp)
 	{
+		NumberFormat formatter = NumberFormat.getInstance();
 		String result = null;
 		double no = Double.valueOf(temp);
-		if(no == 0)
+		if (no == 0)
 			result = temp;
-		else if(no > 100000)
-			result = formatter.format(no/1000000) + "M";
-		else if(no < 1.0)
+		else if (no > 100000)
+			result = formatter.format(no / 1000000) + "M";
+		else if (no < 1.0)
 		{
-			result = formatter.format(no*100) +"%";
-		}
-		else
+			result = formatter.format(no * 100) + "%";
+		} else
 			result = temp;
-		
+
 		return result;
 	}
+
+	/*
+	 * Method to AES encrypt the given string. return the cipher text after AES
+	 * encryption.
+	 */
+	private String encryptString(String srcText)
+	{
+		try
+		{
+			SecretKeySpec keySpec = new SecretKeySpec("ep1G3n0meh@xXing".getBytes(), "AES");
+			Cipher desCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			desCipher.init(Cipher.ENCRYPT_MODE, keySpec);
+			byte[] byteDataToEncrypt = srcText.getBytes();
+			byte[] byteCipherText = desCipher.doFinal(byteDataToEncrypt);
+			String strCipherText = new BASE64Encoder().encode(byteCipherText);
+			return strCipherText;
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return srcText;
+	}
+
+	@Override
+	public ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams)
+	{
 	
+       // System.out.println(getTimestamp());
+		ArrayList<LibraryData> data = new ArrayList<LibraryData>();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			
+			//build the where clause using the LibraryDataQuery specification
+			String where = "WHERE ";
+			if (queryParams.getDBid() != null)
+				where += " id_run_sample = " + queryParams.getDBid() + " AND ";
+			if (queryParams.getFlowcell() != null)
+				where += " flowcell_serial LIKE '%" + queryParams.getFlowcell() + "%' AND ";
+
+			//filter based upon user ldap group!
+			HttpServletRequest request = this.getThreadLocalRequest();
+			if (request != null && request.getUserPrincipal() != null)
+			{
+				// debug for user role checking
+				if (request.isUserInRole("ECCPWebAdmin"))
+					logWriter("ECCPWebAdmin group");
+				if (request.isUserInRole("solexaWebData"))
+					logWriter("solexaWebData group");
+				
+				//logWriter("Query:" + request.getQueryString());
+				logWriter("URI:" + request.getRequestURL() + "  REF:" + request.getHeader("referer") );
+				//logWriter("map size:" + request.getParameterMap().size());
+				//logWriter("ref:" + request.getHeader("referer"));
+				
+				URL url = new URL(request.getHeader("referer"));
+				MultiMap<String> params = new MultiMap<String>();
+				if(url.getQuery() != null)
+					UrlEncoded.decodeTo(url.getQuery(), params, "UTF-8");
+				if(request.isUserInRole("ECCPWebAdmin") && params.containsKey("superquery"))
+					where += decryptTextMD5(params.getString("superquery")) + " AND ";
+				else if (!request.isUserInRole("ECCPWebAdmin") || params.containsKey("t") || params.containsKey("q"))
+				{
+					String contents = "";
+					if(params.containsKey("t"))
+						contents += decryptTextMD5(params.getString("t"));
+					if(params.containsKey("q"))
+						contents += "  " + decryptTextMD5(params.getString("q"));
+					if(contents.length() < 3)
+						contents = "NOTHINGBUTGARBAGE";
+					logWriter("URL PARAM DEC: " + contents);
+					where += "MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
+				}
+			}
+			
+			where += "0=0";
+
+			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted " : " * ";				
+
+			// create statement handle for executing queries
+			Statement stat = myConnection.createStatement();
+			// Get all the distinct sample_names for the given projectName
+			String selectQuery = "select" + columns + "from main_lib_view " + where + " ORDER BY RunParam_RunID DESC";
+			logWriter("SQL Query: " + selectQuery);
+			ResultSet results = stat.executeQuery(selectQuery);
+			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
+			// NumberFormat formatter = new DecimalFormat("##.##");
+			DecimalFormat dbl = new DecimalFormat("0.##E00");
+			DecimalFormat itgr = new DecimalFormat();
+			itgr.setGroupingSize(3);
+			dbl.setGroupingSize(3);
+
+		
+			//Iterate over the results
+			 while(results.next())
+			 {
+				 LibraryData d = new LibraryData();
+				 for(int i = 1 ; i <= results.getMetaData().getColumnCount(); i++)
+				 {	 
+					 LibraryProperty p = new LibraryProperty(); 
+					 //Name
+					 p.setName( results.getMetaData().getColumnName(i));
+					 //Value
+					 String tvalue = results.getString(i);
+					 
+				 if (qcTypes.containsKey(p.getName())) 
+				 {
+					// System.out.println("Metric Name: "+p.getName()+" "+qcTypes.get(p.getName()));
+					 
+					 if (qcTypes.get(p.getName()).get("isNumeric").equals("1")) 
+					 {
+				//		 System.out.println("Numeric metric: "+tname+" "+tvalue);
+						 double dd = Double.valueOf(tvalue);
+						 long n = (long)dd;
+						 if ((dd-n) == 0 ) {
+							 //System.out.println(itgr.format(n));
+							 p.setValue(itgr.format(n));
+							
+						 }
+						 else  {
+							 
+							 if (Math.abs(dd) < 1) {
+        						 p.setValue(dbl.format(dd));
+        						// System.out.println(dbl.format(dd));
+							 }
+							 else  {
+								 p.setValue(itgr.format(dd));							
+							     //System.out.println(itgr.format(dd));
+							 }
+						 }
+					 }
+					 else  {
+						    // p.setValue(tvalue);
+						// System.out.println("tvalue="+tvalue);
+						 if (tvalue !=null)
+						     p.setValue(formatString(tvalue));
+						 else p.setValue(tvalue);
+					 }
+					 
+				 }
+				    
+				 else 	 p.setValue(tvalue);
+				
+				 	 //Category
+				 	if(!queryParams.getIsSummaryOnly())
+				 	{
+					 	 if(qcTypes.containsKey(p.getName()))
+					 	 {
+						 	 p.setCategory(qcTypes.get(p.getName()).get("category"));
+						 	//sort_order
+						 	 p.setSortOrder(qcTypes.get(p.getName()).get("sort_order"));
+						 	//desc
+						 	 p.setDescription(qcTypes.get(p.getName()).get("description"));
+						 	//pretty_name
+						 	 p.setPrettyName(qcTypes.get(p.getName()).get("pretty_name"));
+						 	 //parser
+						 	 p.setSource(qcTypes.get(p.getName()).get("parser"));
+						 	//usage
+						 	 p.setUsage(qcTypes.get(p.getName()).get("usage_enum"));
+						 	 //validation
+						 	p.setValidation(qcTypes.get(p.getName()).get("qc_formula"));
+					 	 }
+					 	 else
+					 	 {
+			 		 		//ZR 140125 if there are always defaults, why not set them in the constructor 
+			 		 		 //category
+			 		 		 p.setCategory("Unknown");
+							 //usage
+						 	 p.setUsage("0");
+							 //pretty_name
+						 	 p.setPrettyName(p.getName());
+			 		 	     //sort_order
+					 	     p.setSortOrder("100000");
+					 	     //desc
+					 	     p.setDescription("No Description");
+					 	     //parser
+					 	     p.setSource("Unknown");
+					 	 }
+				 	}
+				 	d.put(p.getName(), p);				 	  
+				 	  
+				 }
+								 
+				 if(queryParams.getGetFiles())
+					 d.setFiles(getFilesforLibrary(d));
+				 data.add(d);
+			 }
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+				
+		return data;
+	}
+	
+	
+	public String formatString(String s) 
+	{
+		try
+		{
+			String row ="";
+			double dd;
+			DecimalFormat dbl = new DecimalFormat("0.##E00");
+			if (s.matches("(\\s*(-?\\d+\\.\\d+(E[-|+]\\d+)?)\\s*,?)+")) {
+				if (s.matches(".*,.*")) {
+					String [] temp = s.split(",");
+					for (int i=0; i < temp.length; i++) {
+						dd = Double.valueOf( temp[i].replaceAll("\\s", ""));
+						String formatted =  dbl.format(dd);
+						 if (!(i == temp.length-1))
+							    row=row+formatted+",";
+					     else row=row+formatted;	
+						
+					}
+					return row;
+				}
+				else return dbl.format(Double.valueOf(s));
+				
+			}
+		}
+		catch(Exception e)
+		{
+			return s;
+		}
+		return s;
+	}
+	public String humanReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	   // String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+	    String pre = ("KMGTPE").charAt(exp-1)+"";
+	    return String.format("%d %s", (int) (bytes / Math.pow(unit, exp)), pre);
+	}
+	
+	//returns a list of files associated with the given library
+	public ArrayList<FileData> getFilesforLibrary(LibraryData lib) throws IllegalArgumentException
+	{
+		ArrayList<FileData> files = new ArrayList<FileData>();
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			if (myConnection != null)
+			{
+				Statement st1 = myConnection.createStatement();
+			//	String selectFiles = "select f.file_fullpath, f.file_size, file_type.id_category, c.name, IF(ISNULL(file_type.description),\"No Description\",file_type.description) as description from file f left outer join file_type on f.id_file_type = file_type.id left outer join category c on file_type.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();
+				String selectFiles = "select f.file_fullpath, f.file_size, IFNULL(t.id_category,0) as category, c.name, IFNULL(t.description,\"No Description\") as description from file f left outer join file_type t on f.file_fullpath RLIKE t.file_match_regex left outer join category c on t.id_category = c.id where f.id_run_sample =" + lib.get("id_run_sample").getValue();				
+				logWriter("SQL Query: " + selectFiles);
+				ResultSet rs1 = st1.executeQuery(selectFiles);
+
+				Pattern pattern = Pattern.compile(".*/storage.+(flowcells|incoming|analysis|merges|external_analysis)/");
+				Matcher matcher;
+				Pattern laneNumPattern = Pattern.compile("(s|" + lib.get("flowcell_serial").getValue() +")_(\\d+)[\\._]+");
+				Matcher laneNumMatcher;
+
+				while (rs1.next())
+				{
+					String fullPath = rs1.getString("f.file_fullpath");
+					String type = rs1.getString("c.name");
+					String description = rs1.getString("description");
+					String size = rs1.getString("f.file_size");
+					FileData file = new FileData();
+					matcher = pattern.matcher(fullPath);
+
+					if (matcher.find())
+					{
+
+						file.setName(getFileName(fullPath));
+						file.setFullPath(fullPath);						
+						file.setLocation(fullPath.substring(matcher.end(), fullPath.lastIndexOf('/')));
+						file.setDownloadLocation(encryptURLEncoded(fullPath));
+						
+						/* Set types and descriptions for files:
+						   Filter out bam/bai from all matched NC_001416 files and assign to "006. Lambda Control Files"
+						   Assign all the rest of NC_001416 files to "008. Intermediate internal pipeline files" 
+						   and set one description for all NC_001416 files
+						*/
+						String fileName = file.getName();
+						fileName = fileName.replaceAll("(\\r|\\n|\\s)", "");
+						if (fileName.matches(".*NC_001416.*")) {
+							if (fileName.matches(".*NC_001416\\.fa(\\.mdups)?\\.bam(\\.bai)?$")) {
+								 file.setType("006. Lambda Control Files");	
+
+							}
+							   else file.setType("008. Intermediate internal pipeline files");
+							   file.setDescription("Lambda control alignments (QC only)");
+						}
+						else {
+							   if (type == null) file.setType("Unknown");
+						       else file.setType(type);						       
+		                       file.setDescription(description);
+						}
+
+						laneNumMatcher = laneNumPattern.matcher(file.getName());
+						if (laneNumMatcher.find())
+							file.setLane(laneNumMatcher.group(2));
+						else
+							file.setLane("0");
+                        
+                        if (size != null) 
+                             file.setSize(humanReadableByteCount(Long.parseLong(size), true));
+                        else file.setSize("N/A");
+                        boolean fileDuplicate=false;
+                        
+                        for (FileData f: files) {
+                        	if (file.getFullPath().equals(f.getFullPath()))
+                        		fileDuplicate=true;
+                        }
+						if (!fileDuplicate) files.add(file);
+						
+					}
+				}
+				rs1.close();
+				st1.close();
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return files;
+	}
+
+	@Override
+	public String createMergeWorkflow(List<LibraryData> libs)
+	{
+		String ret = "";
+//		for(LibraryData lib : libs)
+//		{
+//			
+//			String libLine = lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n"; 
+//			
+//			ret += "#" + libLine;
+//		}
+//		
+		
+		
+		
+		try
+		{
+			String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
+			Runtime oRuntime = Runtime.getRuntime();
+			Process oProcess = null;
+
+			oProcess = oRuntime.exec(aCmdArgs);
+			//oProcess.waitFor();
+			/* dump output stream */
+			BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
+			OutputStreamWriter os = new OutputStreamWriter(oProcess.getOutputStream());
+			
+			String line = null;
+			
+			
+			for(LibraryData lib : libs)
+			{
+				String libLine = lib.get("sample_name").getValue().replace(" ", "-") + " " + new File(lib.get("analysis_id").getValue()).getParent() + "\n"; 
+				os.write(libLine);
+				ret += "#" + libLine;
+			}
+			os.flush();
+			os.close();
+		
+			while((line = is.readLine()) != null)
+				ret += line + "\n";
+			
+			oProcess.waitFor();
+
+		} catch (Exception e)
+		{
+			ret += "ERROR ENCOUNTERED\n";
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	@Override
+	public String getLibrariesJSON(LibraryDataQuery queryParams)
+	{
+		Gson gson = new Gson();
+		return gson.toJson(getLibraries(queryParams));
+	}
+
+	//get the workflow params or illumina casava params for a flowcell
+	
+	public String getIlluminaParams(String flowcell_serial)
+	{
+		String paramText = "";
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			if (myConnection != null)
+			{
+				
+				String selectQuery ="select flowcell_serial, lane, geneusID_sample, sample_name, barcode, sample_name, ControlLane, processing_formatted, technician from main_lib_view where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(selectQuery);
+				int cols = results.getMetaData().getColumnCount();
+
+				paramText += "FCID" + "," + "Lane" + "," + "SampleID" + "," + "SampleRef" + "," + "Index"  + "," + "Description" + "," + "Control" + "," +"Recipe" + "," + "Operator\n";
+				while(results.next())
+				{
+					for(int i=1;i<=cols;i++)
+					{
+						if(i == 8)
+							paramText +="Unknown";
+						else
+							paramText += results.getString(i);
+						paramText += ",";
+					}
+					paramText += "\n";
+				}
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return paramText;
+	}
+	
+	public String getWorkflowParams(String  flowcell_serial)
+	{
+		String paramText = "";
+		java.sql.Connection myConnection = null;
+		try
+		{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+
+    		Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+
+			if (myConnection != null)
+			{
+				
+				String selectQuery ="select geneusID_sample, lane, sample_name, barcode,  project, processing_formatted, protocol, organism from main_lib_view where flowcell_serial ='"+flowcell_serial + "' group by geneusID_sample, lane order by lane";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(selectQuery);
+			
+								
+				int i=0;
+			
+				paramText += "ClusterSize = 1" + "\n" + "queue = laird" + "\n" + "FlowCellName = " + flowcell_serial + "\n" +  "MinMismatches = 2 " + "\n" + "MaqPileupQ = 30" + "\n" + "referenceLane = 1 " + "\n" + "randomSubset = 300000\n";
+				while(results.next())
+				{
+					paramText += "\n";
+					i++;
+					paramText += "#Sample: " + results.getString("sample_name") + " (" + results.getString("project") + " of " + results.getString("organism") +")\n";
+					paramText += "Sample."+ i + ".SampleID = " + results.getString("geneusID_sample") + "\n";
+					String lane = results.getString("lane");
+					String barcode = results.getString("barcode");
+					paramText += "Sample."+ i + ".Lane = " + lane + "\n";
+					
+					if(results.getString("protocol").contains("Paired"))
+					{
+						if(results.getString("barcode").contains("NO BARCODE"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R2_001.fastq.gz\n";
+						else
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R2_001.fastq.gz\n";
+					}
+					else if(results.getString("protocol").contains("Single"))
+					{
+						if(results.getString("barcode").contains("NO BARCODE"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz\n";
+						else
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz\n";
+					}
+					
+					String workflow = "unaligned";
+					String genome = "/home/uec-00/shared/production/genomes/unaligned/unaligned.fa";
+					
+					if(results.getString("processing_formatted").toLowerCase().contains("chip"))
+						workflow = "chipseq";
+					else if(results.getString("processing_formatted").toLowerCase().contains("bs") || results.getString("processing_formatted").toLowerCase().contains("sulfit"))
+						workflow = "bisulfite";
+					else if(results.getString("processing_formatted").toLowerCase().contains("rna"))
+						workflow = "rnaseqv2";
+					else if(results.getString("processing_formatted").toLowerCase().contains("genom") || results.getString("processing_formatted").toLowerCase().contains("regul"))
+						workflow = "regular";
+					
+					if(results.getString("organism").toLowerCase().contains("mus"))
+						genome = "/home/uec-00/shared/production/genomes/mm10/mm10.fa";
+					else if(results.getString("organism").toLowerCase().contains("phi"))
+						genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+					else if(results.getString("organism").toLowerCase().contains("phi"))
+						genome = "/home/uec-00/shared/production/genomes/phi-X174/phi_plus_SNPs.fa";
+					else if(results.getString("organism").toLowerCase().contains("rabidop"))
+						genome = "/home/uec-00/shared/production/genomes/arabidopsis/tair8.pluscontam.fa";
+					else if(results.getString("organism").toLowerCase().contains("gallus"))
+						genome = "/home/uec-00/shared/production/genomes/chicken/Gallus_gallus.WASHUC2.68.dna.toplevel.fa";
+					//handle human
+					else if(results.getString("organism").toLowerCase().contains("homo") || results.getString("organism").toLowerCase().contains("human"))
+					{
+						if(results.getString("processing_formatted").toLowerCase().contains("rna") || results.getString("processing_formatted").toLowerCase().contains("chip") )
+							genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
+						else
+							genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";
+					}
+					
+					//handle rnaseq genomes
+					if(results.getString("processing_formatted").toLowerCase().contains("rna"))
+						genome = genome.substring(0, genome.length() - 3);
+					
+					paramText += "Sample."+ i + ".Workflow = " + workflow + "\n";
+					paramText += "Sample."+ i + ".Reference = " + genome + "\n";
+				}
+				paramText += "\n";			
+			
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			try
+			{
+				myConnection.close();
+			} catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return paramText;
+	}
+
+	public String getTimestamp() {
+        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("MM/dd/yy H:mm:ss");
+        java.util.Date currentDate= new java.util.Date();
+		return formatter.format(currentDate);
+		
+	}
+	
+	public String logWriter(HttpServletRequest request, String text) 
+	{
+		String userID = "unknown";
+		String site = "unknown";
+		String ip = "unknown";
+		if (request != null && request.getUserPrincipal() != null)
+			userID=request.getUserPrincipal().getName();
+		if (request != null && request.getRequestURI() != null)
+		{
+			if(request.getRequestURI().contains("beta"))
+				site="ecdp-beta";
+			else if(request.getRequestURI().contains("alpha"))
+				site="ecdp-alpha";
+			else if(request.getRequestURI().contains("eccp"))
+				site="ecdp";
+			else if(request.getRequestURI().contains("garepo"))
+				site="gareports";
+		}
+		if(request != null && request.getRemoteAddr() != null)
+			ip =  request.getRemoteAddr();
+		      
+		System.out.println(getTimestamp() + " " +  "User:" + userID +"@" + ip + " Site:" + site + "\t" + text);
+		return null; //return null since gwt asyncs need a return val
+	}
+	
+	public String logWriter(String text) 
+	{
+		this.logWriter(this.getThreadLocalRequest(), text);
+		return null; //return null since gwt asyncs need a return val
+	}
 
 }

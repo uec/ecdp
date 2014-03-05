@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context override="true" allowLinking="true">
+<ResourceLink global="jdbc/sequencing" name="jdbc/sequencing" type="javax.sql.DataSource"/>
+<ResourceLink global="jdbc/sequencing_devel" name="jdbc/sequencing_devel" type="javax.sql.DataSource"/>
+
+<!-- <Resource
+        name="jdbc/sequencing_production"
+        auth="Container" 
+        type="javax.sql.DataSource"
+        username="zack"
+        password="LQSadm80"
+        driverClassName="com.mysql.jdbc.Driver"
+        maxActive="100" maxIdle="30" maxWait="10000" 
+        url="jdbc:mysql://webapp.epigenome.usc.edu:3306/sequencing_production"   -->           
+    />
+</Context>

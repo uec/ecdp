@@ -1,65 +1,23 @@
 package edu.usc.epigenome.eccp.client;
-import edu.usc.epigenome.eccp.client.controlPanel.ControlPanelWidget;
-import edu.usc.epigenome.eccp.client.pane.ECPane;
-import edu.usc.epigenome.eccp.client.pane.PBS.PBSreport;
-import edu.usc.epigenome.eccp.client.pane.analysisReport.AnalysisReport;
-import edu.usc.epigenome.eccp.client.pane.cacheManagement.CacheManager;
-import edu.usc.epigenome.eccp.client.pane.flowcellReport.FlowcellReport;
-import edu.usc.epigenome.eccp.client.pane.methylation.MethylationReport;
-import edu.usc.epigenome.eccp.client.pane.methylation.MethylationSanityCheck;
-import edu.usc.epigenome.eccp.client.pane.systemStatus.StatusSummary;
-
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.DecoratedTabPanel;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.RootPanel;
-
-
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.sencha.gxt.widget.core.client.container.Viewport;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ECControlCenter implements EntryPoint
 {
-	DecoratedTabPanel mainTabPanel = new DecoratedTabPanel();
-	ControlPanelWidget cp = new ControlPanelWidget();
-	HorizontalPanel mainPanel = new HorizontalPanel();
-	
-	public void onModuleLoad()
+	/**
+	 * This is the entry point method.
+	 * Check for the parameters and set the user type(either super or guest user)
+	 * and bind to that particular template
+	 */
+	public void onModuleLoad() 
 	{
-		mainPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_TOP);
-		mainPanel.add(cp);
-		mainPanel.add(mainTabPanel);
-		mainTabPanel.setAnimationEnabled(true);
-				
-		//add flowcell reports
-		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowAll),"Flowcell Reports");
-		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowGeneus),"Flowcell Reports");
-		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowFS),"Flowcell Reports");
-		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowIncomplete),"Flowcell Reports");
-		addToControlPanel(new FlowcellReport(FlowcellReport.ReportType.ShowComplete),"Flowcell Reports");
-		addToControlPanel(new AnalysisReport(AnalysisReport.ReportType.ShowFS),"Flowcell Reports");
-		
-		//Methylation Report
-		addToControlPanel(new MethylationReport(),"Methylation Reports");
-		addToControlPanel(new MethylationSanityCheck(),"Methylation Reports");
-		
-		//add pbs reports
-		addToControlPanel(new PBSreport("all"),"HPCC PBS");
-		addToControlPanel(new PBSreport("laird"),"HPCC PBS");
-		addToControlPanel(new PBSreport("lairdprio"),"HPCC PBS");
-		
-		//add system reports
-		addToControlPanel(new StatusSummary(),"System Status");
-		
-		//cache manager to clear file and geneus cache
-		addToControlPanel(new CacheManager(),"Cache Management");
-		
-		RootPanel.get().add(mainPanel);		
-	}
-	private void addToControlPanel(ECPane p, String header)
-	{		
-		cp.addPane(p, header,mainTabPanel);
+			ECCPBinderWidget sbw = new ECCPBinderWidget();
+			Viewport viewport = new Viewport();
+		    viewport.setWidget(sbw);
+			RootLayoutPanel.get().add(viewport);
 	}
 }

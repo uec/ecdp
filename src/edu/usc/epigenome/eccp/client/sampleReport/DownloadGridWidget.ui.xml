@@ -1,0 +1,27 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+    		 xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	         xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	         xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
+
+	
+	<g:ScrollPanel>
+	<gxt:ContentPanel ui:field="gridPanel" headingText="Download Files">
+					<container:VerticalLayoutContainer ui:field="vlc">
+						<container:child >
+								<gxt:toolbar.ToolBar ui:field="buttons">
+									<g:HorizontalPanel ui:field="buttonsHP">
+										<gxt:button.TextButton ui:field="organizeType" text="Organize by Type" />
+										<gxt:button.TextButton ui:field="organizeLocation" text="Organize by Location" />
+										<gxt:button.TextButton ui:field="downloadSelected" text="Download Selected" /> 
+										<gxt:button.TextButton ui:field="help" text="Help" /> 
+									</g:HorizontalPanel>
+								</gxt:toolbar.ToolBar>
+						</container:child>
+						<container:child >
+							<gxt:container.VerticalLayoutContainer ui:field="content" />
+						</container:child>
+					</container:VerticalLayoutContainer>
+				</gxt:ContentPanel>			
+	</g:ScrollPanel>
+</ui:UiBinder> 
