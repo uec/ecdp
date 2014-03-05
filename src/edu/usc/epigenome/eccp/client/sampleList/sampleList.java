@@ -132,8 +132,10 @@ public class sampleList extends Composite implements HasLayout
 		        	
 		        	String text = filter.getText().toLowerCase();
 		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
-		        	for (LibraryData item : completeData) {
-		        		try {
+		        	for (LibraryData item : completeData) 
+		        	{
+		        		try 
+		        		{
 		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
 		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
 		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
@@ -141,8 +143,8 @@ public class sampleList extends Composite implements HasLayout
 		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text))
 		        				tmp.add(item);
 		        		} 
-		        		catch (NullPointerException e) {
-		        			
+		        		catch (Exception e) 
+		        		{
 		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.toString());
 		        		}
 		        	}
