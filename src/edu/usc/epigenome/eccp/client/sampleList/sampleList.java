@@ -140,7 +140,8 @@ public class sampleList extends Composite implements HasLayout
 		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
 		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
 		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
-		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text))
+		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text) ||
+		        					item.get("processing_formatted").getValue().toLowerCase().contains(text))
 		        				tmp.add(item);
 		        		} 
 		        		catch (Exception e) 
