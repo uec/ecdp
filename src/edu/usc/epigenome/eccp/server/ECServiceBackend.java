@@ -902,10 +902,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					//handle human
 					else if(results.getString("organism").toLowerCase().contains("homo") || results.getString("organism").toLowerCase().contains("human"))
 					{
-						if(results.getString("processing_formatted").toLowerCase().contains("rna") || results.getString("processing_formatted").toLowerCase().contains("chip") )
-							genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
+						if(results.getString("processing_formatted").toLowerCase().contains("bs") || results.getString("processing_formatted").toLowerCase().contains("sulfit"))
+							genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";							
 						else
-							genome = "/home/uec-00/shared/production/genomes/hg19_rCRSchrm/hg19_rCRSchrm.fa";
+							genome = "/home/uec-00/shared/production/genomes/encode_hg19_mf/male.hg19.fa";
 					}
 					
 					//handle rnaseq genomes
