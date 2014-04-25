@@ -118,7 +118,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	{
 		initWidget(uiBinder.createAndBindUi(this));
 		// This if-else hides "Unknown" group and "Internal pipeline files" group from a regular user
-		if(Window.Location.getQueryString().length() > 0 )
+		if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") )
 		      fileData=filterFileData(data);
 		else fileData=data;
 		this.setLayoutData(new VerticalLayoutData(-1,-1));
@@ -165,7 +165,8 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		        return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"retrieve.jsp?resource=" + object + " \">download</a>");
+		    	if (Window.Location.getHref().contains("ecdp-demo") ) return SafeHtmlUtils.fromTrustedString("<a href=\"#donothing\">download</a>");
+		    	else return SafeHtmlUtils.fromTrustedString("<a target=\"new\" href=\"retrieve.jsp?resource=" + object + " \">download</a>");
 		      }
 		}));
 		 cc5 = new ColumnConfig<FileData, String>(properties.size(), 50, "Size");

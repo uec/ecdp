@@ -52,6 +52,7 @@ import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.tips.QuickTip;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import edu.usc.epigenome.eccp.client.ECService;
@@ -117,7 +118,7 @@ public class sampleList extends Composite implements HasLayout
 	    gridPanel.addTool(filter);	   
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
-	    if(Window.Location.getQueryString().length() > 0 ) {
+	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
 	    	  toolbar.remove(share);
 	    	//  toolbar.remove(userManual);
 	    }
@@ -167,7 +168,7 @@ public class sampleList extends Composite implements HasLayout
 			}
 	    	
 	    });
-	    if(Window.Location.getQueryString().contains("GODMODE"))
+	    if(Window.Location.getQueryString().contains("GODMODE") && !Window.Location.getHref().contains("ecdp-demo"))
 	    	godmode();
 	    
 	}
@@ -180,17 +181,31 @@ public class sampleList extends Composite implements HasLayout
 		
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
 		 
-		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Run");
+		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Status");
 		 runCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
 		{
 		      public SafeHtml render(String object) 
 		      {  
-		    	  String ret = new String(object);
+		    	  /*String ret = new String(object);
 		    	  ret = ret.replace("/storage/hpcc/uec-gs1/laird/shared/production/ga/flowcells/", "");
 		    	  String[] vals = ret.split("/");
 		    	  ret = vals.length > 2 ? vals[1] : object;
+		    	  return SafeHtmlUtils.fromString(object.length() > 30 ? ret : object);
+		    	  */
+		    	  String qtip="";
+		    	  String ret = new String(object);
+		    	  ret = ret.replace("/storage/hpcc/uec-gs1/laird/shared/production/ga/flowcells/", "");
+		    	  String[] vals = ret.split("/");
+		    	  if (vals.length > 3) {
+		    		  if (ret.endsWith("csv")) ret = "analysis avail";
+		    		  else ret = vals[1];
+		    	  }
 		    	  
-		    	  return SafeHtmlUtils.fromString(object.length() > 30 ? ret : object);		        
+		    	  else if (ret.contains("pathToAnalysisDir") || ret.endsWith("XX/") ) ret = "reads avail";
+		    		   else if (ret.contains("no downstream analysis")) ret = "in process";
+		    		        else ret = object; 
+		    	  		    	  
+		    	  return SafeHtmlUtils.fromString (ret);		        
 		      }
 		}));
 		 
@@ -233,6 +248,7 @@ public class sampleList extends Composite implements HasLayout
 		 view.groupBy(dateCol);
 		 		 
 		 grid = new Grid<LibraryData>(store, columnModel);
+		 new QuickTip(grid);
 		 grid.setView(view);
 		 
 		 new GridDragSource<LibraryData>(grid);		
