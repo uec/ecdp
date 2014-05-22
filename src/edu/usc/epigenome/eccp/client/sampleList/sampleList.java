@@ -22,18 +22,24 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
+import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
+import com.sencha.gxt.dnd.core.client.DndDropEvent;
+import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
+import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
@@ -81,6 +87,7 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
+	@UiField TextButton analyze;
 	@UiField ToolBar toolbar;
 	TextButton userManual = new TextButton("HELP");
 		
@@ -119,7 +126,8 @@ public class sampleList extends Composite implements HasLayout
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
-	    	  toolbar.remove(share);
+	    	    toolbar.remove(share);
+	    	    toolbar.remove(analyze);
 	    	//  toolbar.remove(userManual);
 	    }
 
@@ -181,34 +189,8 @@ public class sampleList extends Composite implements HasLayout
 		
 		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
 		 
-		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("analysis_id"), 100, "Status");
-		 runCol.setCell(new SimpleSafeHtmlCell<String>(new AbstractSafeHtmlRenderer<String>() 
-		{
-		      public SafeHtml render(String object) 
-		      {  
-		    	  /*String ret = new String(object);
-		    	  ret = ret.replace("/storage/hpcc/uec-gs1/laird/shared/production/ga/flowcells/", "");
-		    	  String[] vals = ret.split("/");
-		    	  ret = vals.length > 2 ? vals[1] : object;
-		    	  return SafeHtmlUtils.fromString(object.length() > 30 ? ret : object);
-		    	  */
-		    	  String qtip="";
-		    	  String ret = new String(object);
-		    	  ret = ret.replace("/storage/hpcc/uec-gs1/laird/shared/production/ga/flowcells/", "");
-		    	  String[] vals = ret.split("/");
-		    	  if (vals.length > 3) {
-		    		  if (ret.endsWith("csv")) ret = "analysis avail";
-		    		  else ret = vals[1];
-		    	  }
-		    	  
-		    	  else if (ret.contains("pathToAnalysisDir") || ret.endsWith("XX/") ) ret = "reads avail";
-		    		   else if (ret.contains("no downstream analysis")) ret = "in process";
-		    		        else ret = object; 
-		    	  		    	  
-		    	  return SafeHtmlUtils.fromString (ret);		        
-		      }
-		}));
-		 
+		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("status"), 100, "Status");
+
 		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
 		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing_formatted"), 30, "LibType");		
 		 libTypeCol.setWidth(80);
@@ -649,6 +631,88 @@ public class sampleList extends Composite implements HasLayout
 			}});
 		 
 	}
+	@UiHandler("analyze")
+	public void launch (SelectEvent e) {
+   	 final Dialog mutect = new Dialog();
+        mutect.setBodyBorder(false);
+        
+        mutect.setHeadingText("MuTect analysis");
+        mutect.setWidth(600);
+        mutect.setHeight(300);
+        mutect.setHideOnButtonClick(true);
+        final TextArea tumtext = new TextArea();
+        tumtext.setEmptyText("Drag-n-drop tumor sample from the left panel");
+
+        BorderLayoutContainer layout = new BorderLayoutContainer();
+        mutect.add(layout);
+        // Layout - west
+        ContentPanel panel = new ContentPanel();
+        panel.setHeadingText("Tumor");
+        BorderLayoutData data = new BorderLayoutData(295);
+        data.setMargins(new Margins(0, 5, 0, 0));
+        panel.setLayoutData(data);
+        panel.add(tumtext);
+        layout.setWestWidget(panel);
+        // Layout - center
+        panel = new ContentPanel();
+        panel.setHeadingText("Normal");
+        final TextArea normtext = new TextArea();
+        normtext.setEmptyText("Drag-n-drop normal sample from the left panel");
+        panel.add(normtext);
+        layout.setCenterWidget(panel);
+
+		 DropTarget tumtarget = new DropTarget(tumtext)
+		 {
+		      @Override
+		      protected void onDragDrop(DndDropEvent event) 
+		      {
+			        super.onDragDrop(event);
+			        @SuppressWarnings("unchecked")
+					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
+			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
+			        {
+			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
+			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
+			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
+			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
+			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
+			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
+			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
+			          tumtext.setText(sampleInfo);
+			        }
+			        
+		      }
+		 
+		 };
+		 tumtarget.setOperation(Operation.COPY);
+		 DropTarget normtarget = new DropTarget(normtext)
+		 {
+		      @Override
+		      protected void onDragDrop(DndDropEvent event) 
+		      {
+			        super.onDragDrop(event);
+			        @SuppressWarnings("unchecked")
+					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
+			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
+			        {
+			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
+			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
+			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
+			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
+			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
+			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
+			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
+			          normtext.setText(sampleInfo);
+			        }
+			        
+		      }
+		 
+		 };
+		 normtarget.setOperation(Operation.COPY);
+		 mutect.show();
+   	
+   }
+	
 	/*@UiHandler("hideMerged")
 	public void onChange(ChangeEvent event) {
 		setVisible(false);

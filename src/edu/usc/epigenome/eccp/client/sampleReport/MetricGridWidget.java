@@ -8,7 +8,7 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -18,6 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
@@ -31,9 +32,14 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.button.ToggleButton;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
+import com.sencha.gxt.widget.core.client.container.Viewport;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -47,6 +53,7 @@ import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
+
 import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
@@ -62,6 +69,7 @@ import edu.usc.epigenome.eccp.client.sampleReport.charts.BarChartWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.MotionChartWidget;
 import edu.usc.epigenome.eccp.client.sampleReport.charts.ScatterChartWidget;
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
+
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 
 public class MetricGridWidget extends Composite implements HasLayout{
@@ -82,8 +90,9 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton mergeLibs;
-	@UiField TextButton viewButton;
-	String usageMode = "user";
+	//@UiField TextButton viewButton;
+	@UiField ToggleButton unused;
+	String usageMode = "admin";
 	List<LibraryData> data;
 	ResizeGroupingView<MultipleLibraryProperty> viewPointer;
 	Grid<MultipleLibraryProperty> gridPointer;
@@ -134,14 +143,16 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		libraries = data;
 		if(libraries.size() < 2)
 			mergeLibs.disable();
-		createMenu();
-	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo"))
+		//createMenu();
+	//    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo"))
+		//unused.disable();
 	//	System.out.println(Window.Location.getHref());
-	    	viewButton.getMenu().getWidget(2).setVisible(false);
+	//    	viewButton.getMenu().getWidget(2).setVisible(false);
+		
 	    makeToolTips();
 		mergeData();
 		filter.bind(store);
-		store.addStoreFilterHandler(new StoreFilterHandler<MultipleLibraryProperty>() {
+		/*store.addStoreFilterHandler(new StoreFilterHandler<MultipleLibraryProperty>() {
 
 			@Override
 			public void onFilter(StoreFilterEvent<MultipleLibraryProperty> event) {
@@ -155,7 +166,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			     
 			}	
 				 logToServer("Search:" +filter.getText());	
-			}});
+			}});*/
 		
 		currentLibraryData=getUsageModeData(); 
 		drawTable();
@@ -539,7 +550,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		    }		
 		}
 	}
-	public void createMenu() {
+	/*public void createMenu() {
 		Menu viewMenu = new Menu();
 		MenuItem item1 = new MenuItem();
 		item1.setText("Summary Metrics");		
@@ -575,8 +586,28 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			     drawTable();
 				 }										 					
 		});
-	}	
-
+	}*/
+	@UiHandler("unused")
+	public void toggle(ValueChangeEvent<Boolean> event)
+	{
+		if (event.getValue() == true) {
+		//	Info.display("Info", "button pressed");
+			 usageMode="other";
+			 setHeadingText("Metrics - Unused Metrics View");
+			 //unused.setText("Normal");
+			 logToServer("UnusedView");
+			 			
+		}
+		else {
+			 usageMode="admin"; 
+			 setHeadingText("Metrics");
+			// unused.setText("Unused");
+			 logToServer("AdvancedView");
+		}
+		 currentLibraryData=getUsageModeData(); 
+		 content.remove(0);
+	     drawTable();
+	}
 	@Override
 	public void forceLayout() {
 		// TODO Auto-generated method stub
@@ -617,7 +648,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 			}
 		 });
     }
-	
+    
 	public static native String evalQC(String arg) /*-{
     eval("var myVar = " + arg + ";");
     return myVar;
