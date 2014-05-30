@@ -353,10 +353,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	@Override
 	public ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams)
 	{
-		
-		HashMap<String, ArrayList<String>> fqmap  = new HashMap<String, ArrayList<String>>();
-		if (!queryParams.getGetFiles() || queryParams.getDBid() == null) fqmap = getFQs();
-		
+	
+       // System.out.println(getTimestamp());
 		ArrayList<LibraryData> data = new ArrayList<LibraryData>();
 		java.sql.Connection myConnection = null;
 		try
@@ -380,7 +378,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			//build the where clause using the LibraryDataQuery specification
 			String where = "WHERE ";
 			if (queryParams.getDBid() != null)
-				where += " id_run_sample = " + queryParams.getDBid() + " AND ";
+				where += " v.id_run_sample = " + queryParams.getDBid() + " AND ";
 			if (queryParams.getFlowcell() != null)
 				where += " flowcell_serial LIKE '%" + queryParams.getFlowcell() + "%' AND ";
 
@@ -420,14 +418,13 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			}
 			
 			where += "0=0";
-            
-			String columns = queryParams.getIsSummaryOnly() ? " id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted " : " * ";				
+
+			String columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail.\")) as status " : " v.* ";				
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
-		
-			String selectQuery = "select" + columns + "from main_lib_view " + where + " ORDER BY RunParam_RunID DESC";
+			String selectQuery = "select" + columns + " from main_lib_view v left join file f on f.id_run_sample = v.id_run_sample and f.id_file_type IN (41,51,33,14,38) " + where + " group by v.id_run_sample ORDER BY RunParam_RunID DESC";
 			logWriter("SQL Query: " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
@@ -530,17 +527,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 								 
 				 if(queryParams.getGetFiles())
 					 d.setFiles(getFilesforLibrary(d));
-				 else {
-					 // create a column "status"
-					 String id = d.get("id_run_sample").getValue();
-					 LibraryProperty pr = new LibraryProperty(); 
-					 pr.setName("status");
-					 if (d.get("analysis_id").getValue().endsWith("csv"))  pr.setValue("analysis_avail");
-					 else if (fqmap.get(id) !=null) pr.setValue("reads_avail");
-					      else  pr.setValue("in process");
-					 d.put(pr.getName(), pr);
-				 }
-				 
 				 data.add(d);
 			 }
 		}
@@ -968,8 +954,6 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				site="ecdp-beta";
 			else if(request.getRequestURI().contains("alpha"))
 				site="ecdp-alpha";
-			else if(request.getRequestURI().contains("demo"))
-				site="ecdp-demo";
 			else if(request.getRequestURI().contains("eccp"))
 				site="ecdp";
 			else if(request.getRequestURI().contains("garepo"))
@@ -987,62 +971,5 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		this.logWriter(this.getThreadLocalRequest(), text);
 		return null; //return null since gwt asyncs need a return val
 	}
-	
-	// create hash map of id_run_sample and fastq's from file table for status column
-	public HashMap<String, ArrayList<String>> getFQs()
-	{
-        System.out.println("Making hash map of library id's and fastq's");
-		HashMap<String, ArrayList<String>> map  = new HashMap<String, ArrayList<String>>();
-		java.sql.Connection myConnection = null;
-		try
-		{
-			//load a properties file with db info
-			Properties prop = new Properties();
-			
-			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
 
-    		Class.forName(prop.getProperty("dbDriver")).newInstance();
-			// get database details from param file
-			String username = prop.getProperty("dbUserName");
-			String password = prop.getProperty("dbPassword");
-
-			// URL to connect to the database
-			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
-		
-			// create the connection
-			myConnection = DriverManager.getConnection(dbURL);
-
-			if (myConnection != null)
-			{				
-				String selectQuery ="select id_run_sample, file_fullpath from file where id_file_type in (14,38)";
-				Statement stat = myConnection.createStatement();
-				ResultSet results = stat.executeQuery(selectQuery);
-			    while (results.next()) {	
-				String key = results.getString(1);
-				String value = results.getString(2);
-				//System.out.println("key ="+key+ " value = "+value);
-				if (map.containsKey(key)) map.get(key).add(value);
-				    else {
-					       ArrayList<String> file = new ArrayList<String>();
-					       file.add(value);
-					       map.put(key, file);					
-				    }
-			    }
-			}	
-				
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		} finally
-		{
-			try
-			{
-				myConnection.close();
-			} catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		return map;
-	}
 }
