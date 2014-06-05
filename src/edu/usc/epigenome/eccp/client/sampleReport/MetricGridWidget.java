@@ -144,8 +144,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		if(libraries.size() < 2)
 			mergeLibs.disable();
 		//createMenu();
-	//    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo"))
-		//unused.disable();
+	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo"))
+		   buttonsHP.remove(unused);
 	//	System.out.println(Window.Location.getHref());
 	//    	viewButton.getMenu().getWidget(2).setVisible(false);
 		

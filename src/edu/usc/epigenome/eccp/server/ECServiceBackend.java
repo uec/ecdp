@@ -353,8 +353,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	@Override
 	public ArrayList<LibraryData> getLibraries(LibraryDataQuery queryParams)
 	{
-	
-       // System.out.println(getTimestamp());
+
 		ArrayList<LibraryData> data = new ArrayList<LibraryData>();
 		java.sql.Connection myConnection = null;
 		try
@@ -417,14 +416,14 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				}
 			}
 			
-			where += "0=0";
+			where += "0=0";            
 
-			String columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail.\")) as status " : " v.* ";				
+			String columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail\")) as status " : " v.* ";				
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
-			String selectQuery = "select" + columns + " from main_lib_view v left join file f on f.id_run_sample = v.id_run_sample and f.id_file_type IN (41,51,33,14,38) " + where + " group by v.id_run_sample ORDER BY RunParam_RunID DESC";
+			String selectQuery = "select" + columns + " from main_lib_view v left join file f on f.id_run_sample = v.id_run_sample and f.id_file_type IN (41,51,33,14,38,54) " + where + " group by v.id_run_sample ORDER BY RunParam_RunID DESC";
 			logWriter("SQL Query: " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
@@ -715,11 +714,12 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		
 		try
 		{
+			
 			String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
 			Runtime oRuntime = Runtime.getRuntime();
 			Process oProcess = null;
-
-			oProcess = oRuntime.exec(aCmdArgs);
+			
+			oProcess = oRuntime.exec(aCmdArgs);			
 			//oProcess.waitFor();
 			/* dump output stream */
 			BufferedReader is = new BufferedReader(new InputStreamReader(oProcess.getInputStream()));
@@ -954,6 +954,8 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				site="ecdp-beta";
 			else if(request.getRequestURI().contains("alpha"))
 				site="ecdp-alpha";
+			else if(request.getRequestURI().contains("demo"))
+				site="ecdp-demo";
 			else if(request.getRequestURI().contains("eccp"))
 				site="ecdp";
 			else if(request.getRequestURI().contains("garepo"))

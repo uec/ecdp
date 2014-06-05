@@ -127,8 +127,7 @@ public class sampleList extends Composite implements HasLayout
 	    //hide share button when already in a shared search 
 	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
 	    	    toolbar.remove(share);
-	    	    toolbar.remove(analyze);
-	    	//  toolbar.remove(userManual);
+	    	    analyze.disable();
 	    }
 
 	    filter.addKeyDownHandler(new KeyDownHandler(){
@@ -353,7 +352,7 @@ public class sampleList extends Composite implements HasLayout
 							    }
 						        if (menuItem.getText().equals("QC metrics to spreadsheet")) {
 						            MetricGridWidget metric = new MetricGridWidget(result);
-						            metric.setUsageMode("user");
+						            metric.setUsageMode("admin");
 						            metric.showCSV(new SelectEvent());						            						      
 						         }
 						        
