@@ -26,11 +26,18 @@ while(my $line=<> )
 	$localDir = $dir;
 	$localDir =~ s/^\/export/\/storage\/hpcc/;
 	
-	#locate the bams
-	my $file = "ERROR: CANT FIND BAM FILE FOR MERGE! tried:\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam $localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam\n$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam\n$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam";
-	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.bam";
-	$file = "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" if -e "$dir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" || -e "$localDir/ResultCount_$flowcell\_$lane\_$lib\.hg19_rCRSchrm.fa.mdups.bam" ;
-	die "$file" if $file =~ /^ERROR/;
+	   #locate the bams
+        my $file = "ERROR: CANT FIND A BAM in $dir or $localDir FILE FOR MERGE!";
+        my @foundFiles;
+        @foundFiles = glob("$dir/*$flowcell\_$lane\_$lib*fa.mdups.bam");
+        @foundFiles = glob("$localDir/*$flowcell\_$lane\_$lib*fa.mdups.bam") unless @foundFiles;
+        @foundFiles = glob("$dir/*$flowcell\_$lane\_$lib*fa.bam") unless @foundFiles;
+        @foundFiles = glob("$localDir/*$flowcell\_$lane\_$lib*fa.bam") unless @foundFiles;
+        @foundFiles = grep !/NC_001416/, @foundFiles;
+        $file = $foundFiles[0] if $foundFiles[0];
+
+        print "# $file\n" if $file =~ /^ERROR/;
+        die "# $file\n" if $file =~ /^ERROR/;
 	
 	#convert back to hpcc fs paths and calc symlinks
 	$file =~ s/\/storage\/hpcc/\/export/;
