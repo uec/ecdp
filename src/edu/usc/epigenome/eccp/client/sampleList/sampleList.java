@@ -40,6 +40,8 @@ import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
+import com.sencha.gxt.widget.core.client.event.DialogHideEvent.DialogHideHandler;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
@@ -270,14 +272,11 @@ public class sampleList extends Composite implements HasLayout
 					              box.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.CANCEL);
 					              box.setIcon(MessageBox.ICONS.question());
 					              box.setMessage("Would you like to reload the data?");
-					              box.addHideHandler(new HideHandler() {
+					              box.addDialogHideHandler(new DialogHideHandler() {
 					 
 					              @Override
-					                 public void onHide(HideEvent event) {
-					                   Dialog btn = (Dialog) event.getSource();
-					                   //String msg = Format.substitute("The '{0}' button was pressed", btn.getHideButton().getText());					          
-					                   if (btn.getHideButton().getText().equals("Yes")) {
-					            	  // Info.display("MessageBox", msg);
+					                 public void onDialogHide(DialogHideEvent event) {
+					            	  if (event.getHideButton().equals(PredefinedButton.YES)) {
 					                	   Window.Location.reload();
 					                   }
 					                 }
@@ -363,12 +362,11 @@ public class sampleList extends Composite implements HasLayout
 		              box.setPredefinedButtons(PredefinedButton.YES, PredefinedButton.CANCEL);
 		              box.setIcon(MessageBox.ICONS.question());
 		              box.setMessage("Would you like to reload the data?");
-		              box.addHideHandler(new HideHandler() {
+		              box.addDialogHideHandler(new DialogHideHandler() {
 		 
 		              @Override
-		                 public void onHide(HideEvent event) {
-		                   Dialog btn = (Dialog) event.getSource();					          
-		                   if (btn.getHideButton().getText().equals("Yes")) {
+		                 public void onDialogHide(DialogHideEvent event) {
+		            	  if (event.getHideButton().equals(PredefinedButton.YES)) {
 		                	   Window.Location.reload();
 		                   }
 		                 }
@@ -510,7 +508,7 @@ public class sampleList extends Composite implements HasLayout
 		 simple.setHeight(200);
 		 simple.show();
 		 
-		 TextButton ok = simple.getButtonById(PredefinedButton.OK.name());
+		 TextButton ok = simple.getButton(PredefinedButton.OK);
 		 final ArrayList<Boolean> showOnce= new ArrayList<Boolean>();
 		 ok.addSelectHandler(new SelectHandler(){
 			@Override
