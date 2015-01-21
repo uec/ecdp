@@ -862,19 +862,23 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					String barcode = results.getString("barcode");
 					paramText += "Sample."+ i + ".Lane = " + lane + "\n";
 					
-					if(results.getString("protocol").contains("Paired"))
+					if(results.getString("protocol").toLowerCase().contains("paired") || results.getString("protocol").toLowerCase().contains("pe"))
 					{
 						if(results.getString("barcode").contains("NO BARCODE"))
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R2_001.fastq.gz\n";
 						else
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R2_001.fastq.gz\n";
 					}
-					else if(results.getString("protocol").contains("Single"))
+					else if(results.getString("protocol").toLowerCase().contains("single") || results.getString("protocol").toLowerCase().contains("sr"))
 					{
 						if(results.getString("barcode").contains("NO BARCODE"))
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz\n";
 						else
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz\n";
+					}
+					else
+					{
+						paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz\n";
 					}
 					
 					String workflow = "unaligned";
