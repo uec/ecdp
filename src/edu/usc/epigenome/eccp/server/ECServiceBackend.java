@@ -864,14 +864,18 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					
 					if(results.getString("protocol").toLowerCase().contains("paired") || results.getString("protocol").toLowerCase().contains("pe"))
 					{
-						if(results.getString("barcode").contains("NO BARCODE"))
+						if(results.getString("protocol").toLowerCase().contains("next"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_L000_R1_001.fastq.gz," + results.getString("sample_name") + "_L000_R2_001.fastq.gz\n";
+						else if(results.getString("barcode").contains("NO BARCODE"))
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R2_001.fastq.gz\n";
 						else
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz," + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R2_001.fastq.gz\n";
 					}
 					else if(results.getString("protocol").toLowerCase().contains("single") || results.getString("protocol").toLowerCase().contains("sr"))
 					{
-						if(results.getString("barcode").contains("NO BARCODE"))
+						if(results.getString("protocol").toLowerCase().contains("next"))
+							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_L000_R1_001.fastq.gz\n";
+						else if(results.getString("barcode").contains("NO BARCODE"))
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_NoIndex_L00" + lane + "_R1_001.fastq.gz\n";
 						else
 							paramText += "Sample."+ i + ".Input = " + results.getString("sample_name") + "_" + barcode + "_L00" + lane + "_R1_001.fastq.gz\n";
