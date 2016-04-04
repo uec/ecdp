@@ -16,5 +16,13 @@ RUN yum -y install mariadb-server
 RUN yum -y install mariadb
 RUN yum -y install tomcat
 RUN yum -y install git
+RUN systemctl enable mariadb
+RUN systemctl enable tomcat
+RUN systemctl start mariadb
+#RUN /usr/mysqladmin create analysis
+#RUN mysqladmin password dockerG0d
 VOLUME [ "/sys/fs/cgroup" ]
 CMD ["/usr/sbin/init"]
+
+#how i run:
+#  docker run -ti -d -privileged --name=ecdp_docker -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 3306:3306 ecdp
