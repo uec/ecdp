@@ -1,2 +1,3 @@
 # Module eccontrolcenter
 # RPC service class, partial path of RPC policy file
+edu.usc.epigenome.eccp.client.ECService, F2550D6221AD6C825FF8784BA16C8284.gwt.rpc
