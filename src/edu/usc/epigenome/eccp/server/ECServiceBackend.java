@@ -715,7 +715,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		try
 		{
 			
-			String[] aCmdArgs = { "/opt/tomcat6/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
+			String[] aCmdArgs = { "/var/lib/tomcat/webapps/eccpgxt/helperscripts/createMergingWorkflow.pl"};
 			Runtime oRuntime = Runtime.getRuntime();
 			Process oProcess = null;
 			
