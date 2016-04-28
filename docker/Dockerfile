@@ -30,7 +30,7 @@ VOLUME [ "/hostmount" ]
 CMD ["/usr/sbin/init"]
 
 #how i run:
-#  docker run -ti -d -privileged --name=ecdp_docker -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 3306:3306 ecdp
+# docker run -ti -d --privileged --name=ecdp_docker -v /root/ecdp:/hostmount -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 3306:3306 -p 8080:8080 ecdp
 
 #connect to live instance
 #docker exec -it ecdp_docker /bin/bash
