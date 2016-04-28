@@ -18,9 +18,13 @@ RUN yum -y install tomcat
 RUN yum -y install git
 RUN systemctl enable mariadb
 RUN systemctl enable tomcat
-ADD sql_setup.sh /sql_setup.sh
-ADD dbdump_tcga.sql.gz /dbdump_tcga.sql.gz
-RUN /bin/sh /sql_setup.sh
+RUN mkdir /ecdp
+ADD ecdp_setup.sh /ecdp/ecdp_setup.sh
+ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
+ADD deploy.key.pub /ecdp/deploy.key.pub
+ADD deploy.key /ecdp/deploy.key
+ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
+RUN /bin/sh /ecdp/ecdp_setup.sh
 VOLUME [ "/sys/fs/cgroup" ]
 VOLUME [ "/hostmount" ]
 CMD ["/usr/sbin/init"]

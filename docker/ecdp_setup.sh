@@ -45,7 +45,13 @@ echo "create database analysis"  | mysql
 echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'dockerG0d';flush privileges;" | mysql
 
 #populate the DB with initial data
-zcat /dbdump_tcga.sql.gz | mysql analysis
-
-
+zcat /ecdp/dbdump_tcga.sql.gz | mysql analysis
 mysqladmin shutdown
+
+
+
+#pull ecdp from git
+cd /ecdp
+ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+ssh-agent bash -c 'ssh-add /ecdp/deploy.key;git clone git@bitbucket.org:zackramjan/ecdp.git;cd ecdp;git fetch; git checkout gxt4'
+
