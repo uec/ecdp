@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 #create the /etc/my.cnf with custom settings
 cat <<EOF > /etc/my.cnf
 [mysqld]
@@ -55,6 +56,8 @@ mkdir /root/.ssh && chmod 700 /root/.ssh
 cd /ecdp
 ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
 ssh-agent bash -c 'ssh-add /ecdp/deploy.key;git clone git@bitbucket.org:zackramjan/ecdp.git;cd ecdp;git fetch; git checkout gxt4'
-mv ecdp/war /var/lib/tomcat/webapps/ecdp
+unzip ecdp/eccpgxt.zip
+mv war /var/lib/tomcat/webapps/ecdp
+chown -R tomcat.tomcat /var/lib/tomcat/webapps/ecdp
 ln -s /var/lib/tomcat/webapps/ecdp /var/lib/tomcat/webapps/ROOT
 
