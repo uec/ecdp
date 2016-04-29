@@ -6,8 +6,7 @@ import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
+
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -18,28 +17,26 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.core.client.util.Margins;
+
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
-import com.sencha.gxt.data.shared.event.StoreFilterEvent;
-import com.sencha.gxt.data.shared.event.StoreFilterEvent.StoreFilterHandler;
+
 import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.dnd.core.client.DndDropEvent;
 import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
-import com.sencha.gxt.widget.core.client.button.TextButton;
+
 import com.sencha.gxt.widget.core.client.button.ToggleButton;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
+
 import com.sencha.gxt.widget.core.client.container.HasLayout;
-import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
+
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
-import com.sencha.gxt.widget.core.client.container.Viewport;
+
 import com.sencha.gxt.widget.core.client.event.RowClickEvent;
 import com.sencha.gxt.widget.core.client.event.RowClickEvent.RowClickHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -49,9 +46,7 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.info.Info;
-import com.sencha.gxt.widget.core.client.menu.Item;
-import com.sencha.gxt.widget.core.client.menu.Menu;
-import com.sencha.gxt.widget.core.client.menu.MenuItem;
+
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import edu.usc.epigenome.eccp.client.ECService;
@@ -89,7 +84,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	@UiField ToolBar buttons;
 	@UiField HorizontalPanel buttonsHP;
 	@UiField VerticalLayoutContainer vlc;
-	@UiField TextButton mergeLibs;
+	//@UiField TextButton mergeLibs;
 	//@UiField TextButton viewButton;
 	@UiField ToggleButton unused;
 	String usageMode = "admin";
@@ -141,8 +136,8 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		filter.setEmptyText("Search...");
 		buttonsHP.add(filter);		
 		libraries = data;
-		if(libraries.size() < 2)
-			mergeLibs.disable();
+//		if(libraries.size() < 2)
+//			mergeLibs.disable();
 		//createMenu();
 	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo"))
 		   buttonsHP.remove(unused);
@@ -338,10 +333,10 @@ public class MetricGridWidget extends Composite implements HasLayout{
 								if (!contains) 
 								{
 									libraries.addAll(result);
-									if(libraries.size() < 2 || Window.Location.getHref().contains("gareports"))
-										mergeLibs.disable();
-									else
-										mergeLibs.enable();
+//									if(libraries.size() < 2 || Window.Location.getHref().contains("gareports"))
+//										mergeLibs.disable();
+//									else
+//										mergeLibs.enable();
 								//	Info.display("Notice","added to table:" + result.get(0).get("sample_name").getValue());
 								}
 							   
@@ -376,7 +371,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 	//set the title in the top bar
 	public void setHeadingText(String title)
 	{
-		gridPanel.setHeadingText(title);
+		gridPanel.setHeading(title);
 	}
 
 	//display the download-files widget for these libraries
@@ -448,7 +443,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 TextArea text = new TextArea();
 		 text.setText(csv);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Tab-separated metrics (Paste into Excel)");
+		 simple.setHeading("Tab-separated metrics (Paste into Excel)");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);
@@ -459,34 +454,34 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 logToServer("toSpreadSheet");
 	}	
 
-	@UiHandler("mergeLibs")
-	public void createMerge(SelectEvent event)
-	{
-		logToServer("Merging Workflow");
-		myServer.createMergeWorkflow(libraries, new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught)
-			{
-				Info.display("ERROR","could not create merging workflow");				
-			}
-
-			@Override
-			public void onSuccess(String result)
-			{
-				 TextArea text = new TextArea();
-				 text.setText(result);
-				 final Dialog simple = new Dialog();
-				 simple.setHeadingText("merging workflow (Pastable at hpcc)");
-				 simple.setPredefinedButtons(PredefinedButton.OK);
-				 simple.setBodyStyleName("pad-text");
-				 simple.add(text);
-				 simple.setHideOnButtonClick(true);
-				 simple.setWidth(700);
-				 simple.setHeight(500);
-				 simple.show();				
-			}});
-	}
+//	@UiHandler("mergeLibs")
+//	public void createMerge(SelectEvent event)
+//	{
+//		logToServer("Merging Workflow");
+//		myServer.createMergeWorkflow(libraries, new AsyncCallback<String>(){
+//
+//			@Override
+//			public void onFailure(Throwable caught)
+//			{
+//				Info.display("ERROR","could not create merging workflow");				
+//			}
+//
+//			@Override
+//			public void onSuccess(String result)
+//			{
+//				 TextArea text = new TextArea();
+//				 text.setText(result);
+//				 final Dialog simple = new Dialog();
+//				 simple.setHeading("merging workflow (Pastable at hpcc)");
+//				 simple.setPredefinedButtons(PredefinedButton.OK);
+//				 simple.setBodyStyleName("pad-text");
+//				 simple.add(text);
+//				 simple.setHideOnButtonClick(true);
+//				 simple.setWidth(700);
+//				 simple.setHeight(500);
+//				 simple.show();				
+//			}});
+//	}
 	
 	public HashMap<String,MultipleLibraryProperty> getUsageModeData() {
      //   System.out.println("Usage mode: "+usageMode);

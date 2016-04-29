@@ -12,7 +12,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.text.shared.AbstractSafeHtmlRenderer;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
@@ -21,25 +21,25 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
-import com.sencha.gxt.core.client.util.Margins;
+
+//import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
-import com.sencha.gxt.dnd.core.client.DndDropEvent;
-import com.sencha.gxt.dnd.core.client.DropTarget;
+//import com.sencha.gxt.dnd.core.client.DndDropEvent;
+//import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
-import com.sencha.gxt.dnd.core.client.DND.Operation;
+//import com.sencha.gxt.dnd.core.client.DND.Operation;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.box.MessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
+//import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
+//import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent.HideHandler;
 import com.sencha.gxt.widget.core.client.event.RowDoubleClickEvent;
@@ -87,7 +87,7 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
-	@UiField TextButton analyze;
+	//@UiField TextButton analyze;
 	@UiField ToolBar toolbar;
 	TextButton userManual = new TextButton("HELP");
 		
@@ -125,10 +125,10 @@ public class sampleList extends Composite implements HasLayout
 	    gridPanel.addTool(filter);	   
 	    filter.setEmptyText("Search...");
 	    //hide share button when already in a shared search 
-	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
-	    	    toolbar.remove(share);
-	    	    analyze.disable();
-	    }
+//	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
+//	    	    toolbar.remove(share);
+//	    	    analyze.disable();
+//	    }
 
 	    filter.addKeyDownHandler(new KeyDownHandler(){
 
@@ -276,7 +276,7 @@ public class sampleList extends Composite implements HasLayout
 					                 public void onHide(HideEvent event) {
 					                   Dialog btn = (Dialog) event.getSource();
 					                   //String msg = Format.substitute("The '{0}' button was pressed", btn.getHideButton().getText());					          
-					                   if (btn.getHideButton().getText().equals("Yes")) {
+					                   if (btn.getButton(PredefinedButton.YES).getText().equals("Yes")) {
 					            	  // Info.display("MessageBox", msg);
 					                	   Window.Location.reload();
 					                   }
@@ -368,7 +368,7 @@ public class sampleList extends Composite implements HasLayout
 		              @Override
 		                 public void onHide(HideEvent event) {
 		                   Dialog btn = (Dialog) event.getSource();					          
-		                   if (btn.getHideButton().getText().equals("Yes")) {
+		                   if (btn.getButton(PredefinedButton.YES).getText().equals("Yes")) {
 		                	   Window.Location.reload();
 		                   }
 		                 }
@@ -477,7 +477,7 @@ public class sampleList extends Composite implements HasLayout
 	}
 	public void showParamDialog(String textToDisplay, String heading){
 		 Dialog paramWindow = new Dialog();
-		 paramWindow.setHeadingText(heading);
+		 paramWindow.setHeading(heading);
 		 paramWindow.setPredefinedButtons(PredefinedButton.OK);
 		 paramWindow.setBodyStyleName("pad-text");
 		 TextArea text = new TextArea();
@@ -501,7 +501,7 @@ public class sampleList extends Composite implements HasLayout
 	{
 		 final TextArea text = new TextArea();
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("SELECT * from view_run_metric WHERE");
+		 simple.setHeading("SELECT * from view_run_metric WHERE");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);
@@ -510,7 +510,7 @@ public class sampleList extends Composite implements HasLayout
 		 simple.setHeight(200);
 		 simple.show();
 		 
-		 TextButton ok = simple.getButtonById(PredefinedButton.OK.name());
+		 TextButton ok = simple.getButton(PredefinedButton.OK);
 		 final ArrayList<Boolean> showOnce= new ArrayList<Boolean>();
 		 ok.addSelectHandler(new SelectHandler(){
 			@Override
@@ -526,7 +526,7 @@ public class sampleList extends Composite implements HasLayout
 					public void onSuccess(ArrayList<String> result)
 					{
 						text.setText("/gareports/ECControlCenter.html?superquery=" + result.get(0)); 
-						simple.setHeadingText("Your query is available at the following link");
+						simple.setHeading("Your query is available at the following link");
 						if(showOnce.size() < 1)
 							simple.show();
 						showOnce.add(true);
@@ -540,7 +540,7 @@ public class sampleList extends Composite implements HasLayout
 	
 	public void setHeadingText(String title)
 	{
-		gridPanel.setHeadingText(title);
+		gridPanel.setHeading(title);
 	}
 	
 	@UiHandler("byFlowcell")
@@ -619,7 +619,7 @@ public class sampleList extends Composite implements HasLayout
 				 TextArea text = new TextArea();
 				 text.setText("https://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
-				 simple.setHeadingText("This link will take you directly to the search results");
+				 simple.setHeading("This link will take you directly to the search results");
 				 simple.setPredefinedButtons(PredefinedButton.OK);
 				 simple.setBodyStyleName("pad-text");
 				 simple.add(text);
@@ -630,87 +630,86 @@ public class sampleList extends Composite implements HasLayout
 			}});
 		 
 	}
-	@UiHandler("analyze")
-	public void launch (SelectEvent e) {
-   	 final Dialog mutect = new Dialog();
-        mutect.setBodyBorder(false);
-        
-        mutect.setHeadingText("MuTect analysis");
-        mutect.setWidth(600);
-        mutect.setHeight(300);
-        mutect.setHideOnButtonClick(true);
-        final TextArea tumtext = new TextArea();
-        tumtext.setEmptyText("Drag-n-drop tumor sample from the left panel");
-
-        BorderLayoutContainer layout = new BorderLayoutContainer();
-        mutect.add(layout);
-        // Layout - west
-        ContentPanel panel = new ContentPanel();
-        panel.setHeadingText("Tumor");
-        BorderLayoutData data = new BorderLayoutData(295);
-        data.setMargins(new Margins(0, 5, 0, 0));
-        panel.setLayoutData(data);
-        panel.add(tumtext);
-        layout.setWestWidget(panel);
-        // Layout - center
-        panel = new ContentPanel();
-        panel.setHeadingText("Normal");
-        final TextArea normtext = new TextArea();
-        normtext.setEmptyText("Drag-n-drop normal sample from the left panel");
-        panel.add(normtext);
-        layout.setCenterWidget(panel);
-
-		 DropTarget tumtarget = new DropTarget(tumtext)
-		 {
-		      @Override
-		      protected void onDragDrop(DndDropEvent event) 
-		      {
-			        super.onDragDrop(event);
-			        @SuppressWarnings("unchecked")
-					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
-			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
-			        {
-			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
-			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
-			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
-			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
-			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
-			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
-			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
-			          tumtext.setText(sampleInfo);
-			        }
-			        
-		      }
-		 
-		 };
-		 tumtarget.setOperation(Operation.COPY);
-		 DropTarget normtarget = new DropTarget(normtext)
-		 {
-		      @Override
-		      protected void onDragDrop(DndDropEvent event) 
-		      {
-			        super.onDragDrop(event);
-			        @SuppressWarnings("unchecked")
-					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
-			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
-			        {
-			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
-			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
-			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
-			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
-			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
-			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
-			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
-			          normtext.setText(sampleInfo);
-			        }
-			        
-		      }
-		 
-		 };
-		 normtarget.setOperation(Operation.COPY);
-		 mutect.show();
-   	
-   }
+//	@UiHandler("analyze")
+//	public void launch (SelectEvent e) {
+//   	 final Dialog mutect = new Dialog();
+//        mutect.setBodyBorder(false);
+//        mutect.setHeading("MuTect analysis");
+//        mutect.setWidth(600);
+//        mutect.setHeight(300);
+//        mutect.setHideOnButtonClick(true);
+//        final TextArea tumtext = new TextArea();
+//        tumtext.setEmptyText("Drag-n-drop tumor sample from the left panel");
+//
+//        BorderLayoutContainer layout = new BorderLayoutContainer();
+//        mutect.add(layout);
+//        // Layout - west
+//        ContentPanel panel = new ContentPanel();
+//        panel.setHeading("Tumor");
+//        BorderLayoutData data = new BorderLayoutData(295);
+//        data.setMargins(new Margins(0, 5, 0, 0));
+//        panel.setLayoutData(data);
+//        panel.add(tumtext);
+//        layout.setWestWidget(panel);
+//        // Layout - center
+//        panel = new ContentPanel();
+//        panel.setHeading("Normal");
+//        final TextArea normtext = new TextArea();
+//        normtext.setEmptyText("Drag-n-drop normal sample from the left panel");
+//        panel.add(normtext);
+//        layout.setCenterWidget(panel);
+//
+//		 DropTarget tumtarget = new DropTarget(tumtext)
+//		 {
+//		      @Override
+//		      protected void onDragDrop(DndDropEvent event) 
+//		      {
+//			        super.onDragDrop(event);
+//			        @SuppressWarnings("unchecked")
+//					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
+//			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
+//			        {
+//			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
+//			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
+//			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
+//			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
+//			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
+//			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
+//			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
+//			          tumtext.setText(sampleInfo);
+//			        }
+//			        
+//		      }
+//		 
+//		 };
+//		 tumtarget.setOperation(Operation.COPY);
+//		 DropTarget normtarget = new DropTarget(normtext)
+//		 {
+//		      @Override
+//		      protected void onDragDrop(DndDropEvent event) 
+//		      {
+//			        super.onDragDrop(event);
+//			        @SuppressWarnings("unchecked")
+//					ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
+//			        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
+//			        {
+//			          String sampleInfo = "Project: "+summarizedLibrary.get("project").getValue()+"\n"+
+//			        		        "Library: "+summarizedLibrary.get("sample_name").getValue()+"\n"+
+//			        		        "LibType: "+summarizedLibrary.get("processing_formatted").getValue()+"\n"+			        		    
+//			        		        "LIMS id: "+summarizedLibrary.get("geneusID_sample").getValue()+"\n"+
+//			        		        "Flowcell: "+summarizedLibrary.get("flowcell_serial").getValue()+"\n"+
+//			        		        "Lane: "+summarizedLibrary.get("lane").getValue()+"\n"+
+//			        		        "Analysis id: "+summarizedLibrary.get("analysis_id").getValue()+"\n";
+//			          normtext.setText(sampleInfo);
+//			        }
+//			        
+//		      }
+//		 
+//		 };
+//		 normtarget.setOperation(Operation.COPY);
+//		 mutect.show();
+//   	
+//   }
 	
 	/*@UiHandler("hideMerged")
 	public void onChange(ChangeEvent event) {
