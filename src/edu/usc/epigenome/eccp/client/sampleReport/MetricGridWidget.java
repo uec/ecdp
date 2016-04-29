@@ -278,7 +278,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 		 }
 		 view.setAutoExpandMin(100);
 		 view.setAutoExpandMax(2000);
-		 view.collapseAllGroups();
+		 //view.collapseAllGroups();
 		 view.groupBy(cc2);
 		 viewPointer=view;
 		 final	Grid<MultipleLibraryProperty> grid = new Grid<MultipleLibraryProperty>(store, colModel);

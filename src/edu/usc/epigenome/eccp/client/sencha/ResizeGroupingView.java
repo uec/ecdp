@@ -61,7 +61,7 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		          grid.getLoader().removeSortInfo(lastSort);
 		        }
 		      } else {// groupingColumn == null;
-		        assert lastStoreSort == null && lastSort == null;
+		        //assert lastStoreSort == null && lastSort == null;
 		      }
 
 		      // set the new one
