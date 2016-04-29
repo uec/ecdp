@@ -16,6 +16,7 @@ RUN yum -y install mariadb-server
 RUN yum -y install mariadb
 RUN yum -y install tomcat
 RUN yum -y install git
+RUN yum -y install unzip
 RUN systemctl enable mariadb
 RUN systemctl enable tomcat
 RUN mkdir /ecdp
