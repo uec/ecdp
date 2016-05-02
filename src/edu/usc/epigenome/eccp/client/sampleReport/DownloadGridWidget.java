@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell.Context;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -20,29 +20,26 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RichTextArea;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.XTemplates;
-import com.sencha.gxt.core.client.dom.XElement;
-import com.sencha.gxt.core.client.util.Util;
+
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
-import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance;
-import com.sencha.gxt.theme.base.client.grid.GroupingViewDefaultAppearance.GroupHeaderTemplate;
+
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.TabItemConfig;
+
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.HasLayout;
 import com.sencha.gxt.widget.core.client.container.HtmlLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.SimpleContainer;
+
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.Viewport;
+
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.StoreFilterField;
@@ -51,9 +48,9 @@ import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GroupingView;
+
 import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingData;
-import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingViewAppearance;
+
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.tips.QuickTip;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -61,15 +58,9 @@ import edu.usc.epigenome.eccp.client.ECService;
 import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.FileData;
 import edu.usc.epigenome.eccp.client.data.FileDataModel;
-import edu.usc.epigenome.eccp.client.data.LibraryProperty;
-import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
+
 import edu.usc.epigenome.eccp.client.sencha.ResizeGroupingView;
-import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
+
 import com.sencha.gxt.widget.core.client.container.AbstractHtmlLayoutContainer.HtmlData;
 public class DownloadGridWidget extends Composite implements HasLayout
 {
@@ -222,7 +213,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 	
 	public void setHeadingText(String title)
 	{
-		gridPanel.setHeadingText(title);
+		gridPanel.setHeading(title);
 	}
 	
 	@UiHandler("organizeType")
@@ -244,7 +235,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 TextArea text = new TextArea();
 		 text.setText(fileList);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("Paste these secure links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
+		 simple.setHeading("Paste these secure links into your favorite download tool (Ex: wget, DownloadThemAll etc)");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 		 simple.add(text);
@@ -341,7 +332,7 @@ public class DownloadGridWidget extends Composite implements HasLayout
 		 Anchor a = new Anchor();
 		 a.setHTML(shtml);
 		 final Dialog simple = new Dialog();
-		 simple.setHeadingText("TUTORIALS");
+		 simple.setHeading("TUTORIALS");
 		 simple.setPredefinedButtons(PredefinedButton.OK);
 		 simple.setBodyStyleName("pad-text");
 	//	 text.setText("test");

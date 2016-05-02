@@ -20,7 +20,8 @@
   <welcome-file-list>
     <welcome-file>ECControlCenter.html</welcome-file>
   </welcome-file-list>
-
+ 
+ <!--
   <resource-ref>
       <description>DB Connection for sequencing_production</description>
       <res-ref-name>jdbc/sequencing_production</res-ref-name>
@@ -35,7 +36,7 @@
       <res-auth>Container</res-auth>
   </resource-ref>
   
-  <!--
+
 <security-constraint>
    <display-name>Security Constraint</display-name>
    <web-resource-collection>

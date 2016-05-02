@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Context override="true" allowLinking="true">
+<!--
 <ResourceLink global="jdbc/sequencing" name="jdbc/sequencing" type="javax.sql.DataSource"/>
 <ResourceLink global="jdbc/sequencing_devel" name="jdbc/sequencing_devel" type="javax.sql.DataSource"/>
 
-<!-- <Resource
+ <Resource
         name="jdbc/sequencing_production"
         auth="Container" 
         type="javax.sql.DataSource"

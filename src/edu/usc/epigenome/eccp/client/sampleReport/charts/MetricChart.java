@@ -5,7 +5,7 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.Dialog.PredefinedButton;
-import com.sencha.gxt.widget.core.client.info.Info;
+
 
 public abstract class MetricChart
 {
@@ -13,7 +13,7 @@ public abstract class MetricChart
 	{
 		//show the plot
 		final Dialog simple = new Dialog();
-		simple.setHeadingText(title);
+		simple.setHeading(title);
 		simple.setPredefinedButtons(PredefinedButton.OK);
 		simple.setBodyStyleName("pad-text");
 		simple.add(chart);

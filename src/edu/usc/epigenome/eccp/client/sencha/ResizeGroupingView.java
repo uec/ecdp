@@ -1,21 +1,18 @@
 package edu.usc.epigenome.eccp.client.sencha;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NodeList;
+
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.SortInfoBean;
 import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.GridView;
+
 import com.sencha.gxt.widget.core.client.grid.GroupingView;
-import com.sencha.gxt.widget.core.client.grid.GroupingView.GroupingViewAppearance;
+
 
 public class ResizeGroupingView<M> extends GroupingView<M>
 {
@@ -64,7 +61,7 @@ public class ResizeGroupingView<M> extends GroupingView<M>
 		          grid.getLoader().removeSortInfo(lastSort);
 		        }
 		      } else {// groupingColumn == null;
-		        assert lastStoreSort == null && lastSort == null;
+		        //assert lastStoreSort == null && lastSort == null;
 		      }
 
 		      // set the new one
