@@ -55,7 +55,7 @@ mysqladmin shutdown
 mkdir /root/.ssh && chmod 700 /root/.ssh
 cd /ecdp
 ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
-ssh-agent bash -c 'ssh-add /ecdp/deploy.key;git clone git@bitbucket.org:zackramjan/ecdp.git;cd ecdp;git fetch; git checkout gxt4'
+ssh-agent bash -c 'ssh-add /ecdp/deploy.key;git clone git@bitbucket.org:zackramjan/ecdp.git;cd ecdp;git fetch; git checkout release'
 unzip ecdp/eccpgxt.zip
 mv war /var/lib/tomcat/webapps/ecdp
 chown -R tomcat.tomcat /var/lib/tomcat/webapps/ecdp
