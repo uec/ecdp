@@ -24,6 +24,7 @@ ADD ecdp_setup.sh /ecdp/ecdp_setup.sh
 ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
 ADD deploy.key.pub /ecdp/deploy.key.pub
 ADD deploy.key /ecdp/deploy.key
+RUN chmod 0600 /ecdp/deploy.key
 ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
 RUN /bin/sh /ecdp/ecdp_setup.sh
 VOLUME [ "/sys/fs/cgroup" ]
