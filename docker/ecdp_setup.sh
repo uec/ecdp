@@ -49,12 +49,10 @@ echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'dockerG0d';flush 
 zcat /ecdp/dbdump_tcga.sql.gz | mysql analysis
 mysqladmin shutdown
 
-#pull ecdp from git
+#pull ecdp from github
 cd /ecdp
-git clone https://github.com/uec/ecdp
-cd ecdp
+wget "https://github.com/uec/ecdp/blob/master/eccpgxt.zip?raw=true" -O eccpgxt.zip
 unzip eccpgxt.zip
 mv war /var/lib/tomcat/webapps/ecdp
 chown -R tomcat.tomcat /var/lib/tomcat/webapps/ecdp
 ln -s /var/lib/tomcat/webapps/ecdp /var/lib/tomcat/webapps/ROOT
-
