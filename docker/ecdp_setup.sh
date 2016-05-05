@@ -55,7 +55,7 @@ git clone https://github.com/uec/ecdp
 cd ecdp
 git fetch
 git checkout release
-unzip ecdp/eccpgxt.zip
+unzip eccpgxt.zip
 mv war /var/lib/tomcat/webapps/ecdp
 chown -R tomcat.tomcat /var/lib/tomcat/webapps/ecdp
 ln -s /var/lib/tomcat/webapps/ecdp /var/lib/tomcat/webapps/ROOT
