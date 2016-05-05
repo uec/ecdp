@@ -10,8 +10,6 @@ rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
 rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 RUN yum -y install wget
-#RUN cd /tmp;wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-#RUN rpm -ivh /tmp/epel-release-7-5.noarch.rpm
 RUN yum -y install mariadb-server
 RUN yum -y install mariadb
 RUN yum -y install tomcat
@@ -20,12 +18,8 @@ RUN yum -y install unzip
 RUN systemctl enable mariadb
 RUN systemctl enable tomcat
 RUN mkdir /ecdp
+ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
 ADD ecdp_setup.sh /ecdp/ecdp_setup.sh
-ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
-ADD deploy.key.pub /ecdp/deploy.key.pub
-ADD deploy.key /ecdp/deploy.key
-RUN chmod 0600 /ecdp/deploy.key
-ADD dbdump_tcga.sql.gz /ecdp/dbdump_tcga.sql.gz
 RUN /bin/sh /ecdp/ecdp_setup.sh
 VOLUME [ "/sys/fs/cgroup" ]
 VOLUME [ "/hostmount" ]
