@@ -544,7 +544,7 @@ public class sampleList extends Composite implements HasLayout
 	}
 	
 	@UiHandler("byFlowcell")
-	public void groupByF(SelectEvent event)
+	public void groupByF(SelectionEvent<Item> event)
 	{
 
 		view.groupBy(flowcellCol);
@@ -553,14 +553,14 @@ public class sampleList extends Composite implements HasLayout
 	}
 	
 	@UiHandler("byLibrary")
-	public void groupByL(SelectEvent event)
+	public void groupByL(SelectionEvent<Item> event)
 	{
 		view.groupBy(libCol);
 		view.collapseAllGroups();
 	}
 	
 	@UiHandler("byProject")
-	public void groupByP(SelectEvent event)
+	public void groupByP(SelectionEvent<Item> event)
 	{
 		view.groupBy(projCol);
 		view.collapseAllGroups();
@@ -571,7 +571,7 @@ public class sampleList extends Composite implements HasLayout
 
 	}
 	@UiHandler("byDate")
-	public void groupByD(SelectEvent event)
+	public void groupByD(SelectionEvent<Item> event)
 	{
 
 		 view.groupBy(dateCol);		 
@@ -579,7 +579,7 @@ public class sampleList extends Composite implements HasLayout
 		
 	}
 	@UiHandler("byLibType")
-	public void groupByLT(SelectEvent event)
+	public void groupByLT(SelectionEvent<Item> event)
 	{
 
 		 view.groupBy(libTypeCol);		 

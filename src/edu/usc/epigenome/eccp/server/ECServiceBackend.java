@@ -416,9 +416,17 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				}
 			}
 			
-			where += "0=0";            
-
-			String columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail\")) as status " : " v.* ";				
+			where += "0=0";         
+			String columns =  " v.* ";
+			if(queryParams.getIsSummaryOnly())
+			{
+				String columnsQuery = "select group_concat(metric) as c from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(columnsQuery);
+				columns = "v.id_run_sample, " + results.getString(1);
+			}
+			
+			// columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail\")) as status " : " v.* ";				
 
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();

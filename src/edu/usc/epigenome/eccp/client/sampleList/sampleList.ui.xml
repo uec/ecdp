@@ -1,41 +1,64 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
-             xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container" 
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
-             
-              <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="toolBarRowData">
-   				 <ui:attributes width="1" height="30" />
-  			  </ui:with>
-  			  
-  			   <ui:with type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData" field="contentData">
-   				<!--  <ui:attributes width="1" height="1" /> -->
-  			  </ui:with>
-  	<container:VerticalLayoutContainer ui:field="vlc">
- 	<container:child >
- 	         <gxt:ContentPanel ui:field="gridPanel" heading="USC Epigenome Center">       
- 	         </gxt:ContentPanel>
-	
- 	</container:child>
- 	
-		
-			<container:child  layoutData='{toolBarRowData}'>
-				<gxt:toolbar.ToolBar ui:field="toolbar">
-					<gxt:button.TextButton ui:field="byFlowcell" text="By Flowcell" />
-					<gxt:button.TextButton ui:field="byLibrary" text="By Library" />
-					<gxt:button.TextButton ui:field="byProject" text="By Project" />
-					<gxt:button.TextButton ui:field="byDate" text="By Date" />
-					<gxt:button.TextButton ui:field="byLibType" text="By LibType" />
-					<gxt:button.TextButton ui:field="expand" text="Expand All" />
-					<gxt:button.TextButton ui:field="collapse" text="Collapse All" />
-					<gxt:button.TextButton ui:field="share" text="Share" />
-<!-- 					<gxt:button.TextButton ui:field="analyze" text="Analyze" /> -->
-				    <gxt:toolbar.SeparatorToolItem />	
-				    <!--<gxt:form.CheckBox ui:field="hideMerged" boxLabel="Hide merged" value="true" visible="false" />--> 		
-				</gxt:toolbar.ToolBar>
-			</container:child>
-			<container:child layoutData='{contentData}'>
-				<gxt:container.VerticalLayoutContainer ui:field="content" />
-			</container:child>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:container="urn:import:com.sencha.gxt.widget.core.client.container"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:menu="urn:import:com.sencha.gxt.widget.core.client.menu"
+	xmlns:toolbar="urn:import:com.sencha.gxt.widget.core.client.toolbar"
+	xmlns:button="urn:import:com.sencha.gxt.widget.core.client.button"
+	xmlns:gxt="urn:import:com.sencha.gxt.widget.core.client">
+
+	<ui:with
+		type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData"
+		field="toolBarRowData">
+		<ui:attributes width="1" height="30" />
+	</ui:with>
+
+	<ui:with
+		type="com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData"
+		field="contentData">
+		<!-- <ui:attributes width="1" height="1" /> -->
+	</ui:with>
+	<container:VerticalLayoutContainer
+		ui:field="vlc">
+		<container:child>
+			<gxt:ContentPanel ui:field="gridPanel" heading="Analysis Data Portal">
+			</gxt:ContentPanel>
+
+		</container:child>
+		<container:child layoutData='{toolBarRowData}'>
+			<toolbar:ToolBar ui:field="toolbar">
+				<button:SplitButton text="Sort">
+					<button:menu>
+						<menu:Menu ui:field="splitButtonMenu">
+							<menu:MenuItem ui:field="byFlowcell">
+								<b>By Flowcell Serial</b>
+							</menu:MenuItem>
+							<menu:MenuItem ui:field="byLibrary">
+								<b>By Library Name</b>
+							</menu:MenuItem>
+							<menu:MenuItem ui:field="byDate">
+								<b>By Date</b>
+							</menu:MenuItem>
+							<menu:MenuItem ui:field="byProject">
+								<b>By Project</b>
+							</menu:MenuItem>
+							<menu:MenuItem ui:field="byLibType">
+								<b>By Library Type</b>
+							</menu:MenuItem>
+						</menu:Menu>
+					</button:menu>
+				</button:SplitButton>
+
+				<gxt:button.TextButton ui:field="expand" text="Expand All" />
+				<gxt:toolbar.SeparatorToolItem />
+				<gxt:button.TextButton ui:field="collapse"
+					text="Collapse All" />
+				<gxt:toolbar.SeparatorToolItem />
+				<gxt:button.TextButton ui:field="share" text="Share" />
+			</toolbar:ToolBar>
+		</container:child>
+		<container:child layoutData='{contentData}'>
+			<gxt:container.VerticalLayoutContainer
+				ui:field="content" />
+		</container:child>
 	</container:VerticalLayoutContainer>
 </ui:UiBinder> 
