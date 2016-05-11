@@ -107,19 +107,32 @@ public class sampleList extends Composite implements HasLayout
 	};
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
-	ColumnConfig<LibraryData, String> flowcellCol,libCol,runCol,laneCol,projCol,dateCol,geneusCol,libTypeCol;
 	ListStore<LibraryData> store;
 	ArrayList<LibraryData> completeData= new ArrayList<LibraryData>();
 	Grid<LibraryData> grid;
-	StoreSortInfo<LibraryData> sortByDate;
+	//StoreSortInfo<LibraryData> sortByDate;
 	MenuItem menuItem;
-	Comparator<String>  dateComparator;
+	List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
+	//Comparator<String>  dateComparator;
 
 	@UiConstructor
 	public sampleList() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-	    createGrid();
+		myServer.getSummaryColumns(new AsyncCallback<ArrayList<String>>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Error","Failed to get sample summary list");	
+				
+			}
+
+			@Override
+			public void onSuccess(ArrayList<String> result) {
+				createGrid(result);
+				
+			}});
+	    
 	  //  setUserManualLink();
 	    setUserManualButton();
 	    gridPanel.addTool(filter);	   
@@ -180,45 +193,16 @@ public class sampleList extends Composite implements HasLayout
 	    
 	}
 	
-	public void createGrid() {
+	public void createGrid(ArrayList<String> columns) {
+		
 		
 		//SET UP COLUMNS
-		 List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
-		 flowcellCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("flowcell_serial"), 90, "Flowcell");
+		for(String column : columns)
+		{
+			ColumnConfig<LibraryData, String> cf =  new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider(column), 100, column);
+			columnDefs.add(cf);
+		}
 		
-		 libCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("sample_name"), 120, "Library");
-		 
-		 runCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("status"), 100, "Status");
-
-		 laneCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("lane"), 30, "Lane");
-		 libTypeCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("processing_formatted"), 30, "LibType");		
-		 libTypeCol.setWidth(80);
-		 geneusCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("geneusID_sample"), 80, "LIMS id");
-		 projCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("project"), 120, "Project");
-		 dateCol = new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider("Date_Sequenced_formatted"), 80, "Date");
-		 dateComparator = new Comparator<String>(){
-
-			public int compare(String o1, String o2) {
-				String d = "No Date Entered";
-				if (o1.matches(d)) 
-					if (o2.matches(d)) return 0;
-					else return -1;
-				else if (o2.matches(d)) return 1;
-				     else return (o1.compareTo(o2));
-				
-			}
-			 
-		 };
-		 dateCol.setComparator(dateComparator);
-		 columnDefs.add(projCol);
-		 columnDefs.add(libCol);
-		 columnDefs.add(libTypeCol);
-		 columnDefs.add(geneusCol);
-		 columnDefs.add(flowcellCol);
-		 columnDefs.add(laneCol);
-		 columnDefs.add(dateCol);
-		 columnDefs.add(runCol);
-		 	 
 		 
          columnModel = new ColumnModel<LibraryData>(columnDefs);
 		 store = new ListStore<LibraryData>(LibraryDataModelFactory.getModelKeyProvider());
@@ -226,9 +210,10 @@ public class sampleList extends Composite implements HasLayout
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 view.groupBy(dateCol);
+		 view.groupBy(columnDefs.get(0));
 		 		 
 		 grid = new Grid<LibraryData>(store, columnModel);
+		 forceLayout();
 		 new QuickTip(grid);
 		 grid.setView(view);
 		 
@@ -320,8 +305,8 @@ public class sampleList extends Composite implements HasLayout
 				
 			}});
 		 // Add sorting by date column to the grid
-         sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
-         grid.getStore().addSortInfo(sortByDate);
+        // sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
+         //grid.getStore().addSortInfo(sortByDate);
 
 	}
 	
@@ -543,49 +528,49 @@ public class sampleList extends Composite implements HasLayout
 		gridPanel.setHeading(title);
 	}
 	
-	@UiHandler("byFlowcell")
-	public void groupByF(SelectionEvent<Item> event)
-	{
-
-		view.groupBy(flowcellCol);
-		view.collapseAllGroups();
-
-	}
-	
-	@UiHandler("byLibrary")
-	public void groupByL(SelectionEvent<Item> event)
-	{
-		view.groupBy(libCol);
-		view.collapseAllGroups();
-	}
-	
-	@UiHandler("byProject")
-	public void groupByP(SelectionEvent<Item> event)
-	{
-		view.groupBy(projCol);
-		view.collapseAllGroups();
-		store.getSortInfo().clear();
-//		StoreSortInfo<LibraryData> sortInfo=new StoreSortInfo<LibraryData>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), dateCol.getComparator(), SortDir.DESC);	
-		store.getSortInfo().add(0, view.getLastStoreSort());
-        store.getSortInfo().add(1, sortByDate);
-
-	}
-	@UiHandler("byDate")
-	public void groupByD(SelectionEvent<Item> event)
-	{
-
-		 view.groupBy(dateCol);		 
-		 view.collapseAllGroups();
-		
-	}
-	@UiHandler("byLibType")
-	public void groupByLT(SelectionEvent<Item> event)
-	{
-
-		 view.groupBy(libTypeCol);		 
-		 view.collapseAllGroups();
-		
-	}
+//	@UiHandler("byFlowcell")
+//	public void groupByF(SelectionEvent<Item> event)
+//	{
+//
+//		view.groupBy(flowcellCol);
+//		view.collapseAllGroups();
+//
+//	}
+//	
+//	@UiHandler("byLibrary")
+//	public void groupByL(SelectionEvent<Item> event)
+//	{
+//		view.groupBy(libCol);
+//		view.collapseAllGroups();
+//	}
+//	
+//	@UiHandler("byProject")
+//	public void groupByP(SelectionEvent<Item> event)
+//	{
+//		view.groupBy(projCol);
+//		view.collapseAllGroups();
+//		store.getSortInfo().clear();
+////		StoreSortInfo<LibraryData> sortInfo=new StoreSortInfo<LibraryData>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), dateCol.getComparator(), SortDir.DESC);	
+//		store.getSortInfo().add(0, view.getLastStoreSort());
+//        store.getSortInfo().add(1, sortByDate);
+//
+//	}
+//	@UiHandler("byDate")
+//	public void groupByD(SelectionEvent<Item> event)
+//	{
+//
+//		 view.groupBy(dateCol);		 
+//		 view.collapseAllGroups();
+//		
+//	}
+//	@UiHandler("byLibType")
+//	public void groupByLT(SelectionEvent<Item> event)
+//	{
+//
+//		 view.groupBy(libTypeCol);		 
+//		 view.collapseAllGroups();
+//		
+//	}
 	@UiHandler("collapse")
 	public void colall(SelectEvent event)
 	{
@@ -740,7 +725,8 @@ public class sampleList extends Composite implements HasLayout
 		gridPanel.forceLayout();
 		content.forceLayout();
 		view.doResize();
-		grid.setHeight(Window.getClientHeight()-70);
+		if(grid != null)
+			grid.setHeight(Window.getClientHeight()-70);
 	}
 
 	@Override

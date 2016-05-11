@@ -423,7 +423,10 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				String columnsQuery = "select group_concat(metric) as c from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
 				Statement stat = myConnection.createStatement();
 				ResultSet results = stat.executeQuery(columnsQuery);
-				columns = "v.id_run_sample, " + results.getString(1);
+				if(results.next())
+					columns = "v.id_run_sample, " + results.getString(1);
+				else
+					throw new Exception("");
 			}
 			
 			// columns = queryParams.getIsSummaryOnly() ? " v.id_run_sample, geneusID_sample, analysis_id, flowcell_serial, lane, project, sample_name, processing_formatted, protocol, Date_Sequenced_formatted, if(count(distinct f.id_file_type) > 1, \"Analysis Avail\",  if(count(distinct f.id_file_type) < 1, \"Processing\", \"Reads Avail\")) as status " : " v.* ";				
@@ -431,7 +434,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			// create statement handle for executing queries
 			Statement stat = myConnection.createStatement();
 			// Get all the distinct sample_names for the given projectName
-			String selectQuery = "select" + columns + " from main_lib_view v left join file f on f.id_run_sample = v.id_run_sample and f.id_file_type IN (40,41,51,33,14,38,54) " + where + " group by v.id_run_sample ORDER BY Date_Sequenced_formatted DESC";
+			String selectQuery = "select " + columns + " from main_lib_view v left join file f on f.id_run_sample = v.id_run_sample and f.id_file_type IN (40,41,51,33,14,38,54) " + where + " group by v.id_run_sample ORDER BY Date_Sequenced_formatted DESC";
 			logWriter("SQL Query: " + selectQuery);
 			ResultSet results = stat.executeQuery(selectQuery);
 			HashMap<String, HashMap<String, String>> qcTypes = getQCTypes();
@@ -988,6 +991,44 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	{
 		this.logWriter(this.getThreadLocalRequest(), text);
 		return null; //return null since gwt asyncs need a return val
+	}
+
+	//get a list of the summary-only columns used for browsing the list of samples
+	@Override
+	public ArrayList<String> getSummaryColumns() 
+	{
+		java.sql.Connection myConnection = null;
+		ArrayList<String> columns = new ArrayList<>();
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+	
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			// get database details from param file
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String columnsQuery = "select metric from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(columnsQuery);
+				while(results.next())
+					columns.add(results.getString(1));			
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return columns;
 	}
 
 }

@@ -28,4 +28,6 @@ public interface ECServiceAsync
 
 	void getWorkflowParams(String flowcell, AsyncCallback<String> callback);
 	void logWriter(String text, AsyncCallback<String> callback);
+
+	void getSummaryColumns(AsyncCallback<ArrayList<String>> callback);
 }
