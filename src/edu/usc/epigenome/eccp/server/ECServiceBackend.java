@@ -366,7 +366,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			// get database details from param file
 			String username = prop.getProperty("dbUserName");
 			String password = prop.getProperty("dbPassword");
-
+			
 			// URL to connect to the database
 			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
 		
@@ -386,11 +386,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 			if (request != null && request.getUserPrincipal() != null)
 			{
 				// debug for user role checking
-				if (request.isUserInRole("ECCPWebAdmin"))
-					logWriter("ECCPWebAdmin group");
-				if (request.isUserInRole("solexaWebData"))
-					logWriter("solexaWebData group");
-				
+				if (request.isUserInRole(prop.getProperty("adminGroup")))
+					logWriter(prop.getProperty("adminGroup"));
+				if (request.isUserInRole(prop.getProperty("userGroup")))
+					logWriter(prop.getProperty("userGroup"));
+			
 				//logWriter("Query:" + request.getQueryString());
 				logWriter("URI:" + request.getRequestURL() + "  REF:" + request.getHeader("referer") );
 				//logWriter("map size:" + request.getParameterMap().size());
@@ -400,9 +400,9 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				MultiMap<String> params = new MultiMap<String>();
 				if(url.getQuery() != null)
 					UrlEncoded.decodeTo(url.getQuery(), params, "UTF-8");
-				if(request.isUserInRole("ECCPWebAdmin") && params.containsKey("superquery"))
+				if(request.isUserInRole(prop.getProperty("adminGroup")) && params.containsKey("superquery"))
 					where += decryptTextMD5(params.getString("superquery")) + " AND ";
-				else if (!request.isUserInRole("ECCPWebAdmin") || params.containsKey("t") || params.containsKey("q"))
+				else if (!request.isUserInRole(prop.getProperty("adminGroup")) || params.containsKey("t") || params.containsKey("q"))
 				{
 					String contents = "";
 					if(params.containsKey("t"))
@@ -412,7 +412,15 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 					if(contents.length() < 3)
 						contents = "NOTHINGBUTGARBAGE";
 					logWriter("URL PARAM DEC: " + contents);
-					where += "MATCH(project, sample_name, organism, technician, flowcell_serial, geneusID_sample) against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
+					
+					String columns = "";
+					String columnsQuery = "select group_concat(metric) as c from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
+					Statement stat = myConnection.createStatement();
+					ResultSet results = stat.executeQuery(columnsQuery);
+					if(results.next())
+						columns = results.getString(1);
+					
+					where += "MATCH(" + columns + ") against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
 				}
 			}
 			
@@ -995,18 +1003,16 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 	//get a list of the summary-only columns used for browsing the list of samples
 	@Override
-	public ArrayList<String> getSummaryColumns() 
+	public ArrayList<LibraryProperty> getSummaryColumns() 
 	{
 		java.sql.Connection myConnection = null;
-		ArrayList<String> columns = new ArrayList<>();
+		ArrayList<LibraryProperty> columns = new ArrayList<>();
 		try{
 			//load a properties file with db info
 			Properties prop = new Properties();
-			
 			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
-	
-			Class.forName(prop.getProperty("dbDriver")).newInstance();
 			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
 			String username = prop.getProperty("dbUserName");
 			String password = prop.getProperty("dbPassword");
 	
@@ -1018,11 +1024,18 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	
 			if (myConnection != null)
 			{
-				String columnsQuery = "select metric from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
+				String columnsQuery = "select metric, pretty_name, description from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
 				Statement stat = myConnection.createStatement();
 				ResultSet results = stat.executeQuery(columnsQuery);
 				while(results.next())
-					columns.add(results.getString(1));			
+				{
+					LibraryProperty l = new LibraryProperty();
+					l.setName(results.getString(1));
+					l.setPrettyName(results.getString(2));
+					l.setDescription(results.getString(3));
+					l.setValue("NULL");
+					columns.add(l);
+				}
 			}
 		}	catch(Exception e)
 		{

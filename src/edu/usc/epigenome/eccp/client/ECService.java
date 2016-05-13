@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 
 /**
  * The client side stub for the RPC service.
@@ -26,5 +27,5 @@ public interface ECService extends RemoteService
 	String getIlluminaParams(String flowcell);
 	String getWorkflowParams(String flowcell);
 	String logWriter(String text);
-	ArrayList<String> getSummaryColumns();
+	ArrayList<LibraryProperty> getSummaryColumns();
 }

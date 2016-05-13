@@ -1,7 +1,7 @@
 package edu.usc.epigenome.eccp.client.sampleList;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -24,9 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 //import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.Store;
-import com.sencha.gxt.data.shared.Store.StoreSortInfo;
 //import com.sencha.gxt.dnd.core.client.DndDropEvent;
 //import com.sencha.gxt.dnd.core.client.DropTarget;
 import com.sencha.gxt.dnd.core.client.GridDragSource;
@@ -66,6 +64,7 @@ import edu.usc.epigenome.eccp.client.ECServiceAsync;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataModelFactory;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 import edu.usc.epigenome.eccp.client.events.ECCPEventBus;
 import edu.usc.epigenome.eccp.client.events.ShowGlobalTabEvent;
 import edu.usc.epigenome.eccp.client.sampleReport.DownloadGridWidget;
@@ -87,39 +86,29 @@ public class sampleList extends Composite implements HasLayout
 	@UiField VerticalLayoutContainer content;
 	@UiField VerticalLayoutContainer vlc;
 	@UiField TextButton share;
+	@UiField Menu splitButtonMenu;
 	//@UiField TextButton analyze;
 	@UiField ToolBar toolbar;
 	TextButton userManual = new TextButton("HELP");
 		
 	ResizeGroupingView<LibraryData> view = new ResizeGroupingView<LibraryData>();
-	StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
-		@Override
-		protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) {	
-			    return 
-						item.get("project").getValue().toLowerCase().contains(filter.toLowerCase()) || 
-						item.get("sample_name").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
-						item.get("flowcell_serial").getValue().toLowerCase().contains(filter.toLowerCase()) ||  
-						item.get("analysis_id").getValue().toLowerCase().contains(filter.toLowerCase()) ||
-						item.get("geneusID_sample").getValue().toLowerCase().contains(filter.toLowerCase());
-					
-		}
-		
-	};
+	
 	String mode = "user";
 	ColumnModel<LibraryData> columnModel;
 	ListStore<LibraryData> store;
 	ArrayList<LibraryData> completeData= new ArrayList<LibraryData>();
 	Grid<LibraryData> grid;
-	//StoreSortInfo<LibraryData> sortByDate;
+	StoreFilterField<LibraryData> SearchFilter;
 	MenuItem menuItem;
 	List<ColumnConfig<LibraryData, ?>> columnDefs = new ArrayList<ColumnConfig<LibraryData, ?>>();
 	//Comparator<String>  dateComparator;
+	//StoreSortInfo<LibraryData> sortByDate;
 
 	@UiConstructor
 	public sampleList() 
 	{
 		initWidget(uiBinder.createAndBindUi(this));
-		myServer.getSummaryColumns(new AsyncCallback<ArrayList<String>>(){
+		myServer.getSummaryColumns(new AsyncCallback<ArrayList<LibraryProperty>>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -128,79 +117,44 @@ public class sampleList extends Composite implements HasLayout
 			}
 
 			@Override
-			public void onSuccess(ArrayList<String> result) {
+			public void onSuccess(ArrayList<LibraryProperty> result) {
 				createGrid(result);
 				
 			}});
 	    
 	  //  setUserManualLink();
 	    setUserManualButton();
-	    gridPanel.addTool(filter);	   
-	    filter.setEmptyText("Search...");
+	    
 	    //hide share button when already in a shared search 
 //	    if(Window.Location.getQueryString().length() > 0 || Window.Location.getHref().contains("ecdp-demo") ) {
 //	    	    toolbar.remove(share);
 //	    	    analyze.disable();
 //	    }
 
-	    filter.addKeyDownHandler(new KeyDownHandler(){
 
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				
-		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	//System.out.println("Here in key down");
-		        	
-		        	String text = filter.getText().toLowerCase();
-		        	List<LibraryData> tmp = new ArrayList<LibraryData>();
-		        	for (LibraryData item : completeData) 
-		        	{
-		        		try 
-		        		{
-		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
-		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
-		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
-		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
-		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text) ||
-		        					item.get("processing_formatted").getValue().toLowerCase().contains(text))
-		        				tmp.add(item);
-		        		} 
-		        		catch (Exception e) 
-		        		{
-		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.toString());
-		        		}
-		        	}
-
-		        	store.replaceAll(tmp);
-		        	tmp.clear();
-		        	logToServer("Search:"+text); 
-		        }	
-			}	    	
-	    });
-	    filter.addTriggerClickHandler(new TriggerClickHandler(){
-
-			@Override
-			public void onTriggerClick(TriggerClickEvent event) {
-				store.replaceAll(completeData);
-				filter.setEmptyText("Search...");
-			//	System.out.println("Reset clicked");
-				logToServer("SearchReset"); 
-			}
-	    	
-	    });
-	    if(Window.Location.getQueryString().contains("GODMODE") && !Window.Location.getHref().contains("ecdp-demo"))
-	    	godmode();
-	    
+	   
 	}
-	
-	public void createGrid(ArrayList<String> columns) {
+	public void createGrid(ArrayList<LibraryProperty> columns) {
 		
 		
 		//SET UP COLUMNS
-		for(String column : columns)
+		for(LibraryProperty column : columns)
 		{
-			ColumnConfig<LibraryData, String> cf =  new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider(column), 100, column);
+			String prettyName = column.getPrettyName() == null ? column.getName() : column.getPrettyName();
+			final ColumnConfig<LibraryData, String> cf =  new ColumnConfig<LibraryData, String>(LibraryDataModelFactory.getValueProvider(column.getName()), 100, prettyName);
+			cf.setToolTip(column.getDescription() == null ? column.getName() : column.getDescription());
 			columnDefs.add(cf);
+			
+			//add "group-by" menu entries
+			MenuItem m = new MenuItem("Group by " + prettyName);
+			m.addSelectionHandler(new SelectionHandler<Item>(){
+				@Override
+				public void onSelection(SelectionEvent<Item> event) 
+				{
+					view.groupBy(cf);
+					view.collapseAllGroups();
+				}});
+			splitButtonMenu.add(m);
 		}
 		
 		 
@@ -273,8 +227,7 @@ public class sampleList extends Composite implements HasLayout
 			
 		});
          
-         contextMenu();
-		// filter.bind(store);
+         createContextMenu();
 		 content.add(grid);
 		 LibraryDataQuery query = new LibraryDataQuery();
 		 query.setIsSummaryOnly(true);
@@ -304,11 +257,83 @@ public class sampleList extends Composite implements HasLayout
 					info.show(new DefaultInfoConfig("Notice", "1200 of " + result.size() + "  records are displayed, use search box to see all"));
 				
 			}});
-		 // Add sorting by date column to the grid
-        // sortByDate = new StoreSortInfo<LibraryData>(dateCol.getValueProvider(), dateCol.getComparator(), SortDir.DESC);
-         //grid.getStore().addSortInfo(sortByDate);
+		 
+		 //add search
+		 createSearchForm(columns);
+		 
+	}
+	
+	public void createSearchForm(final ArrayList<LibraryProperty> columnsToSearch)
+	{
+		final StoreFilterField<LibraryData> filter = new StoreFilterField<LibraryData>() {
+			@Override
+			protected boolean doSelect(Store<LibraryData> store, LibraryData parent,LibraryData item, String filter) 
+			{
+				
+				for(LibraryProperty p: columnsToSearch)
+					if(item.get(p.getName()).getValue().toLowerCase().contains(filter.toLowerCase()))
+						return true;
+				return false;				
+						
+			}
+			
+		};
+		SearchFilter = filter;
+		gridPanel.addTool(filter);
+		filter.bind(store);
+	    filter.setEmptyText("Search...");
+	    filter.addTriggerClickHandler(new TriggerClickHandler(){
+
+			@Override
+			public void onTriggerClick(TriggerClickEvent event) {
+				store.replaceAll(completeData);
+				filter.setEmptyText("Search...");
+			//	System.out.println("Reset clicked");
+				logToServer("SearchReset"); 
+			}
+	    	
+	    });
+	    if(Window.Location.getQueryString().contains("GODMODE") && !Window.Location.getHref().contains("ecdp-demo"))
+	    	godmode();
+	    
+	    filter.addKeyDownHandler(new KeyDownHandler(){
+
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				
+		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+		        	//System.out.println("Here in key down");
+		        	
+		        	String text = filter.getText().toLowerCase();
+		        	List<LibraryData> searchResults = new ArrayList<LibraryData>();
+		        	for (LibraryData item : completeData) 
+		        	{
+		        		try 
+		        		{
+		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
+		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
+		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
+		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
+		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text) ||
+		        					item.get("processing_formatted").getValue().toLowerCase().contains(text))
+		        				searchResults.add(item);
+		        		} 
+		        		catch (Exception e) 
+		        		{
+		        			logToServer("Search:" +text+ " is throwing a NULL exception, because some of the attributes are null: " + item.toString());
+		        		}
+		        	}
+
+		        	store.replaceAll(searchResults);
+		        	searchResults.clear();
+		        	logToServer("Search:"+text); 
+		        }	
+			}	    	
+	    });
 
 	}
+	
+	
 	
 	public void getContextData(final LibraryData library) {
 		 LibraryDataQuery query = new LibraryDataQuery();
@@ -363,7 +388,7 @@ public class sampleList extends Composite implements HasLayout
 				}}});		   
 	}
 	
-	public void contextMenu() {
+	public void createContextMenu() {
 		     Menu contextMenu= new Menu();
 	         final MenuItem openQCGrid = new MenuItem();
 	         openQCGrid.setText("QC window");
@@ -528,49 +553,7 @@ public class sampleList extends Composite implements HasLayout
 		gridPanel.setHeading(title);
 	}
 	
-//	@UiHandler("byFlowcell")
-//	public void groupByF(SelectionEvent<Item> event)
-//	{
-//
-//		view.groupBy(flowcellCol);
-//		view.collapseAllGroups();
-//
-//	}
-//	
-//	@UiHandler("byLibrary")
-//	public void groupByL(SelectionEvent<Item> event)
-//	{
-//		view.groupBy(libCol);
-//		view.collapseAllGroups();
-//	}
-//	
-//	@UiHandler("byProject")
-//	public void groupByP(SelectionEvent<Item> event)
-//	{
-//		view.groupBy(projCol);
-//		view.collapseAllGroups();
-//		store.getSortInfo().clear();
-////		StoreSortInfo<LibraryData> sortInfo=new StoreSortInfo<LibraryData>(LibraryDataModelFactory.getValueProvider("Date_Sequenced"), dateCol.getComparator(), SortDir.DESC);	
-//		store.getSortInfo().add(0, view.getLastStoreSort());
-//        store.getSortInfo().add(1, sortByDate);
-//
-//	}
-//	@UiHandler("byDate")
-//	public void groupByD(SelectionEvent<Item> event)
-//	{
-//
-//		 view.groupBy(dateCol);		 
-//		 view.collapseAllGroups();
-//		
-//	}
-//	@UiHandler("byLibType")
-//	public void groupByLT(SelectionEvent<Item> event)
-//	{
-//
-//		 view.groupBy(libTypeCol);		 
-//		 view.collapseAllGroups();
-//		
-//	}
+
 	@UiHandler("collapse")
 	public void colall(SelectEvent event)
 	{
@@ -586,13 +569,15 @@ public class sampleList extends Composite implements HasLayout
 	@UiHandler("share")
 	public void share(SelectEvent event)
 	{
-		 if(filter.getText().length() < 3 || filter.getText().contains("Search..."))
+		if(SearchFilter == null)
+			return;
+		 if(SearchFilter.getText().length() < 3 || SearchFilter.getText().contains("Search..."))
 		 {
 			 Info.display("Error", "enter something is the search box before you can share");
 			 return;
 		 }
 		 
-		 myServer.getEncryptedData(filter.getText(), new AsyncCallback<ArrayList<String>>(){
+		 myServer.getEncryptedData(SearchFilter.getText(), new AsyncCallback<ArrayList<String>>(){
 			@Override
 			public void onFailure(Throwable caught)
 			{
@@ -602,7 +587,8 @@ public class sampleList extends Composite implements HasLayout
 			public void onSuccess(ArrayList<String> result)
 			{
 				 TextArea text = new TextArea();
-				 text.setText("https://webapp.epigenome.usc.edu/gareports/ECControlCenter.html?t=" + result.get(0));
+				 ;
+				 text.setText(Window.Location.getHref() + "?t=" + result.get(0));
 				 final Dialog simple = new Dialog();
 				 simple.setHeading("This link will take you directly to the search results");
 				 simple.setPredefinedButtons(PredefinedButton.OK);
@@ -719,8 +705,8 @@ public class sampleList extends Composite implements HasLayout
 			}});
 	    toolbar.add(userManual);
 	}
-	public void forceLayout() {
-		// TODO Auto-generated method stub
+	public void forceLayout() 
+	{
 		vlc.forceLayout();
 		gridPanel.forceLayout();
 		content.forceLayout();

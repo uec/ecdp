@@ -26,25 +26,9 @@
 		</container:child>
 		<container:child layoutData='{toolBarRowData}'>
 			<toolbar:ToolBar ui:field="toolbar">
-				<button:SplitButton text="Sort">
+				<button:SplitButton text="Group By">
 					<button:menu>
-						<menu:Menu ui:field="splitButtonMenu">
-							<menu:MenuItem ui:field="byFlowcell">
-								<b>By Flowcell Serial</b>
-							</menu:MenuItem>
-							<menu:MenuItem ui:field="byLibrary">
-								<b>By Library Name</b>
-							</menu:MenuItem>
-							<menu:MenuItem ui:field="byDate">
-								<b>By Date</b>
-							</menu:MenuItem>
-							<menu:MenuItem ui:field="byProject">
-								<b>By Project</b>
-							</menu:MenuItem>
-							<menu:MenuItem ui:field="byLibType">
-								<b>By Library Type</b>
-							</menu:MenuItem>
-						</menu:Menu>
+						<menu:Menu ui:field="splitButtonMenu"/>										
 					</button:menu>
 				</button:SplitButton>
 

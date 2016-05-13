@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import edu.usc.epigenome.eccp.client.data.LibraryData;
 import edu.usc.epigenome.eccp.client.data.LibraryDataQuery;
+import edu.usc.epigenome.eccp.client.data.LibraryProperty;
 
 
 /**
@@ -29,5 +30,5 @@ public interface ECServiceAsync
 	void getWorkflowParams(String flowcell, AsyncCallback<String> callback);
 	void logWriter(String text, AsyncCallback<String> callback);
 
-	void getSummaryColumns(AsyncCallback<ArrayList<String>> callback);
+	void getSummaryColumns(AsyncCallback<ArrayList<LibraryProperty>> callback);
 }
