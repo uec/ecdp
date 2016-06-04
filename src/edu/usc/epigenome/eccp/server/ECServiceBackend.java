@@ -12,6 +12,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -1006,7 +1007,7 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 	public ArrayList<LibraryProperty> getSummaryColumns() 
 	{
 		java.sql.Connection myConnection = null;
-		ArrayList<LibraryProperty> columns = new ArrayList<>();
+		ArrayList<LibraryProperty> columns = new ArrayList<LibraryProperty>();
 		try{
 			//load a properties file with db info
 			Properties prop = new Properties();
@@ -1043,5 +1044,210 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 		}
 		return columns;
 	}
-
+	
+	//insert a new analysis and return the id;
+	public int insertAnalysis(String ExperimentID,String SampleID, String AnalysisID)
+	{
+		int rsid = -1;
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "CALL insert_lane(?,?,?)";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setString(1, ExperimentID);
+				query.setString(2, SampleID);
+				query.setString(3, AnalysisID);
+				ResultSet results = query.executeQuery();
+				
+				while(results.next())
+					rsid = results.getInt(1);
+				
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return rsid;
+	}
+	
+	public void insertMetric(int ResultSetID, String metricName, String metricValue)
+	{
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "CALL insert_metric(?,?,?)";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setInt(1, ResultSetID);
+				query.setString(2, metricName);
+				query.setString(3, metricValue);
+				query.executeUpdate();
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void insertMetric(int ResultSetID, String metricName, String metricValue,int fileID)
+	{
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "CALL Ninsert_metric(?,?,?,?,?,?,?)";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setInt(1, ResultSetID);
+				query.setString(2, metricName);
+				query.setString(3, metricValue);
+				query.setInt(4, 4); ///default category if metric does not exist
+				query.setInt(5, 11); //default type if file_type does not exist
+				query.setInt(6, fileID);
+				query.setInt(7, 0); // not used, so 0
+				query.executeUpdate();
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public int insertFileURI(String Path, int ResultSetID, long fileSize)
+	{
+		int fileId = -1;
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "CALL Ninsert_file(?,?,?)";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setString(1, Path);
+				query.setInt(2, ResultSetID);
+				query.setLong(3, fileSize);
+				ResultSet results = query.executeQuery();
+				
+				while(results.next())
+					fileId = results.getInt(1);
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return fileId;
+	}
+	public void deleteAnalysis(String AnalysisID)
+	{
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "delete from run_sample where analysis_id = ?";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setString(1, AnalysisID);
+				query.executeUpdate();
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public void generateDB()
+	{
+		java.sql.Connection myConnection = null;
+		try{
+			//load a properties file with db info
+			Properties prop = new Properties();
+			prop.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("config.properties"));
+			// get database details from param file
+			Class.forName(prop.getProperty("dbDriver")).newInstance();
+			String username = prop.getProperty("dbUserName");
+			String password = prop.getProperty("dbPassword");
+	
+			// URL to connect to the database
+			String dbURL = prop.getProperty("dbConnetion") + username + "&password=" + password;
+		
+			// create the connection
+			myConnection = DriverManager.getConnection(dbURL);
+	
+			if (myConnection != null)
+			{
+				String queryString = "call run_metric_dynamic_crosstab()";
+				PreparedStatement query = myConnection.prepareStatement(queryString);
+				query.setQueryTimeout(3600);
+				query.executeUpdate();
+			}
+		}	catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

@@ -248,13 +248,19 @@ public class sampleList extends Composite implements HasLayout
 					Info.display("Security Error","Access denied. Check your links or contact the Epigenome Center");
 				completeData = result;
 				ArrayList<LibraryData> partialData = new ArrayList<LibraryData>();
-				for(int i = 0; i < 1200 && i < result.size(); i++)
-					partialData.add(result.get(i));
-				populateGrid(partialData);
 				Info info = new Info();
+				for(int i = 0; i < 1000 && i < result.size(); i++)
+				{
+					partialData.add(result.get(i));
+					LibraryData d =  result.get(i);
+					String s = d.get("project").getValue();
+					s.length();
+				}
+				populateGrid(partialData);
+				
 				info.setPosition(100,100); // setting the position doesn't work
 				if(result.size() > 1200)
-					info.show(new DefaultInfoConfig("Notice", "1200 of " + result.size() + "  records are displayed, use search box to see all"));
+					info.show(new DefaultInfoConfig("Notice", "1000 of " + result.size() + "  records are displayed, use search box to see all"));
 				
 			}});
 		 
@@ -306,17 +312,26 @@ public class sampleList extends Composite implements HasLayout
 		        	
 		        	String text = filter.getText().toLowerCase();
 		        	List<LibraryData> searchResults = new ArrayList<LibraryData>();
+		        	outer:
 		        	for (LibraryData item : completeData) 
 		        	{
 		        		try 
 		        		{
-		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
-		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
-		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
-		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
-		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text) ||
-		        					item.get("processing_formatted").getValue().toLowerCase().contains(text))
-		        				searchResults.add(item);
+		        			for(LibraryProperty p : columnsToSearch)
+			        		{
+			        			if(item.get(p.getName()).getValue().toLowerCase().contains(text))
+			        			{
+			        				searchResults.add(item);
+			        				continue outer;
+			        			}
+			        		}
+//		        			if (item.get("project").getValue().toLowerCase().contains(text) || 
+//		        					item.get("sample_name").getValue().toLowerCase().contains(text) ||  
+//		        					item.get("flowcell_serial").getValue().toLowerCase().contains(text) ||  
+//		        					item.get("analysis_id").getValue().toLowerCase().contains(text) ||
+//		        					item.get("geneusID_sample").getValue().toLowerCase().contains(text) ||
+//		        					item.get("processing_formatted").getValue().toLowerCase().contains(text))
+//		        				searchResults.add(item);
 		        		} 
 		        		catch (Exception e) 
 		        		{
