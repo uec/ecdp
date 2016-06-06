@@ -1,0 +1,29 @@
+{
+   "experimentID":"myExp564",
+   "sampleId":"ABC23",
+   "analysisID":"Run2_For_ABC455",
+   "metrics":[
+      {
+         "metricName":"Date_Sequenced",
+         "metricValue":"Jan 22 2016"
+      },
+      {
+         "metricName":"project",
+         "metricValue":"ABC project",
+         "metricFileName":"http://path-an-file.bam",
+         "metricFileSize":123123
+      },
+      {
+         "metricName":"sample_name",
+         "metricValue":"abc my sample"
+      },
+      {
+         "metricFileName":"s3://asdasd.asdad/123123.bam",
+         "metricFileSize":123123
+      },
+      {
+         "metricName":"processing",
+         "metricValue":"nomeseq"
+      }
+   ]
+}

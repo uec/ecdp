@@ -164,7 +164,7 @@ public class sampleList extends Composite implements HasLayout
 		 view.setShowGroupedColumn(false);
 		 view.setStripeRows(true);
 		 view.setForceFit(true);
-		 view.groupBy(columnDefs.get(0));
+		 //view.groupBy(columnDefs.get(0));
 		 		 
 		 grid = new Grid<LibraryData>(store, columnModel);
 		 forceLayout();
@@ -727,7 +727,7 @@ public class sampleList extends Composite implements HasLayout
 		content.forceLayout();
 		view.doResize();
 		if(grid != null)
-			grid.setHeight(Window.getClientHeight()-70);
+			grid.setHeight(Window.getClientHeight()-100);
 	}
 
 	@Override
