@@ -384,6 +384,33 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 
 			//filter based upon user ldap group!
 			HttpServletRequest request = this.getThreadLocalRequest();
+			MultiMap<String> params = new MultiMap<String>();
+			URL url = new URL(request.getHeader("referer"));
+			if(url.getQuery() != null)
+				UrlEncoded.decodeTo(url.getQuery(), params, "UTF-8");
+			if (params.containsKey("t") || params.containsKey("q"))
+			{
+				String contents = "";
+				if(params.containsKey("t"))
+					contents += decryptTextMD5(params.getString("t"));
+				if(params.containsKey("q"))
+					contents += "  " + decryptTextMD5(params.getString("q"));
+				if(contents.length() < 3)
+					contents = "NOTHINGBUTGARBAGE";
+				logWriter("URL PARAM DEC: " + contents);
+				
+				String columns = "";
+				//ZR KLUDGE!!! we hardcode the exclusion of "formatted" metric columns from the view since mariadb fails when they are in a MATCH call. 
+				String columnsQuery = "select group_concat(metric) as c from metric where ShowInSampleBrowser > 0 AND metric NOT LIKE '%ormatted%' order by ShowInSampleBrowser ASC";
+				Statement stat = myConnection.createStatement();
+				ResultSet results = stat.executeQuery(columnsQuery);
+				if(results.next())
+					columns = results.getString(1);
+				
+				where += "MATCH(" + columns + ") against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
+			}
+			
+			
 			if (request != null && request.getUserPrincipal() != null)
 			{
 				// debug for user role checking
@@ -397,32 +424,11 @@ public class ECServiceBackend extends RemoteServiceServlet implements ECService
 				//logWriter("map size:" + request.getParameterMap().size());
 				//logWriter("ref:" + request.getHeader("referer"));
 				
-				URL url = new URL(request.getHeader("referer"));
-				MultiMap<String> params = new MultiMap<String>();
 				if(url.getQuery() != null)
 					UrlEncoded.decodeTo(url.getQuery(), params, "UTF-8");
 				if(request.isUserInRole(prop.getProperty("adminGroup")) && params.containsKey("superquery"))
 					where += decryptTextMD5(params.getString("superquery")) + " AND ";
-				else if (!request.isUserInRole(prop.getProperty("adminGroup")) || params.containsKey("t") || params.containsKey("q"))
-				{
-					String contents = "";
-					if(params.containsKey("t"))
-						contents += decryptTextMD5(params.getString("t"));
-					if(params.containsKey("q"))
-						contents += "  " + decryptTextMD5(params.getString("q"));
-					if(contents.length() < 3)
-						contents = "NOTHINGBUTGARBAGE";
-					logWriter("URL PARAM DEC: " + contents);
-					
-					String columns = "";
-					String columnsQuery = "select group_concat(metric) as c from metric where ShowInSampleBrowser > 0 order by ShowInSampleBrowser ASC";
-					Statement stat = myConnection.createStatement();
-					ResultSet results = stat.executeQuery(columnsQuery);
-					if(results.next())
-						columns = results.getString(1);
-					
-					where += "MATCH(" + columns + ") against ('+"+ contents + "' IN BOOLEAN MODE) AND ";
-				}
+				
 			}
 			
 			where += "0=0";         
