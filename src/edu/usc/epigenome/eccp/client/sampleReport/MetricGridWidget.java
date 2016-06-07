@@ -307,7 +307,7 @@ public class MetricGridWidget extends Composite implements HasLayout{
 				ArrayList<LibraryData> droppedSummarizedLibs = (ArrayList<LibraryData>) event.getData();
 		        for(LibraryData summarizedLibrary : droppedSummarizedLibs)
 		        {
-		        	logToServer("Libraries Dragged and Dropped to Metrics: " +  summarizedLibrary.get("flowcell_serial").getValue() + ":" + summarizedLibrary.get("geneusID_sample").getValue());
+		        	logToServer("Libraries Dragged and Dropped to Metrics: " +  summarizedLibrary.toString());
 					 LibraryDataQuery query = new LibraryDataQuery();
 					 query.setIsSummaryOnly(false);
 					 query.setGetFiles(true);

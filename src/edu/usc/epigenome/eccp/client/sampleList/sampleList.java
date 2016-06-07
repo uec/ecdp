@@ -416,7 +416,7 @@ public class sampleList extends Composite implements HasLayout
 				//	Info.display("Info","Open QC window clicked");
 					LibraryData library = grid.getSelectionModel().getSelectedItem();
 					menuItem = openQCGrid;
-					logToServer("View Metrics Context click: " +  library.get("flowcell_serial").getValue() + ":" + library.get("geneusID_sample").getValue());
+					logToServer("View Metrics Context click: " +  library.toString());
 					getContextData(library);
 											 					
 				}});
@@ -430,7 +430,7 @@ public class sampleList extends Composite implements HasLayout
 					//	Info.display("Info","Download Files window clicked");
 						LibraryData library = grid.getSelectionModel().getSelectedItem();
 						menuItem = openDownloadFiles;
-						logToServer("Download Files Context click: " +  library.get("flowcell_serial").getValue() + ":" + library.get("geneusID_sample").getValue());
+						logToServer("Download Files Context click: " +  library.toString());
 						getContextData(library);
 												 					
 					}});
@@ -443,7 +443,7 @@ public class sampleList extends Composite implements HasLayout
 					public void onSelection(SelectionEvent<Item> event) {
 						LibraryData library = grid.getSelectionModel().getSelectedItem();
 						menuItem = spreadSheet;
-						logToServer("To-Spreadsheet Context click: " +  library.get("flowcell_serial").getValue() + ":" + library.get("geneusID_sample").getValue());
+						logToServer("To-Spreadsheet Context click: " +  library.toString());
 						getContextData(library);
 												 					
 					}});
